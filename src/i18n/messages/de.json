@@ -1,0 +1,74 @@
+{
+  "common": {
+    "addToCart": "In den Warenkorb",
+    "checkout": "Zur Kasse",
+    "search": "Suchen",
+    "home": "Startseite",
+    "products": "Produkte",
+    "cart": "Warenkorb",
+    "account": "Konto",
+    "signIn": "Anmelden",
+    "signOut": "Abmelden",
+    "loading": "Laden...",
+    "error": "Etwas ist schiefgelaufen",
+    "tryAgain": "Erneut versuchen",
+    "back": "Zurück",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "currency": "CHF"
+  },
+  "products": {
+    "title": "Produkte",
+    "featured": "Empfohlene Produkte",
+    "noResults": "Keine Produkte gefunden",
+    "filters": {
+      "category": "Kategorie",
+      "price": "Preis",
+      "sort": "Sortierung"
+    },
+    "addedToCart": "Zum Warenkorb hinzugefügt"
+  },
+  "cart": {
+    "title": "Warenkorb",
+    "empty": "Dein Warenkorb ist leer",
+    "subtotal": "Zwischensumme",
+    "shipping": "Versand",
+    "tax": "MwSt.",
+    "total": "Gesamtsumme",
+    "remove": "Entfernen",
+    "continueShopping": "Weiter einkaufen"
+  },
+  "checkout": {
+    "title": "Kasse",
+    "shipping": {
+      "title": "Lieferadresse",
+      "name": "Name",
+      "address": "Adresse",
+      "city": "Stadt",
+      "zip": "PLZ",
+      "country": "Land"
+    },
+    "payment": {
+      "title": "Zahlung"
+    },
+    "review": {
+      "title": "Bestellung überprüfen"
+    },
+    "success": {
+      "title": "Bestellung bestätigt",
+      "message": "Vielen Dank für deine Bestellung!"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "revenue": "Umsatz",
+      "orders": "Bestellungen",
+      "products": "Produkte",
+      "customers": "Kunden"
+    }
+  }
+}

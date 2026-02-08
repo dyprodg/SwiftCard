@@ -1,0 +1,74 @@
+{
+  "common": {
+    "addToCart": "Add to Cart",
+    "checkout": "Checkout",
+    "search": "Search",
+    "home": "Home",
+    "products": "Products",
+    "cart": "Cart",
+    "account": "Account",
+    "signIn": "Sign In",
+    "signOut": "Sign Out",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "tryAgain": "Try Again",
+    "back": "Back",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "currency": "CHF"
+  },
+  "products": {
+    "title": "Products",
+    "featured": "Featured Products",
+    "noResults": "No products found",
+    "filters": {
+      "category": "Category",
+      "price": "Price",
+      "sort": "Sort"
+    },
+    "addedToCart": "Added to cart"
+  },
+  "cart": {
+    "title": "Cart",
+    "empty": "Your cart is empty",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "total": "Total",
+    "remove": "Remove",
+    "continueShopping": "Continue Shopping"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "shipping": {
+      "title": "Shipping Address",
+      "name": "Name",
+      "address": "Address",
+      "city": "City",
+      "zip": "ZIP Code",
+      "country": "Country"
+    },
+    "payment": {
+      "title": "Payment"
+    },
+    "review": {
+      "title": "Review Order"
+    },
+    "success": {
+      "title": "Order Confirmed",
+      "message": "Thank you for your order!"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Dashboard",
+      "revenue": "Revenue",
+      "orders": "Orders",
+      "products": "Products",
+      "customers": "Customers"
+    }
+  }
+}
