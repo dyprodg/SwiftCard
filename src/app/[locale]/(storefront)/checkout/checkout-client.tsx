@@ -20,6 +20,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Form,
   FormControl,
   FormField,
@@ -30,6 +37,7 @@ import {
 import { useCartStore, selectSubtotal, selectTotalItems } from "@/stores/cart-store";
 import { formatPrice } from "@/lib/utils/format-price";
 import { checkoutFormSchema, type CheckoutFormValues } from "@/lib/validations/checkout";
+import { SHIPPING_COUNTRIES } from "@/lib/constants/countries";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -237,9 +245,20 @@ export function CheckoutClient() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>{t("shipping.country")}</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder={t("shipping.country")} />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {SHIPPING_COUNTRIES.map((country) => (
+                            <SelectItem key={country.code} value={country.code}>
+                              {locale === "de" ? country.nameDe : country.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}

@@ -13,9 +13,9 @@ export default clerkMiddleware(async (auth, req) => {
 
   const response = intlMiddleware(req);
 
-  // Set guest cart session cookie if not authenticated and no cookie exists
-  const { userId } = await auth();
-  if (!userId && !req.cookies.get("cart_session")) {
+  // Ensure cart_session cookie exists for all users (guest + logged-in)
+  // The checkout API route uses this cookie since API routes are excluded from Clerk middleware
+  if (!req.cookies.get("cart_session")) {
     const sessionId = crypto.randomUUID();
     response.cookies.set("cart_session", sessionId, {
       httpOnly: true,

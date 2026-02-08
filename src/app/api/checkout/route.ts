@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { cookies } from "next/headers";
 import { db } from "@/db";
 import { products, productVariants, shopSettings } from "@/db/schema";
 import { orders, orderItems } from "@/db/schema/orders";
 import { eq, sql } from "drizzle-orm";
 import { stripe } from "@/lib/stripe/client";
-import { getCart, cartKey, guestCartKey } from "@/lib/kv";
+import { getCart, guestCartKey } from "@/lib/kv";
 import { checkoutSchema } from "@/lib/validations/checkout";
 import { generateOrderNumber } from "@/lib/utils/order-number";
 
@@ -25,20 +24,14 @@ export async function POST(req: NextRequest) {
 
     const { shippingAddress, customerEmail, customerNote } = validation.data;
 
-    // Get cart
-    const { userId } = await auth();
-    let cartId: string;
-
-    if (userId) {
-      cartId = cartKey(userId);
-    } else {
-      const cookieStore = await cookies();
-      const sessionId = cookieStore.get("cart_session")?.value;
-      if (!sessionId) {
-        return NextResponse.json({ error: "No cart session" }, { status: 400 });
-      }
-      cartId = guestCartKey(sessionId);
+    // Get cart via cookie (works for both guests and logged-in users)
+    // API routes are excluded from Clerk middleware, so we use the cart_session cookie
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get("cart_session")?.value;
+    if (!sessionId) {
+      return NextResponse.json({ error: "No cart session" }, { status: 400 });
     }
+    const cartId = guestCartKey(sessionId);
 
     const cartItems = await getCart(cartId);
     if (cartItems.length === 0) {
@@ -137,7 +130,7 @@ export async function POST(req: NextRequest) {
           shipping: shippingCost,
           total,
           currency,
-          customerId: userId ?? null,
+          customerId: null, // Guest checkout — linked by email
           customerEmail,
           shippingName: shippingAddress.name,
           shippingAddress1: shippingAddress.address1,

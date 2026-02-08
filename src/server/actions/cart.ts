@@ -17,12 +17,9 @@ import {
 // ==================== HELPERS ====================
 
 async function getCartId(): Promise<string> {
-  const { userId } = await auth();
-
-  if (userId) {
-    return cartKey(userId);
-  }
-
+  // Always use the cart_session cookie as the cart key.
+  // This ensures the same cart is used in both server actions and API routes
+  // (API routes are excluded from the proxy/Clerk middleware matcher).
   const cookieStore = await cookies();
   const sessionId = cookieStore.get("cart_session")?.value;
 
