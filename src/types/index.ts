@@ -37,3 +37,20 @@ export type ProductWithRelations = Product & {
 export type OrderWithItems = Order & {
   items: OrderItem[];
 };
+
+// Cart types
+export type CartItem = {
+  productId: string;
+  variantId: string | null;
+  quantity: number;
+  productName: string;
+  variantName: string | null;
+  unitPrice: number; // cents
+  imageUrl: string | null;
+};
+
+// Checkout types
+export type CheckoutResponse = {
+  clientSecret: string;
+  orderId: string;
+};

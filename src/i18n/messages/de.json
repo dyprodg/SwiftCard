@@ -46,14 +46,21 @@
     "tax": "MwSt.",
     "total": "Gesamtsumme",
     "remove": "Entfernen",
-    "continueShopping": "Weiter einkaufen"
+    "continueShopping": "Weiter einkaufen",
+    "checkout": "Zur Kasse gehen",
+    "quantity": "Menge",
+    "estimatedShipping": "Wird an der Kasse berechnet",
+    "freeShipping": "Kostenlos",
+    "orderSummary": "Bestellübersicht",
+    "items": "Artikel"
   },
   "checkout": {
     "title": "Kasse",
     "shipping": {
       "title": "Lieferadresse",
-      "name": "Name",
+      "name": "Vollständiger Name",
       "address": "Adresse",
+      "address2": "Wohnung, Suite, etc. (optional)",
       "city": "Stadt",
       "zip": "PLZ",
       "country": "Land"
@@ -62,11 +69,24 @@
       "title": "Zahlung"
     },
     "review": {
-      "title": "Bestellung überprüfen"
+      "title": "Bestellübersicht"
     },
+    "email": "E-Mail",
+    "note": "Bestellnotiz (optional)",
+    "placeOrder": "Bestellung aufgeben",
+    "processing": "Wird verarbeitet...",
     "success": {
-      "title": "Bestellung bestätigt",
-      "message": "Vielen Dank für deine Bestellung!"
+      "title": "Bestellung bestätigt!",
+      "message": "Vielen Dank für deine Bestellung!",
+      "orderNumber": "Bestellnummer",
+      "paymentProcessing": "Zahlung wird verarbeitet...",
+      "continueShopping": "Weiter einkaufen",
+      "viewOrder": "Bestellung ansehen"
+    },
+    "errors": {
+      "cartEmpty": "Dein Warenkorb ist leer",
+      "paymentFailed": "Zahlung fehlgeschlagen. Bitte versuche es erneut.",
+      "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
     }
   },
   "admin": {

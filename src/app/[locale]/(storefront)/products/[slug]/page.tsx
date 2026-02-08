@@ -6,7 +6,6 @@ import { ChevronRight } from "lucide-react";
 
 import { getProductBySlug } from "@/server/queries/products";
 import { formatPrice } from "@/lib/utils/format-price";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ProductDetailClient } from "./product-detail-client";
 
@@ -108,18 +107,14 @@ export default async function ProductDetailPage({ params }: Props) {
             <p className="text-2xl font-bold">{formatPrice(product.basePrice)}</p>
           )}
 
-          {/* Variant Selector */}
-          {product.variants.length > 0 && (
-            <ProductDetailClient
-              variants={product.variants}
-              basePrice={product.basePrice}
-            />
-          )}
-
-          {/* Add to Cart placeholder */}
-          <Button size="lg" className="w-full" disabled>
-            {t("addToCart")} (Phase 3)
-          </Button>
+          {/* Variant Selector + Add to Cart */}
+          <ProductDetailClient
+            productId={product.id}
+            productName={product.name}
+            variants={product.variants}
+            basePrice={product.basePrice}
+            imageUrl={product.images[0]?.url ?? null}
+          />
 
           {/* Description */}
           {product.description && (

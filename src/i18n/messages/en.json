@@ -46,14 +46,21 @@
     "tax": "Tax",
     "total": "Total",
     "remove": "Remove",
-    "continueShopping": "Continue Shopping"
+    "continueShopping": "Continue Shopping",
+    "checkout": "Proceed to Checkout",
+    "quantity": "Quantity",
+    "estimatedShipping": "Estimated at checkout",
+    "freeShipping": "Free",
+    "orderSummary": "Order Summary",
+    "items": "items"
   },
   "checkout": {
     "title": "Checkout",
     "shipping": {
       "title": "Shipping Address",
-      "name": "Name",
+      "name": "Full Name",
       "address": "Address",
+      "address2": "Apartment, suite, etc. (optional)",
       "city": "City",
       "zip": "ZIP Code",
       "country": "Country"
@@ -62,11 +69,24 @@
       "title": "Payment"
     },
     "review": {
-      "title": "Review Order"
+      "title": "Order Summary"
     },
+    "email": "Email",
+    "note": "Order note (optional)",
+    "placeOrder": "Place Order",
+    "processing": "Processing...",
     "success": {
-      "title": "Order Confirmed",
-      "message": "Thank you for your order!"
+      "title": "Order Confirmed!",
+      "message": "Thank you for your order!",
+      "orderNumber": "Order Number",
+      "paymentProcessing": "Payment is being processed...",
+      "continueShopping": "Continue Shopping",
+      "viewOrder": "View Order"
+    },
+    "errors": {
+      "cartEmpty": "Your cart is empty",
+      "paymentFailed": "Payment failed. Please try again.",
+      "generic": "Something went wrong. Please try again."
     }
   },
   "admin": {

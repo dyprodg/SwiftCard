@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Store, ShoppingCart, User } from "lucide-react";
+import { Store, User } from "lucide-react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
+import { CartSheet } from "./cart-sheet";
 
 export async function Header() {
   const locale = await getLocale();
@@ -46,13 +47,8 @@ export async function Header() {
             </Link>
           </div>
 
-          {/* Cart */}
-          <Button variant="ghost" size="icon" asChild>
-            <Link href={`/${locale}/cart`}>
-              <ShoppingCart className="h-5 w-5" />
-              <span className="sr-only">{t("cart")}</span>
-            </Link>
-          </Button>
+          {/* Cart Sheet (client component with badge) */}
+          <CartSheet locale={locale} />
 
           {/* Auth */}
           <SignedIn>
