@@ -1,3 +1,5 @@
+import { Header } from "@/components/storefront/header";
+
 type Props = {
   children: React.ReactNode;
 };
@@ -5,7 +7,7 @@ type Props = {
 export default function StorefrontLayout({ children }: Props) {
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Header will be added in Phase 2 */}
+      <Header />
       <main className="flex-1">{children}</main>
       {/* Footer will be added later */}
     </div>

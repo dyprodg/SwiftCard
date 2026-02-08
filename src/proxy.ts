@@ -4,7 +4,7 @@ import { routing } from "./i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
-const isAdminRoute = createRouteMatcher(["/:locale/(admin)(.*)"]);
+const isAdminRoute = createRouteMatcher(["/:locale/admin(.*)"]);
 
 export default clerkMiddleware(async (auth, req) => {
   if (isAdminRoute(req)) {

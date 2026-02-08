@@ -18,12 +18,19 @@
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "create": "Erstellen",
-    "currency": "CHF"
+    "currency": "CHF",
+    "featuredProducts": "Empfohlene Produkte",
+    "viewAll": "Alle anzeigen"
   },
   "products": {
     "title": "Produkte",
     "featured": "Empfohlene Produkte",
     "noResults": "Keine Produkte gefunden",
+    "productsFound": "Produkte gefunden",
+    "categories": "Kategorien",
+    "allProducts": "Alle Produkte",
+    "addToCart": "In den Warenkorb",
+    "description": "Beschreibung",
     "filters": {
       "category": "Kategorie",
       "price": "Preis",

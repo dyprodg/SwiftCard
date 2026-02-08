@@ -1,0 +1,137 @@
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
+import { ChevronRight } from "lucide-react";
+
+import { getProductBySlug } from "@/server/queries/products";
+import { formatPrice } from "@/lib/utils/format-price";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ProductDetailClient } from "./product-detail-client";
+
+type Props = {
+  params: Promise<{ slug: string }>;
+};
+
+export default async function ProductDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const locale = await getLocale();
+  const t = await getTranslations("products");
+  const product = await getProductBySlug(slug);
+
+  if (!product || product.status !== "ACTIVE") {
+    notFound();
+  }
+
+  const primaryImage = product.images[0];
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Breadcrumb */}
+      <nav className="text-muted-foreground mb-6 flex items-center gap-1 text-sm">
+        <Link href={`/${locale}`} className="hover:text-foreground transition-colors">
+          Home
+        </Link>
+        <ChevronRight className="h-3 w-3" />
+        <Link
+          href={`/${locale}/products`}
+          className="hover:text-foreground transition-colors"
+        >
+          {t("title")}
+        </Link>
+        {product.category && (
+          <>
+            <ChevronRight className="h-3 w-3" />
+            <span>{product.category.name}</span>
+          </>
+        )}
+        <ChevronRight className="h-3 w-3" />
+        <span className="text-foreground">{product.name}</span>
+      </nav>
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        {/* Image Gallery */}
+        <div className="space-y-4">
+          <div className="relative aspect-square overflow-hidden rounded-lg border">
+            {primaryImage ? (
+              <Image
+                src={primaryImage.url}
+                alt={primaryImage.alt ?? product.name}
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                priority
+              />
+            ) : (
+              <div className="bg-muted flex h-full w-full items-center justify-center">
+                <span className="text-muted-foreground">No image</span>
+              </div>
+            )}
+          </div>
+
+          {/* Thumbnail strip */}
+          {product.images.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto">
+              {product.images.map((img, i) => (
+                <div
+                  key={img.id}
+                  className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border"
+                >
+                  <Image
+                    src={img.url}
+                    alt={img.alt ?? `${product.name} ${i + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="80px"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Product Info */}
+        <div className="space-y-6">
+          <div>
+            {product.featured && <Badge className="mb-2">Featured</Badge>}
+            <h1 className="text-3xl font-bold tracking-tight">{product.name}</h1>
+            {product.category && (
+              <p className="text-muted-foreground mt-1 text-sm">
+                {product.category.name}
+              </p>
+            )}
+          </div>
+
+          {/* Price (shown when no variants) */}
+          {product.variants.length === 0 && (
+            <p className="text-2xl font-bold">{formatPrice(product.basePrice)}</p>
+          )}
+
+          {/* Variant Selector */}
+          {product.variants.length > 0 && (
+            <ProductDetailClient
+              variants={product.variants}
+              basePrice={product.basePrice}
+            />
+          )}
+
+          {/* Add to Cart placeholder */}
+          <Button size="lg" className="w-full" disabled>
+            {t("addToCart")} (Phase 3)
+          </Button>
+
+          {/* Description */}
+          {product.description && (
+            <div>
+              <h2 className="mb-2 text-lg font-semibold">{t("description")}</h2>
+              <p className="text-muted-foreground whitespace-pre-line">
+                {product.description}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
