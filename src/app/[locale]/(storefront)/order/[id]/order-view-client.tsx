@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -9,7 +10,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -64,6 +65,7 @@ type Translations = {
   retryBanner: string;
   processing: string;
   paymentFailed: string;
+  paymentBeingProcessed: string;
   continueShopping: string;
 };
 
@@ -95,13 +97,40 @@ export function OrderViewClient({
   locale: string;
   translations: Translations;
 }) {
+  const router = useRouter();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isRetrying, setIsRetrying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canRetry =
-    (order.paymentStatus === "FAILED" || order.paymentStatus === "PENDING") &&
-    order.status !== "CANCELLED";
+  // Only show retry for FAILED (not PENDING — payment is in-flight)
+  const canRetry = order.paymentStatus === "FAILED" && order.status !== "CANCELLED";
+
+  const isPending = order.paymentStatus === "PENDING";
+
+  // Poll for status when payment is PENDING
+  useEffect(() => {
+    if (!isPending) return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(
+          `/api/orders/${order.id}/status?token=${encodeURIComponent(token)}`,
+        );
+        if (!res.ok) return;
+
+        const data = await res.json();
+
+        if (data.paymentStatus !== "PENDING") {
+          clearInterval(interval);
+          router.refresh();
+        }
+      } catch {
+        // Network error — keep trying
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isPending, order.id, token, router]);
 
   async function handleRetry() {
     setIsRetrying(true);
@@ -151,7 +180,7 @@ export function OrderViewClient({
 
   return (
     <div className="space-y-6">
-      {/* Retry payment banner */}
+      {/* Retry payment banner — only for FAILED */}
       {canRetry && (
         <div className="flex items-center gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
           <AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
@@ -167,6 +196,14 @@ export function OrderViewClient({
           >
             {isRetrying ? t.processing : t.retryPayment}
           </Button>
+        </div>
+      )}
+
+      {/* Pending payment banner */}
+      {isPending && (
+        <div className="flex items-center justify-center gap-2 rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+          <Loader2 className="h-4 w-4 animate-spin" />
+          <span>{t.paymentBeingProcessed}</span>
         </div>
       )}
 

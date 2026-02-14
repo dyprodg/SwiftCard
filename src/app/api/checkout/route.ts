@@ -169,6 +169,7 @@ export async function POST(req: NextRequest) {
         orderId: result.order.id,
         orderNumber: result.order.orderNumber,
         cartId,
+        customerEmail,
       },
       automatic_payment_methods: {
         enabled: true,

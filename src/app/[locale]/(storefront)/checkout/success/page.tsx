@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { formatPrice } from "@/lib/utils/format-price";
+import { reconcileOrderWithStripe } from "@/lib/stripe/reconcile";
+import { OrderStatusPoller } from "./order-status-poller";
 
 type Props = {
   searchParams: Promise<{ order_id?: string }>;
@@ -29,6 +31,9 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       </div>
     );
   }
+
+  // Try to reconcile immediately (covers most cases — webhook just hasn't arrived yet)
+  await reconcileOrderWithStripe(order_id);
 
   const [order] = await db.select().from(orders).where(eq(orders.id, order_id));
 
@@ -61,6 +66,18 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
         <h1 className="text-3xl font-bold">{t("title")}</h1>
         <p className="text-muted-foreground mt-2 text-lg">{t("message")}</p>
       </div>
+
+      {/* Poll for status if still pending after server-side reconciliation */}
+      {!isPaid && (
+        <div className="mb-6">
+          <OrderStatusPoller
+            orderId={order.id}
+            token={order.guestAccessToken}
+            pendingMessage={t("paymentProcessing")}
+            fallbackMessage={t("checkBackLater")}
+          />
+        </div>
+      )}
 
       <Card>
         <CardHeader>

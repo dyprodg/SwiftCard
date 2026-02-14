@@ -51,7 +51,12 @@ export async function POST(req: NextRequest) {
             )
             .returning();
 
-          if (!updated) break; // Stale PI — ignore
+          if (!updated) {
+            console.warn(
+              `Webhook: stale PI ${paymentIntent.id} for order ${orderId} — already reconciled`,
+            );
+            break;
+          }
 
           // Clear the cart
           if (cartId) {
@@ -86,7 +91,12 @@ export async function POST(req: NextRequest) {
             )
             .returning();
 
-          if (!updated) break; // Stale PI — ignore
+          if (!updated) {
+            console.warn(
+              `Webhook: stale PI ${paymentIntent.id} for failed order ${orderId} — already updated`,
+            );
+            break;
+          }
 
           // Restore stock for each order item
           const items = await db

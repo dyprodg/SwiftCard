@@ -81,7 +81,8 @@
       "orderNumber": "Order Number",
       "paymentProcessing": "Payment is being processed...",
       "continueShopping": "Continue Shopping",
-      "viewOrder": "View Order"
+      "viewOrder": "View Order",
+      "checkBackLater": "Payment confirmation is taking longer than usual. Please check back in a few minutes."
     },
     "errors": {
       "cartEmpty": "Your cart is empty",
@@ -127,6 +128,7 @@
     "retryBanner": "Your payment could not be processed. You can retry the payment below.",
     "processing": "Processing...",
     "paymentFailed": "Payment failed. Please try again.",
+    "paymentBeingProcessed": "Payment is being processed. This page will update automatically.",
     "continueShopping": "Continue Shopping"
   },
   "admin": {

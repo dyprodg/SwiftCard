@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { orders } from "@/db/schema/orders";
+import { orders, orderItems } from "@/db/schema/orders";
 import { productVariants } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { stripe } from "@/lib/stripe/client";
 
 export async function POST(
@@ -17,28 +17,50 @@ export async function POST(
       return NextResponse.json({ error: "Missing token" }, { status: 400 });
     }
 
-    // Find order and validate token
-    const order = await db.query.orders.findFirst({
-      where: eq(orders.id, id),
-      with: { items: true },
-    });
+    // Atomic guard: only allow retry from FAILED (not PENDING — payment is in-flight)
+    // First request wins; second gets 409 Conflict
+    const [claimed] = await db
+      .update(orders)
+      .set({ paymentStatus: "PENDING" })
+      .where(
+        and(
+          eq(orders.id, id),
+          eq(orders.guestAccessToken, token),
+          eq(orders.paymentStatus, "FAILED"),
+        ),
+      )
+      .returning();
 
-    if (!order || order.guestAccessToken !== token) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
+    if (!claimed) {
+      // Either order doesn't exist, token is wrong, or status isn't FAILED
+      const order = await db.query.orders.findFirst({
+        where: eq(orders.id, id),
+      });
 
-    // Only allow retry for FAILED or PENDING payments on non-cancelled orders
-    if (order.status === "CANCELLED") {
-      return NextResponse.json({ error: "Order has been cancelled" }, { status: 400 });
-    }
+      if (!order || order.guestAccessToken !== token) {
+        return NextResponse.json({ error: "Not found" }, { status: 404 });
+      }
 
-    if (order.paymentStatus !== "FAILED" && order.paymentStatus !== "PENDING") {
+      if (order.status === "CANCELLED") {
+        return NextResponse.json({ error: "Order has been cancelled" }, { status: 400 });
+      }
+
+      if (order.paymentStatus === "PENDING") {
+        return NextResponse.json(
+          { error: "Payment is already being processed" },
+          { status: 409 },
+        );
+      }
+
       return NextResponse.json({ error: "Payment cannot be retried" }, { status: 400 });
     }
 
+    // Get order items for stock re-lock
+    const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
+
     // Re-lock stock in a transaction (stock was restored on failure)
     await db.transaction(async (tx) => {
-      for (const item of order.items) {
+      for (const item of items) {
         if (item.variantId) {
           const result = await tx
             .update(productVariants)
@@ -59,25 +81,23 @@ export async function POST(
 
     // Create a NEW PaymentIntent (old one may be expired/terminal)
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: order.total,
-      currency: order.currency.toLowerCase(),
+      amount: claimed.total,
+      currency: claimed.currency.toLowerCase(),
       metadata: {
-        orderId: order.id,
-        orderNumber: order.orderNumber,
+        orderId: claimed.id,
+        orderNumber: claimed.orderNumber,
+        customerEmail: claimed.customerEmail,
       },
       automatic_payment_methods: {
         enabled: true,
       },
     });
 
-    // Update order with new PaymentIntent ID and reset payment status
+    // Update order with new PaymentIntent ID
     await db
       .update(orders)
-      .set({
-        stripePaymentIntentId: paymentIntent.id,
-        paymentStatus: "PENDING",
-      })
-      .where(eq(orders.id, order.id));
+      .set({ stripePaymentIntentId: paymentIntent.id })
+      .where(eq(orders.id, id));
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,

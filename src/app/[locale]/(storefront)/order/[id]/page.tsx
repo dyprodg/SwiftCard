@@ -91,6 +91,7 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
           retryBanner: t("retryBanner"),
           processing: t("processing"),
           paymentFailed: t("paymentFailed"),
+          paymentBeingProcessed: t("paymentBeingProcessed"),
           continueShopping: t("continueShopping"),
         }}
       />
