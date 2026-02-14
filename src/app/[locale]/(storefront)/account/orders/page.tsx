@@ -2,7 +2,7 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getLocale } from "next-intl/server";
-import { Package } from "lucide-react";
+import { ChevronRight, Package } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -68,43 +68,48 @@ export default async function CustomerOrdersPage() {
       ) : (
         <div className="space-y-4">
           {result.orders.map((order) => (
-            <Card key={order.id} className="p-6">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm font-semibold">{order.orderNumber}</p>
-                  <p className="text-muted-foreground text-xs">
-                    {new Date(order.createdAt).toLocaleDateString("de-CH", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </p>
-                </div>
-                <Badge variant="outline" className={statusColors[order.status] ?? ""}>
-                  {statusLabels[order.status] ?? order.status}
-                </Badge>
-              </div>
-
-              <Separator className="my-4" />
-
-              <div className="flex items-center justify-between text-sm">
-                <div className="space-y-1">
-                  <p>
-                    <span className="text-muted-foreground">Payment: </span>
-                    <span className="font-medium">{order.paymentStatus}</span>
-                  </p>
-                  {order.shippedAt && (
-                    <p>
-                      <span className="text-muted-foreground">Shipped: </span>
-                      {new Date(order.shippedAt).toLocaleDateString("de-CH")}
+            <Link key={order.id} href={`/${locale}/order/${order.id}`}>
+              <Card className="hover:bg-muted/50 p-6 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <p className="text-sm font-semibold">{order.orderNumber}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {new Date(order.createdAt).toLocaleDateString("de-CH", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
                     </p>
-                  )}
+                  </div>
+                  <Badge variant="outline" className={statusColors[order.status] ?? ""}>
+                    {statusLabels[order.status] ?? order.status}
+                  </Badge>
                 </div>
-                <p className="text-lg font-semibold">
-                  {formatPrice(order.total, order.currency)}
-                </p>
-              </div>
-            </Card>
+
+                <Separator className="my-4" />
+
+                <div className="flex items-center justify-between text-sm">
+                  <div className="space-y-1">
+                    <p>
+                      <span className="text-muted-foreground">Payment: </span>
+                      <span className="font-medium">{order.paymentStatus}</span>
+                    </p>
+                    {order.shippedAt && (
+                      <p>
+                        <span className="text-muted-foreground">Shipped: </span>
+                        {new Date(order.shippedAt).toLocaleDateString("de-CH")}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-lg font-semibold">
+                      {formatPrice(order.total, order.currency)}
+                    </p>
+                    <ChevronRight className="text-muted-foreground h-5 w-5" />
+                  </div>
+                </div>
+              </Card>
+            </Link>
           ))}
         </div>
       )}
