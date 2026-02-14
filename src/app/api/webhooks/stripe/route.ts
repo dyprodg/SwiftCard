@@ -6,6 +6,7 @@ import { productVariants } from "@/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { constructEvent } from "@/lib/stripe/webhooks";
 import { deleteCart } from "@/lib/kv";
+import { handlePaymentSuccess } from "@/server/actions/orders";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -46,6 +47,11 @@ export async function POST(req: NextRequest) {
           if (cartId) {
             await deleteCart(cartId).catch(() => {});
           }
+
+          // Send order confirmation email
+          await handlePaymentSuccess(orderId).catch((err) =>
+            console.error("Failed to send order confirmation:", err),
+          );
         }
 
         break;

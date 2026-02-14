@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Store, User } from "lucide-react";
+import { Store, User, ClipboardList } from "lucide-react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { getLocale, getTranslations } from "next-intl/server";
 
@@ -52,6 +52,12 @@ export async function Header() {
 
           {/* Auth */}
           <SignedIn>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={`/${locale}/account/orders`}>
+                <ClipboardList className="h-5 w-5" />
+                <span className="sr-only">{t("account")}</span>
+              </Link>
+            </Button>
             <UserButton />
           </SignedIn>
           <SignedOut>

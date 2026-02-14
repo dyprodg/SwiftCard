@@ -89,6 +89,27 @@
       "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
     }
   },
+  "orders": {
+    "title": "Meine Bestellungen",
+    "empty": "Noch keine Bestellungen",
+    "emptyDescription": "Sobald du eine Bestellung aufgibst, erscheint sie hier.",
+    "browseProducts": "Produkte durchsuchen",
+    "orderNumber": "Bestellnummer",
+    "date": "Datum",
+    "status": "Status",
+    "payment": "Zahlung",
+    "total": "Gesamtsumme",
+    "shipped": "Versendet",
+    "statuses": {
+      "PENDING": "Ausstehend",
+      "CONFIRMED": "Bestätigt",
+      "PROCESSING": "In Bearbeitung",
+      "SHIPPED": "Versendet",
+      "DELIVERED": "Zugestellt",
+      "CANCELLED": "Storniert",
+      "REFUNDED": "Erstattet"
+    }
+  },
   "admin": {
     "dashboard": {
       "title": "Dashboard",
@@ -96,6 +117,23 @@
       "orders": "Bestellungen",
       "products": "Produkte",
       "customers": "Kunden"
+    },
+    "orders": {
+      "title": "Bestellungen",
+      "description": "Bestellungen verwalten und verfolgen",
+      "searchPlaceholder": "Bestellungen suchen...",
+      "allStatuses": "Alle Status",
+      "allPayments": "Alle Zahlungen",
+      "updateStatus": "Status aktualisieren",
+      "noTransitions": "Keine Statusübergänge verfügbar.",
+      "items": "Artikel",
+      "customer": "Kunde",
+      "shippingAddress": "Lieferadresse",
+      "internalNotes": "Interne Notizen",
+      "customerNote": "Kundennotiz",
+      "addNote": "Notiz hinzufügen",
+      "adding": "Wird hinzugefügt...",
+      "addNotePlaceholder": "Notiz hinzufügen..."
     }
   }
 }

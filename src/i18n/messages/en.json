@@ -89,6 +89,27 @@
       "generic": "Something went wrong. Please try again."
     }
   },
+  "orders": {
+    "title": "My Orders",
+    "empty": "No orders yet",
+    "emptyDescription": "When you place an order, it will appear here.",
+    "browseProducts": "Browse Products",
+    "orderNumber": "Order Number",
+    "date": "Date",
+    "status": "Status",
+    "payment": "Payment",
+    "total": "Total",
+    "shipped": "Shipped",
+    "statuses": {
+      "PENDING": "Pending",
+      "CONFIRMED": "Confirmed",
+      "PROCESSING": "Processing",
+      "SHIPPED": "Shipped",
+      "DELIVERED": "Delivered",
+      "CANCELLED": "Cancelled",
+      "REFUNDED": "Refunded"
+    }
+  },
   "admin": {
     "dashboard": {
       "title": "Dashboard",
@@ -96,6 +117,23 @@
       "orders": "Orders",
       "products": "Products",
       "customers": "Customers"
+    },
+    "orders": {
+      "title": "Orders",
+      "description": "Manage and track customer orders",
+      "searchPlaceholder": "Search orders...",
+      "allStatuses": "All Statuses",
+      "allPayments": "All Payments",
+      "updateStatus": "Update Status",
+      "noTransitions": "No status transitions available.",
+      "items": "Items",
+      "customer": "Customer",
+      "shippingAddress": "Shipping Address",
+      "internalNotes": "Internal Notes",
+      "customerNote": "Customer Note",
+      "addNote": "Add Note",
+      "adding": "Adding...",
+      "addNotePlaceholder": "Add a note..."
     }
   }
 }
