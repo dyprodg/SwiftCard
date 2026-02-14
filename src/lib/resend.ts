@@ -4,6 +4,17 @@ export const resend = new Resend(process.env.RESEND_API_KEY);
 
 const FROM_EMAIL = "SwiftCart <onboarding@resend.dev>";
 
+/**
+ * In test mode, all emails are redirected to RESEND_TEST_EMAIL.
+ * Set RESEND_TEST_MODE=true and RESEND_TEST_EMAIL=you@example.com in .env.local
+ */
+function resolveRecipient(to: string): string {
+  if (process.env.RESEND_TEST_MODE === "true" && process.env.RESEND_TEST_EMAIL) {
+    return process.env.RESEND_TEST_EMAIL;
+  }
+  return to;
+}
+
 export async function sendOrderConfirmationEmail(
   to: string,
   data: {
@@ -33,7 +44,7 @@ export async function sendOrderConfirmationEmail(
 
   return resend.emails.send({
     from: FROM_EMAIL,
-    to,
+    to: resolveRecipient(to),
     subject: `Order Confirmed - ${data.orderNumber}`,
     react: OrderConfirmationEmail(data),
   });
@@ -58,7 +69,7 @@ export async function sendOrderCreatedEmail(
 
   return resend.emails.send({
     from: FROM_EMAIL,
-    to,
+    to: resolveRecipient(to),
     subject: `Order Received - ${data.orderNumber}`,
     react: OrderCreatedEmail(data),
   });
@@ -77,7 +88,7 @@ export async function sendPaymentFailedEmail(
 
   return resend.emails.send({
     from: FROM_EMAIL,
-    to,
+    to: resolveRecipient(to),
     subject: `Payment Failed - ${data.orderNumber}`,
     react: PaymentFailedEmail(data),
   });
@@ -96,7 +107,7 @@ export async function sendShippingNotificationEmail(
 
   return resend.emails.send({
     from: FROM_EMAIL,
-    to,
+    to: resolveRecipient(to),
     subject: `Your order ${data.orderNumber} has been shipped!`,
     react: OrderShippedEmail(data),
   });
