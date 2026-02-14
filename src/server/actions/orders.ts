@@ -6,6 +6,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { isValidStatusTransition } from "@/lib/constants/order-status";
 import { sendOrderConfirmationEmail, sendShippingNotificationEmail } from "@/lib/resend";
+import { buildOrderViewUrl } from "@/lib/utils/order-url";
 
 export async function updateOrderStatus(orderId: string, newStatus: string) {
   const order = await db.query.orders.findFirst({
@@ -86,6 +87,8 @@ export async function handlePaymentSuccess(orderId: string) {
 
   if (!order) return;
 
+  const orderViewUrl = buildOrderViewUrl(order.id, order.guestAccessToken, "en");
+
   await sendOrderConfirmationEmail(order.customerEmail, {
     orderNumber: order.orderNumber,
     items: order.items.map((item) => ({
@@ -106,5 +109,6 @@ export async function handlePaymentSuccess(orderId: string) {
     shippingCity: order.shippingCity,
     shippingZip: order.shippingZip,
     shippingCountry: order.shippingCountry,
+    orderViewUrl,
   }).catch((err) => console.error("Failed to send order confirmation email:", err));
 }

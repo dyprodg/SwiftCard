@@ -8,6 +8,13 @@
       "when": 1770545377267,
       "tag": "0000_stale_chronomancer",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1771096300966,
+      "tag": "0001_flat_the_anarchist",
+      "breakpoints": true
     }
   ]
 }

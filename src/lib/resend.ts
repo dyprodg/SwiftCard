@@ -26,6 +26,7 @@ export async function sendOrderConfirmationEmail(
     shippingCity: string;
     shippingZip: string;
     shippingCountry: string;
+    orderViewUrl?: string;
   },
 ) {
   const { OrderConfirmationEmail } = await import("@/emails/order-confirmation");
@@ -35,6 +36,50 @@ export async function sendOrderConfirmationEmail(
     to,
     subject: `Order Confirmed - ${data.orderNumber}`,
     react: OrderConfirmationEmail(data),
+  });
+}
+
+export async function sendOrderCreatedEmail(
+  to: string,
+  data: {
+    orderNumber: string;
+    items: {
+      productName: string;
+      variantName: string | null;
+      quantity: number;
+      total: number;
+    }[];
+    total: number;
+    currency: string;
+    orderViewUrl: string;
+  },
+) {
+  const { OrderCreatedEmail } = await import("@/emails/order-created");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject: `Order Received - ${data.orderNumber}`,
+    react: OrderCreatedEmail(data),
+  });
+}
+
+export async function sendPaymentFailedEmail(
+  to: string,
+  data: {
+    orderNumber: string;
+    total: number;
+    currency: string;
+    orderViewUrl: string;
+  },
+) {
+  const { PaymentFailedEmail } = await import("@/emails/payment-failed");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to,
+    subject: `Payment Failed - ${data.orderNumber}`,
+    react: PaymentFailedEmail(data),
   });
 }
 

@@ -8,6 +8,8 @@ import { stripe } from "@/lib/stripe/client";
 import { getCart, guestCartKey } from "@/lib/kv";
 import { checkoutSchema } from "@/lib/validations/checkout";
 import { generateOrderNumber } from "@/lib/utils/order-number";
+import { buildOrderViewUrl } from "@/lib/utils/order-url";
+import { sendOrderCreatedEmail } from "@/lib/resend";
 
 export async function POST(req: NextRequest) {
   try {
@@ -156,7 +158,7 @@ export async function POST(req: NextRequest) {
         })),
       );
 
-      return { order, total, currency };
+      return { order, validatedItems, total, currency };
     });
 
     // Create Stripe PaymentIntent
@@ -178,6 +180,25 @@ export async function POST(req: NextRequest) {
       .update(orders)
       .set({ stripePaymentIntentId: paymentIntent.id })
       .where(eq(orders.id, result.order.id));
+
+    // Send order-created email (fire-and-forget)
+    const orderViewUrl = buildOrderViewUrl(
+      result.order.id,
+      result.order.guestAccessToken,
+      "en",
+    );
+    sendOrderCreatedEmail(result.order.customerEmail, {
+      orderNumber: result.order.orderNumber,
+      items: result.validatedItems.map((item) => ({
+        productName: item.productName,
+        variantName: item.variantName,
+        quantity: item.quantity,
+        total: item.unitPrice * item.quantity,
+      })),
+      total: result.total,
+      currency: result.currency,
+      orderViewUrl,
+    }).catch((err) => console.error("Failed to send order-created email:", err));
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,

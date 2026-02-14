@@ -127,6 +127,11 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       </Card>
 
       <div className="mt-8 flex justify-center gap-4">
+        <Button asChild variant="outline">
+          <Link href={`/${locale}/order/${order.id}?token=${order.guestAccessToken}`}>
+            {t("viewOrder")}
+          </Link>
+        </Button>
         <Button asChild>
           <Link href={`/${locale}/products`}>{t("continueShopping")}</Link>
         </Button>

@@ -110,6 +110,25 @@
       "REFUNDED": "Refunded"
     }
   },
+  "orderView": {
+    "title": "Order Details",
+    "orderNumber": "Order Number",
+    "date": "Date",
+    "status": "Status",
+    "paymentStatus": "Payment",
+    "items": "Items",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "shipping": "Shipping",
+    "shippingFree": "Free",
+    "total": "Total",
+    "shippingAddress": "Shipping Address",
+    "retryPayment": "Retry Payment",
+    "retryBanner": "Your payment could not be processed. You can retry the payment below.",
+    "processing": "Processing...",
+    "paymentFailed": "Payment failed. Please try again.",
+    "continueShopping": "Continue Shopping"
+  },
   "admin": {
     "dashboard": {
       "title": "Dashboard",

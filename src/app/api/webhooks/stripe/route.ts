@@ -3,10 +3,12 @@ import type Stripe from "stripe";
 import { db } from "@/db";
 import { orders, orderItems } from "@/db/schema/orders";
 import { productVariants } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 import { constructEvent } from "@/lib/stripe/webhooks";
 import { deleteCart } from "@/lib/kv";
 import { handlePaymentSuccess } from "@/server/actions/orders";
+import { sendPaymentFailedEmail } from "@/lib/resend";
+import { buildOrderViewUrl } from "@/lib/utils/order-url";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -33,15 +35,23 @@ export async function POST(req: NextRequest) {
         const cartId = paymentIntent.metadata.cartId;
 
         if (orderId) {
-          // Update order status
-          await db
+          // Guard against stale PaymentIntents (from pre-retry attempts)
+          const [updated] = await db
             .update(orders)
             .set({
               status: "CONFIRMED",
               paymentStatus: "PAID",
               paidAt: new Date(),
             })
-            .where(eq(orders.id, orderId));
+            .where(
+              and(
+                eq(orders.id, orderId),
+                eq(orders.stripePaymentIntentId, paymentIntent.id),
+              ),
+            )
+            .returning();
+
+          if (!updated) break; // Stale PI — ignore
 
           // Clear the cart
           if (cartId) {
@@ -62,13 +72,21 @@ export async function POST(req: NextRequest) {
         const orderId = paymentIntent.metadata.orderId;
 
         if (orderId) {
-          // Update order status
-          await db
+          // Guard against stale PaymentIntents
+          const [updated] = await db
             .update(orders)
             .set({
               paymentStatus: "FAILED",
             })
-            .where(eq(orders.id, orderId));
+            .where(
+              and(
+                eq(orders.id, orderId),
+                eq(orders.stripePaymentIntentId, paymentIntent.id),
+              ),
+            )
+            .returning();
+
+          if (!updated) break; // Stale PI — ignore
 
           // Restore stock for each order item
           const items = await db
@@ -86,6 +104,19 @@ export async function POST(req: NextRequest) {
                 .where(eq(productVariants.id, item.variantId));
             }
           }
+
+          // Send payment-failed email
+          const orderViewUrl = buildOrderViewUrl(
+            updated.id,
+            updated.guestAccessToken,
+            "en",
+          );
+          sendPaymentFailedEmail(updated.customerEmail, {
+            orderNumber: updated.orderNumber,
+            total: updated.total,
+            currency: updated.currency,
+            orderViewUrl,
+          }).catch((err) => console.error("Failed to send payment-failed email:", err));
         }
 
         break;

@@ -110,6 +110,25 @@
       "REFUNDED": "Erstattet"
     }
   },
+  "orderView": {
+    "title": "Bestelldetails",
+    "orderNumber": "Bestellnummer",
+    "date": "Datum",
+    "status": "Status",
+    "paymentStatus": "Zahlung",
+    "items": "Artikel",
+    "subtotal": "Zwischensumme",
+    "tax": "MwSt.",
+    "shipping": "Versand",
+    "shippingFree": "Kostenlos",
+    "total": "Gesamtsumme",
+    "shippingAddress": "Lieferadresse",
+    "retryPayment": "Zahlung wiederholen",
+    "retryBanner": "Deine Zahlung konnte nicht verarbeitet werden. Du kannst die Zahlung unten erneut versuchen.",
+    "processing": "Wird verarbeitet...",
+    "paymentFailed": "Zahlung fehlgeschlagen. Bitte versuche es erneut.",
+    "continueShopping": "Weiter einkaufen"
+  },
   "admin": {
     "dashboard": {
       "title": "Dashboard",

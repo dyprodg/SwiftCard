@@ -1,27 +1,17 @@
 import { Section, Text, Row, Column, Hr, Button } from "@react-email/components";
 import { EmailLayout } from "./components/email-layout";
 
-type OrderConfirmationProps = {
+type OrderCreatedProps = {
   orderNumber: string;
   items: {
     productName: string;
     variantName: string | null;
     quantity: number;
-    unitPrice: number;
     total: number;
   }[];
-  subtotal: number;
-  tax: number;
-  shipping: number;
   total: number;
   currency: string;
-  shippingName: string;
-  shippingAddress1: string;
-  shippingAddress2: string | null;
-  shippingCity: string;
-  shippingZip: string;
-  shippingCountry: string;
-  orderViewUrl?: string;
+  orderViewUrl: string;
 };
 
 function formatAmount(cents: number, currency: string) {
@@ -30,31 +20,16 @@ function formatAmount(cents: number, currency: string) {
   );
 }
 
-export function OrderConfirmationEmail(props: OrderConfirmationProps) {
-  const {
-    orderNumber,
-    items,
-    subtotal,
-    tax,
-    shipping,
-    total,
-    currency,
-    shippingName,
-    shippingAddress1,
-    shippingAddress2,
-    shippingCity,
-    shippingZip,
-    shippingCountry,
-    orderViewUrl,
-  } = props;
+export function OrderCreatedEmail(props: OrderCreatedProps) {
+  const { orderNumber, items, total, currency, orderViewUrl } = props;
 
   return (
-    <EmailLayout preview={`Order confirmed - ${orderNumber}`}>
+    <EmailLayout preview={`Order received - ${orderNumber}`}>
       <Section style={content}>
-        <Text style={heading}>Order Confirmed</Text>
+        <Text style={heading}>Order Received</Text>
         <Text style={paragraph}>
-          Thank you for your order! Your payment has been received and your order is being
-          processed.
+          Thank you for your order! We have received your order and are processing your
+          payment.
         </Text>
         <Text style={orderNumberStyle}>
           Order: <strong>{orderNumber}</strong>
@@ -62,7 +37,6 @@ export function OrderConfirmationEmail(props: OrderConfirmationProps) {
 
         <Hr style={hr} />
 
-        {/* Order Items */}
         <Text style={sectionTitle}>Items Ordered</Text>
         {items.map((item, i) => (
           <Row key={i} style={itemRow}>
@@ -81,34 +55,6 @@ export function OrderConfirmationEmail(props: OrderConfirmationProps) {
 
         <Hr style={hr} />
 
-        {/* Totals */}
-        <Row style={totalRow}>
-          <Column style={totalLabel}>
-            <Text style={totalText}>Subtotal</Text>
-          </Column>
-          <Column style={totalValue}>
-            <Text style={totalText}>{formatAmount(subtotal, currency)}</Text>
-          </Column>
-        </Row>
-        <Row style={totalRow}>
-          <Column style={totalLabel}>
-            <Text style={totalText}>Shipping</Text>
-          </Column>
-          <Column style={totalValue}>
-            <Text style={totalText}>
-              {shipping === 0 ? "Free" : formatAmount(shipping, currency)}
-            </Text>
-          </Column>
-        </Row>
-        <Row style={totalRow}>
-          <Column style={totalLabel}>
-            <Text style={totalText}>Tax</Text>
-          </Column>
-          <Column style={totalValue}>
-            <Text style={totalText}>{formatAmount(tax, currency)}</Text>
-          </Column>
-        </Row>
-        <Hr style={hr} />
         <Row style={totalRow}>
           <Column style={totalLabel}>
             <Text style={grandTotalText}>Total</Text>
@@ -120,34 +66,11 @@ export function OrderConfirmationEmail(props: OrderConfirmationProps) {
 
         <Hr style={hr} />
 
-        {/* Shipping Address */}
-        <Text style={sectionTitle}>Shipping Address</Text>
-        <Text style={addressText}>
-          {shippingName}
-          <br />
-          {shippingAddress1}
-          {shippingAddress2 ? (
-            <>
-              <br />
-              {shippingAddress2}
-            </>
-          ) : null}
-          <br />
-          {shippingZip} {shippingCity}
-          <br />
-          {shippingCountry}
-        </Text>
-
-        {orderViewUrl && (
-          <>
-            <Hr style={hr} />
-            <Section style={buttonSection}>
-              <Button style={button} href={orderViewUrl}>
-                View Order
-              </Button>
-            </Section>
-          </>
-        )}
+        <Section style={buttonSection}>
+          <Button style={button} href={orderViewUrl}>
+            View Order
+          </Button>
+        </Section>
       </Section>
     </EmailLayout>
   );
@@ -183,12 +106,6 @@ const itemPriceText = {
 const totalRow = { marginBottom: "4px" };
 const totalLabel = { width: "70%" };
 const totalValue = { width: "30%", textAlign: "right" as const };
-const totalText = {
-  fontSize: "14px",
-  color: "#525f7f",
-  margin: "0",
-  textAlign: "right" as const,
-};
 const grandTotalText = {
   fontSize: "16px",
   fontWeight: "bold" as const,
@@ -196,7 +113,6 @@ const grandTotalText = {
   margin: "0",
   textAlign: "right" as const,
 };
-const addressText = { fontSize: "14px", color: "#525f7f", lineHeight: "22px" };
 const buttonSection = { textAlign: "center" as const, margin: "24px 0 8px" };
 const button = {
   backgroundColor: "#1a1a1a",

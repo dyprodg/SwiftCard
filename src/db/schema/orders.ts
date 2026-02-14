@@ -76,10 +76,14 @@ export const orders = pgTable(
     shippedAt: timestamp("shipped_at"),
     deliveredAt: timestamp("delivered_at"),
     cancelledAt: timestamp("cancelled_at"),
+    guestAccessToken: text("guest_access_token")
+      .$defaultFn(() => createId())
+      .notNull(),
   },
   (table) => [
     uniqueIndex("orders_order_number_idx").on(table.orderNumber),
     uniqueIndex("orders_stripe_pi_idx").on(table.stripePaymentIntentId),
+    uniqueIndex("orders_guest_token_idx").on(table.guestAccessToken),
     index("orders_customer_id_idx").on(table.customerId),
     index("orders_status_idx").on(table.status),
     index("orders_created_at_idx").on(table.createdAt),
