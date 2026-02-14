@@ -20,7 +20,11 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages();
 
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      signInUrl={`/${locale}/sign-in`}
+      signUpUrl={`/${locale}/sign-up`}
+      afterSignOutUrl={`/${locale}`}
+    >
       <NextIntlClientProvider messages={messages}>
         {children}
         <Toaster />

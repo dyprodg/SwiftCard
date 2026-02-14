@@ -2,7 +2,7 @@ import { Resend } from "resend";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
-const FROM_EMAIL = "SwiftCart <noreply@swiftcart.ch>";
+const FROM_EMAIL = "SwiftCart <onboarding@resend.dev>";
 
 export async function sendOrderConfirmationEmail(
   to: string,
