@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { getShopSettings } from "@/lib/edge-config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,13 +13,16 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "SwiftCart",
-    template: "%s | SwiftCart",
-  },
-  description: "Modern e-commerce built with Next.js",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getShopSettings();
+  return {
+    title: {
+      default: settings.shopName,
+      template: `%s | ${settings.shopName}`,
+    },
+    description: settings.shopDescription ?? "Modern e-commerce built with Next.js",
+  };
+}
 
 export default function RootLayout({
   children,

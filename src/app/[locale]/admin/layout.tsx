@@ -1,10 +1,16 @@
+import { auth } from "@clerk/nextjs/server";
+import { notFound } from "next/navigation";
 import { AdminSidebar } from "@/components/admin/sidebar";
 
 type Props = {
   children: React.ReactNode;
 };
 
-export default function AdminLayout({ children }: Props) {
+export default async function AdminLayout({ children }: Props) {
+  const { sessionClaims } = await auth();
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
+  if (role !== "admin") notFound();
+
   return (
     <div className="flex min-h-screen">
       <AdminSidebar />

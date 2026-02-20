@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/db";
@@ -6,10 +8,11 @@ import { and, eq, isNotNull, lt } from "drizzle-orm";
 import { reconcileOrderWithStripe } from "@/lib/stripe/reconcile";
 
 export async function POST() {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
 
-  if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!userId || role !== "admin") {
+    return new NextResponse("Not Found", { status: 404 });
   }
 
   // Find stale PENDING orders (older than 15 minutes) with a Stripe PI

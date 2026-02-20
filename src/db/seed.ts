@@ -1,5 +1,11 @@
 import { db } from "./index";
-import { categories, products, productVariants, productImages } from "./schema";
+import {
+  categories,
+  products,
+  productVariants,
+  productImages,
+  shopSettings,
+} from "./schema";
 import { createId } from "@paralleldrive/cuid2";
 
 async function seed() {
@@ -97,6 +103,17 @@ async function seed() {
       productId: cap.id,
     },
   ]);
+
+  // Shop Settings
+  await db.insert(shopSettings).values({
+    id: "singleton",
+    shopName: "SwiftCart",
+    contactEmail: "info@swiftcart.ch",
+    defaultShippingCost: 990,
+    freeShippingThreshold: 10000,
+    defaultTaxRate: 0.081,
+    currency: "CHF",
+  });
 
   console.log("Seed complete.");
   process.exit(0);

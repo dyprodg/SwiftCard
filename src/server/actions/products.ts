@@ -21,9 +21,10 @@ import { slugify } from "@/lib/utils/slugify";
 import { deleteImage } from "@/lib/blob";
 
 async function requireAdmin() {
-  const { userId } = await auth();
+  const { userId, sessionClaims } = await auth();
   if (!userId) throw new Error("Unauthorized");
-  // TODO: Check admin role via Clerk metadata
+  const role = (sessionClaims?.metadata as { role?: string })?.role;
+  if (role !== "admin") throw new Error("Unauthorized");
   return userId;
 }
 

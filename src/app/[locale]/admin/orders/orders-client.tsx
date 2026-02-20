@@ -122,7 +122,9 @@ export function OrdersClient({
 
         <Select
           value={currentStatus ?? "all"}
-          onValueChange={(v) => updateParams("status", v === "all" ? undefined : v)}
+          onValueChange={(v: string) =>
+            updateParams("status", v === "all" ? undefined : v)
+          }
         >
           <SelectTrigger className="w-[160px]">
             <SelectValue placeholder="Status" />
@@ -141,7 +143,7 @@ export function OrdersClient({
 
         <Select
           value={currentPaymentStatus ?? "all"}
-          onValueChange={(v) =>
+          onValueChange={(v: string) =>
             updateParams("paymentStatus", v === "all" ? undefined : v)
           }
         >

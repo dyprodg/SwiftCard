@@ -5,10 +5,12 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./cart-sheet";
+import { getShopSettings } from "@/lib/edge-config";
 
 export async function Header() {
   const locale = await getLocale();
   const t = await getTranslations("common");
+  const settings = await getShopSettings();
 
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
@@ -16,7 +18,7 @@ export async function Header() {
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center gap-2 font-bold">
           <Store className="h-5 w-5" />
-          <span>SwiftCart</span>
+          <span>{settings.shopName}</span>
         </Link>
 
         {/* Navigation */}

@@ -5,11 +5,15 @@ import { ArrowRight } from "lucide-react";
 import { getFeaturedProducts } from "@/server/queries/products";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { Button } from "@/components/ui/button";
+import { getShopSettings } from "@/lib/edge-config";
 
 export default async function HomePage() {
   const locale = await getLocale();
   const t = await getTranslations("common");
-  const featured = await getFeaturedProducts(6);
+  const [featured, settings] = await Promise.all([
+    getFeaturedProducts(6),
+    getShopSettings(),
+  ]);
 
   return (
     <div>
@@ -17,10 +21,11 @@ export default async function HomePage() {
       <section className="bg-muted/30 border-b">
         <div className="container mx-auto px-4 py-20 text-center">
           <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            SwiftCart
+            {settings.shopName}
           </h1>
           <p className="text-muted-foreground mx-auto mt-4 max-w-xl text-lg">
-            Modern e-commerce built with Next.js, Drizzle & Vercel
+            {settings.shopDescription ??
+              "Modern e-commerce built with Next.js, Drizzle & Vercel"}
           </p>
           <div className="mt-8 flex items-center justify-center gap-4">
             <Button size="lg" asChild>

@@ -6,7 +6,6 @@ import { ChevronRight, Package } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { getOrdersByCustomer } from "@/server/queries/orders";
 import { formatPrice } from "@/lib/utils/format-price";
 
@@ -86,7 +85,7 @@ export default async function CustomerOrdersPage() {
                   </Badge>
                 </div>
 
-                <Separator className="my-4" />
+                <hr className="my-4" />
 
                 <div className="flex items-center justify-between text-sm">
                   <div className="space-y-1">

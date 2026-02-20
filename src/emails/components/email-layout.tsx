@@ -11,9 +11,14 @@ import {
 type EmailLayoutProps = {
   preview: string;
   children: React.ReactNode;
+  shopName?: string;
 };
 
-export function EmailLayout({ preview, children }: EmailLayoutProps) {
+export function EmailLayout({
+  preview,
+  children,
+  shopName = "SwiftCart",
+}: EmailLayoutProps) {
   return (
     <Html>
       <Head />
@@ -21,11 +26,11 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
       <Body style={body}>
         <Container style={container}>
           <Section style={header}>
-            <Text style={logo}>SwiftCart</Text>
+            <Text style={logo}>{shopName}</Text>
           </Section>
           {children}
           <Section style={footer}>
-            <Text style={footerText}>SwiftCart - Your trusted online store</Text>
+            <Text style={footerText}>{shopName} - Your trusted online store</Text>
             <Text style={footerText}>
               This is an automated email. Please do not reply directly.
             </Text>
