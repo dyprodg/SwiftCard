@@ -5,7 +5,7 @@ import { orders } from "@/db/schema";
 import { sql, desc } from "drizzle-orm";
 import { clerkClient } from "@clerk/nextjs/server";
 import { formatPrice } from "@/lib/utils/format-price";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -26,27 +26,36 @@ type CustomerRow = {
 
 export default async function CustomersPage() {
   // Fetch order aggregates by email
-  const orderAggregates = await db
-    .select({
-      email: orders.customerEmail,
-      orderCount: sql<number>`count(*)`.as("order_count"),
-      totalSpent: sql<number>`coalesce(sum(${orders.total}), 0)`.as("total_spent"),
-      lastOrderDate: sql<Date>`max(${orders.createdAt})`.as("last_order"),
-    })
-    .from(orders)
-    .groupBy(orders.customerEmail)
-    .orderBy(desc(sql`max(${orders.createdAt})`));
+  let aggregateMap = new Map<
+    string,
+    { orderCount: number; totalSpent: number; lastOrderDate: Date | null }
+  >();
 
-  const aggregateMap = new Map(
-    orderAggregates.map((a) => [
-      a.email.toLowerCase(),
-      {
-        orderCount: Number(a.orderCount),
-        totalSpent: Number(a.totalSpent),
-        lastOrderDate: a.lastOrderDate,
-      },
-    ]),
-  );
+  try {
+    const orderAggregates = await db
+      .select({
+        email: orders.customerEmail,
+        orderCount: sql<string>`count(*)`.as("order_count"),
+        totalSpent: sql<string>`coalesce(sum(${orders.total}), 0)`.as("total_spent"),
+        lastOrderDate: sql<string | null>`max(${orders.createdAt})`.as("last_order"),
+      })
+      .from(orders)
+      .groupBy(orders.customerEmail)
+      .orderBy(desc(sql`max(${orders.createdAt})`));
+
+    aggregateMap = new Map(
+      orderAggregates.map((a) => [
+        a.email.toLowerCase(),
+        {
+          orderCount: Number(a.orderCount),
+          totalSpent: Number(a.totalSpent),
+          lastOrderDate: a.lastOrderDate ? new Date(a.lastOrderDate) : null,
+        },
+      ]),
+    );
+  } catch (e) {
+    console.error("Failed to fetch order aggregates:", e);
+  }
 
   // Fetch Clerk users
   const clerk = await clerkClient();
@@ -128,7 +137,7 @@ export default async function CustomersPage() {
                   <TableRow key={c.email}>
                     <TableCell className="font-medium">{c.email}</TableCell>
                     <TableCell className="text-muted-foreground">
-                      {c.name || "—"}
+                      {c.name || "\u2014"}
                     </TableCell>
                     <TableCell>
                       <span
@@ -148,7 +157,7 @@ export default async function CustomersPage() {
                     <TableCell className="text-muted-foreground">
                       {c.lastOrderDate
                         ? c.lastOrderDate.toLocaleDateString("de-CH")
-                        : "—"}
+                        : "\u2014"}
                     </TableCell>
                   </TableRow>
                 ))
