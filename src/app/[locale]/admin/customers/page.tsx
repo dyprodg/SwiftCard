@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { orders } from "@/db/schema";
 import { sql, desc } from "drizzle-orm";
 import { clerkClient } from "@clerk/nextjs/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { formatPrice } from "@/lib/utils/format-price";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -25,6 +26,9 @@ type CustomerRow = {
 };
 
 export default async function CustomersPage() {
+  const locale = await getLocale();
+  const t = await getTranslations("admin.customers");
+
   // Fetch order aggregates by email
   let aggregateMap = new Map<
     string,
@@ -104,9 +108,9 @@ export default async function CustomersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Customers</h1>
+      <h1 className="text-2xl font-bold">{t("title")}</h1>
       <p className="text-muted-foreground mt-1 mb-6">
-        {customers.length} customer{customers.length !== 1 && "s"}
+        {t("count", { count: customers.length })}
       </p>
 
       <Card>
@@ -114,12 +118,12 @@ export default async function CustomersPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Email</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead className="text-right">Orders</TableHead>
-                <TableHead className="text-right">Total Spent</TableHead>
-                <TableHead>Last Order</TableHead>
+                <TableHead>{t("email")}</TableHead>
+                <TableHead>{t("name")}</TableHead>
+                <TableHead>{t("type")}</TableHead>
+                <TableHead className="text-right">{t("ordersCount")}</TableHead>
+                <TableHead className="text-right">{t("totalSpent")}</TableHead>
+                <TableHead>{t("lastOrder")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -129,7 +133,7 @@ export default async function CustomersPage() {
                     colSpan={6}
                     className="text-muted-foreground h-24 text-center"
                   >
-                    No customers yet
+                    {t("noCustomers")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -147,7 +151,7 @@ export default async function CustomersPage() {
                             : "bg-gray-100 text-gray-800"
                         }`}
                       >
-                        {c.source === "clerk" ? "Account" : "Guest"}
+                        {c.source === "clerk" ? t("account") : t("guest")}
                       </span>
                     </TableCell>
                     <TableCell className="text-right">{c.orderCount}</TableCell>
@@ -156,7 +160,9 @@ export default async function CustomersPage() {
                     </TableCell>
                     <TableCell className="text-muted-foreground">
                       {c.lastOrderDate
-                        ? c.lastOrderDate.toLocaleDateString("de-CH")
+                        ? c.lastOrderDate.toLocaleDateString(
+                            locale === "de" ? "de-CH" : "en-CH",
+                          )
                         : "\u2014"}
                     </TableCell>
                   </TableRow>

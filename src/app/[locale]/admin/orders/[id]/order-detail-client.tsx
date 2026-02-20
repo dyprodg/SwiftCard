@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowLeft } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -27,12 +27,15 @@ import type { OrderWithItems } from "@/types";
 
 export function OrderDetailClient({ order }: { order: OrderWithItems }) {
   const locale = useLocale();
+  const t = useTranslations("admin.orders");
+  const td = useTranslations("admin.orders.detail");
   const [updating, setUpdating] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [addingNote, setAddingNote] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const allowedTransitions = ORDER_STATUS_TRANSITIONS[order.status] ?? [];
+  const dateLocale = locale === "de" ? "de-CH" : "en-CH";
 
   async function handleStatusChange(newStatus: string) {
     setUpdating(true);
@@ -64,7 +67,7 @@ export function OrderDetailClient({ order }: { order: OrderWithItems }) {
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{order.orderNumber}</h1>
           <p className="text-muted-foreground text-sm">
-            {new Date(order.createdAt).toLocaleString("de-CH")}
+            {new Date(order.createdAt).toLocaleString(dateLocale)}
           </p>
         </div>
         <OrderStatusBadge status={order.status} />
@@ -78,7 +81,7 @@ export function OrderDetailClient({ order }: { order: OrderWithItems }) {
       <div className="grid gap-6 md:grid-cols-3">
         {/* Order Items */}
         <Card className="p-6 md:col-span-2">
-          <h2 className="mb-4 text-lg font-semibold">Items</h2>
+          <h2 className="mb-4 text-lg font-semibold">{t("items")}</h2>
           <div className="space-y-3">
             {order.items.map((item) => (
               <div key={item.id} className="flex items-center justify-between">
@@ -102,24 +105,24 @@ export function OrderDetailClient({ order }: { order: OrderWithItems }) {
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Subtotal</span>
+              <span className="text-muted-foreground">{td("subtotal")}</span>
               <span>{formatPrice(order.subtotal, order.currency)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Shipping</span>
+              <span className="text-muted-foreground">{td("shipping")}</span>
               <span>
                 {order.shipping === 0
-                  ? "Free"
+                  ? td("shippingFree")
                   : formatPrice(order.shipping, order.currency)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">Tax</span>
+              <span className="text-muted-foreground">{td("tax")}</span>
               <span>{formatPrice(order.tax, order.currency)}</span>
             </div>
             <Separator />
             <div className="flex justify-between font-semibold">
-              <span>Total</span>
+              <span>{td("total")}</span>
               <span>{formatPrice(order.total, order.currency)}</span>
             </div>
           </div>
@@ -129,53 +132,55 @@ export function OrderDetailClient({ order }: { order: OrderWithItems }) {
         <div className="space-y-6">
           {/* Status Controls */}
           <Card className="p-6">
-            <h2 className="mb-4 text-lg font-semibold">Update Status</h2>
+            <h2 className="mb-4 text-lg font-semibold">{t("updateStatus")}</h2>
             {allowedTransitions.length > 0 ? (
               <div className="space-y-3">
                 <Select onValueChange={handleStatusChange} disabled={updating}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Change status..." />
+                    <SelectValue placeholder={t("changeStatus")} />
                   </SelectTrigger>
                   <SelectContent>
                     {allowedTransitions.map((status) => (
                       <SelectItem key={status} value={status}>
-                        {status}
+                        {t(
+                          `statuses.${status as "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED"}`,
+                        )}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                {updating && <p className="text-muted-foreground text-xs">Updating...</p>}
+                {updating && (
+                  <p className="text-muted-foreground text-xs">{t("adding")}</p>
+                )}
               </div>
             ) : (
-              <p className="text-muted-foreground text-sm">
-                No status transitions available.
-              </p>
+              <p className="text-muted-foreground text-sm">{t("noTransitions")}</p>
             )}
 
             {/* Timestamps */}
             <div className="mt-4 space-y-2 text-xs">
               {order.paidAt && (
                 <p>
-                  <span className="text-muted-foreground">Paid: </span>
-                  {new Date(order.paidAt).toLocaleString("de-CH")}
+                  <span className="text-muted-foreground">{td("paid")} </span>
+                  {new Date(order.paidAt).toLocaleString(dateLocale)}
                 </p>
               )}
               {order.shippedAt && (
                 <p>
-                  <span className="text-muted-foreground">Shipped: </span>
-                  {new Date(order.shippedAt).toLocaleString("de-CH")}
+                  <span className="text-muted-foreground">{td("shipped")} </span>
+                  {new Date(order.shippedAt).toLocaleString(dateLocale)}
                 </p>
               )}
               {order.deliveredAt && (
                 <p>
-                  <span className="text-muted-foreground">Delivered: </span>
-                  {new Date(order.deliveredAt).toLocaleString("de-CH")}
+                  <span className="text-muted-foreground">{td("delivered")} </span>
+                  {new Date(order.deliveredAt).toLocaleString(dateLocale)}
                 </p>
               )}
               {order.cancelledAt && (
                 <p>
-                  <span className="text-muted-foreground">Cancelled: </span>
-                  {new Date(order.cancelledAt).toLocaleString("de-CH")}
+                  <span className="text-muted-foreground">{td("cancelled")} </span>
+                  {new Date(order.cancelledAt).toLocaleString(dateLocale)}
                 </p>
               )}
             </div>
@@ -183,7 +188,7 @@ export function OrderDetailClient({ order }: { order: OrderWithItems }) {
 
           {/* Customer Info */}
           <Card className="p-6">
-            <h2 className="mb-4 text-lg font-semibold">Customer</h2>
+            <h2 className="mb-4 text-lg font-semibold">{t("customer")}</h2>
             <div className="space-y-2 text-sm">
               <p className="font-medium">{order.shippingName}</p>
               <p className="text-muted-foreground">{order.customerEmail}</p>
@@ -192,7 +197,7 @@ export function OrderDetailClient({ order }: { order: OrderWithItems }) {
 
           {/* Shipping Address */}
           <Card className="p-6">
-            <h2 className="mb-4 text-lg font-semibold">Shipping Address</h2>
+            <h2 className="mb-4 text-lg font-semibold">{t("shippingAddress")}</h2>
             <div className="text-sm leading-relaxed">
               <p>{order.shippingName}</p>
               <p>{order.shippingAddress1}</p>
@@ -206,7 +211,7 @@ export function OrderDetailClient({ order }: { order: OrderWithItems }) {
 
           {/* Internal Notes */}
           <Card className="p-6">
-            <h2 className="mb-4 text-lg font-semibold">Internal Notes</h2>
+            <h2 className="mb-4 text-lg font-semibold">{t("internalNotes")}</h2>
             {order.internalNote && (
               <pre className="text-muted-foreground mb-4 text-xs whitespace-pre-wrap">
                 {order.internalNote}
@@ -214,13 +219,13 @@ export function OrderDetailClient({ order }: { order: OrderWithItems }) {
             )}
             {order.customerNote && (
               <div className="mb-4">
-                <p className="text-xs font-medium">Customer Note:</p>
+                <p className="text-xs font-medium">{t("customerNote")}:</p>
                 <p className="text-muted-foreground text-xs">{order.customerNote}</p>
               </div>
             )}
             <div className="space-y-2">
               <Textarea
-                placeholder="Add a note..."
+                placeholder={t("addNotePlaceholder")}
                 value={noteText}
                 onChange={(e) => setNoteText(e.target.value)}
                 rows={2}
@@ -230,7 +235,7 @@ export function OrderDetailClient({ order }: { order: OrderWithItems }) {
                 onClick={handleAddNote}
                 disabled={addingNote || !noteText.trim()}
               >
-                {addingNote ? "Adding..." : "Add Note"}
+                {addingNote ? t("adding") : t("addNote")}
               </Button>
             </div>
           </Card>

@@ -1,10 +1,34 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { getActiveProducts } from "@/server/queries/products";
+import { localizeProducts } from "@/lib/utils/localize-product";
 import { getCategories } from "@/server/queries/categories";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { Button } from "@/components/ui/button";
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://localhost:3000";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const t = await getTranslations("products");
+  const url = `${APP_URL}/${locale}/products`;
+
+  return {
+    title: t("title"),
+    alternates: {
+      canonical: url,
+      languages: { de: `${APP_URL}/de/products`, en: `${APP_URL}/en/products` },
+    },
+    openGraph: {
+      title: t("title"),
+      url,
+      locale,
+      type: "website",
+    },
+  };
+}
 
 type Props = {
   searchParams: Promise<{
@@ -65,22 +89,26 @@ export default async function ProductsPage({ searchParams }: Props) {
 
         {/* Products */}
         <div className="flex-1">
-          <ProductGrid products={items} />
+          <ProductGrid products={localizeProducts(items, locale)} />
 
           {/* Pagination */}
           {totalPages > 1 && (
             <div className="mt-8 flex items-center justify-center gap-2">
               {page > 1 && (
                 <Button variant="outline" size="sm" asChild>
-                  <Link href={`/${locale}/products?page=${page - 1}`}>Previous</Link>
+                  <Link href={`/${locale}/products?page=${page - 1}`}>
+                    {t("pagination.previous")}
+                  </Link>
                 </Button>
               )}
               <span className="text-muted-foreground text-sm">
-                Page {page} of {totalPages}
+                {t("pagination.page")} {page} / {totalPages}
               </span>
               {page < totalPages && (
                 <Button variant="outline" size="sm" asChild>
-                  <Link href={`/${locale}/products?page=${page + 1}`}>Next</Link>
+                  <Link href={`/${locale}/products?page=${page + 1}`}>
+                    {t("pagination.next")}
+                  </Link>
                 </Button>
               )}
             </div>

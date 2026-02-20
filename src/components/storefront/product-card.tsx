@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,6 +16,7 @@ type ProductCardProps = {
 
 export async function ProductCard({ product }: ProductCardProps) {
   const locale = await getLocale();
+  const t = await getTranslations("common");
   const primaryImage = product.images[0];
 
   // Calculate price range from variants
@@ -40,10 +41,12 @@ export async function ProductCard({ product }: ProductCardProps) {
             />
           ) : (
             <div className="bg-muted flex h-full w-full items-center justify-center">
-              <span className="text-muted-foreground">No image</span>
+              <span className="text-muted-foreground">{t("noImage")}</span>
             </div>
           )}
-          {product.featured && <Badge className="absolute top-2 left-2">Featured</Badge>}
+          {product.featured && (
+            <Badge className="absolute top-2 left-2">{t("featured")}</Badge>
+          )}
         </div>
         <CardContent className="p-4">
           <h3 className="line-clamp-2 leading-tight font-medium">{product.name}</h3>
@@ -54,8 +57,8 @@ export async function ProductCard({ product }: ProductCardProps) {
           </p>
           {product.variants.length > 0 && (
             <p className="text-muted-foreground mt-1 text-xs">
-              {product.variants.length} variant
-              {product.variants.length !== 1 ? "s" : ""}
+              {product.variants.length}{" "}
+              {product.variants.length === 1 ? t("variant") : t("variants")}
             </p>
           )}
         </CardContent>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   Package,
@@ -14,23 +14,24 @@ import {
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-  { label: "Products", href: "/admin/products", icon: Package },
-  { label: "Orders", href: "/admin/orders", icon: ShoppingCart },
-  { label: "Customers", href: "/admin/customers", icon: Users },
-  { label: "Settings", href: "/admin/settings/general", icon: Settings },
+  { key: "dashboard" as const, href: "/admin/dashboard", icon: LayoutDashboard },
+  { key: "products" as const, href: "/admin/products", icon: Package },
+  { key: "orders" as const, href: "/admin/orders", icon: ShoppingCart },
+  { key: "customers" as const, href: "/admin/customers", icon: Users },
+  { key: "settings" as const, href: "/admin/settings/general", icon: Settings },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const locale = useLocale();
+  const t = useTranslations("admin.nav");
 
   return (
     <aside className="bg-muted/40 flex w-64 flex-col border-r">
       <div className="flex h-14 items-center border-b px-4">
         <Link href={`/${locale}`} className="flex items-center gap-2 font-semibold">
           <Store className="h-5 w-5" />
-          <span>SwiftCart Admin</span>
+          <span>{t("adminTitle")}</span>
         </Link>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">
@@ -50,7 +51,7 @@ export function AdminSidebar() {
               )}
             >
               <item.icon className="h-4 w-4" />
-              {item.label}
+              {t(item.key)}
             </Link>
           );
         })}
@@ -61,7 +62,7 @@ export function AdminSidebar() {
           className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm"
         >
           <Store className="h-4 w-4" />
-          View Storefront
+          {t("viewStorefront")}
         </Link>
       </div>
     </aside>

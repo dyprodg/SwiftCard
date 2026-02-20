@@ -1,5 +1,14 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { CheckoutClient } from "./checkout-client";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("checkout");
+  return {
+    title: t("title"),
+    robots: { index: false, follow: false },
+  };
+}
 
 export default async function CheckoutPage() {
   const t = await getTranslations("checkout");

@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import {
   shippingSettingsSchema,
@@ -32,6 +33,9 @@ type Props = {
 
 export function ShippingSettingsForm({ defaultValues }: Props) {
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("admin.settings");
+  const tf = useTranslations("admin.settings.shippingForm");
+  const tc = useTranslations("common");
 
   const form = useForm<ShippingSettingsInput>({
     resolver: zodResolver(shippingSettingsSchema),
@@ -44,9 +48,9 @@ export function ShippingSettingsForm({ defaultValues }: Props) {
     startTransition(async () => {
       try {
         await updateShippingSettings(data);
-        toast.success("Shipping settings saved");
+        toast.success(t("saved"));
       } catch {
-        toast.error("Failed to save settings");
+        toast.error(t("saveFailed"));
       }
     });
   }
@@ -54,7 +58,7 @@ export function ShippingSettingsForm({ defaultValues }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Shipping</CardTitle>
+        <CardTitle>{tf("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -64,7 +68,7 @@ export function ShippingSettingsForm({ defaultValues }: Props) {
               name="defaultShippingCost"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Default Shipping Cost (cents)</FormLabel>
+                  <FormLabel>{tf("defaultCost")}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -73,7 +77,7 @@ export function ShippingSettingsForm({ defaultValues }: Props) {
                       onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                   </FormControl>
-                  <FormDescription>e.g. 990 = CHF 9.90</FormDescription>
+                  <FormDescription>{tf("defaultCostHint")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -81,10 +85,8 @@ export function ShippingSettingsForm({ defaultValues }: Props) {
 
             <div className="flex items-center justify-between rounded-lg border p-4">
               <div>
-                <p className="text-sm font-medium">Free Shipping Threshold</p>
-                <p className="text-muted-foreground text-sm">
-                  Waive shipping above a certain order total
-                </p>
+                <p className="text-sm font-medium">{tf("freeThreshold")}</p>
+                <p className="text-muted-foreground text-sm">{tf("freeThresholdHint")}</p>
               </div>
               <Switch
                 checked={hasFreeThreshold}
@@ -102,7 +104,7 @@ export function ShippingSettingsForm({ defaultValues }: Props) {
                 name="freeShippingThreshold"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Threshold (cents)</FormLabel>
+                    <FormLabel>{tf("thresholdAmount")}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -115,9 +117,7 @@ export function ShippingSettingsForm({ defaultValues }: Props) {
                         }
                       />
                     </FormControl>
-                    <FormDescription>
-                      e.g. 10000 = free shipping above CHF 100.00
-                    </FormDescription>
+                    <FormDescription>{tf("thresholdAmountHint")}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -126,7 +126,7 @@ export function ShippingSettingsForm({ defaultValues }: Props) {
 
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {tc("saveChanges")}
             </Button>
           </form>
         </Form>

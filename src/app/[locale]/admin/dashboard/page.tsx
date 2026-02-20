@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   DollarSign,
   ShoppingCart,
@@ -31,6 +31,7 @@ import { MaintenanceToggle } from "./maintenance-toggle";
 
 export default async function DashboardPage() {
   const locale = await getLocale();
+  const t = await getTranslations("admin.dashboard");
   const [metrics, lowStock, maintenance] = await Promise.all([
     getDashboardMetrics(),
     getLowStockAlerts(),
@@ -39,22 +40,22 @@ export default async function DashboardPage() {
 
   const cards = [
     {
-      title: "Total Revenue",
+      title: t("revenue"),
       value: formatPrice(metrics.revenue),
       icon: DollarSign,
     },
     {
-      title: "Total Orders",
+      title: t("orders"),
       value: metrics.totalCount.toString(),
       icon: ShoppingCart,
     },
     {
-      title: "Paid Orders",
+      title: t("paidOrders"),
       value: metrics.paidCount.toString(),
       icon: CreditCard,
     },
     {
-      title: "Avg. Order Value",
+      title: t("avgOrderValue"),
       value: formatPrice(metrics.avgOrderValue),
       icon: TrendingUp,
     },
@@ -64,8 +65,8 @@ export default async function DashboardPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Overview of your store performance</p>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("description")}</p>
         </div>
         <MaintenanceToggle enabled={maintenance} toggleAction={updateMaintenanceMode} />
       </div>
@@ -93,17 +94,17 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-yellow-500" />
-              Low Stock Alerts
+              {t("lowStockAlerts")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>SKU</TableHead>
-                  <TableHead>Product</TableHead>
-                  <TableHead>Variant</TableHead>
-                  <TableHead className="text-right">Stock</TableHead>
+                  <TableHead>{t("sku")}</TableHead>
+                  <TableHead>{t("product")}</TableHead>
+                  <TableHead>{t("variantLabel")}</TableHead>
+                  <TableHead className="text-right">{t("stock")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -119,7 +120,7 @@ export default async function DashboardPage() {
                       </Link>
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {[item.size, item.color].filter(Boolean).join(" / ") || "—"}
+                      {[item.size, item.color].filter(Boolean).join(" / ") || "\u2014"}
                     </TableCell>
                     <TableCell className="text-right font-medium">
                       <span
@@ -139,18 +140,18 @@ export default async function DashboardPage() {
       {/* Recent Orders */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Orders</CardTitle>
+          <CardTitle>{t("recentOrders")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Order</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Payment</TableHead>
-                <TableHead className="text-right">Total</TableHead>
-                <TableHead>Date</TableHead>
+                <TableHead>{t("order")}</TableHead>
+                <TableHead>{t("customer")}</TableHead>
+                <TableHead>{t("status")}</TableHead>
+                <TableHead>{t("paymentCol")}</TableHead>
+                <TableHead className="text-right">{t("total")}</TableHead>
+                <TableHead>{t("date")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -160,7 +161,7 @@ export default async function DashboardPage() {
                     colSpan={6}
                     className="text-muted-foreground h-24 text-center"
                   >
-                    No orders yet
+                    {t("noOrdersYet")}
                   </TableCell>
                 </TableRow>
               ) : (
@@ -187,7 +188,9 @@ export default async function DashboardPage() {
                       {formatPrice(order.total, order.currency)}
                     </TableCell>
                     <TableCell className="text-muted-foreground">
-                      {order.createdAt.toLocaleDateString("de-CH")}
+                      {order.createdAt.toLocaleDateString(
+                        locale === "de" ? "de-CH" : "en-CH",
+                      )}
                     </TableCell>
                   </TableRow>
                 ))

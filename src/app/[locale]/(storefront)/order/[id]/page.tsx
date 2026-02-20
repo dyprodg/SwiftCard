@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { auth, currentUser } from "@clerk/nextjs/server";
+
+export const metadata: Metadata = {
+  title: "Order Details",
+  robots: { index: false, follow: false },
+};
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { db } from "@/db";

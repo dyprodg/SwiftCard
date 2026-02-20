@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import {
   paymentSettingsSchema,
@@ -38,6 +39,9 @@ type Props = {
 
 export function PaymentSettingsForm({ defaultValues }: Props) {
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("admin.settings");
+  const tf = useTranslations("admin.settings.paymentForm");
+  const tc = useTranslations("common");
 
   const form = useForm<PaymentSettingsInput>({
     resolver: zodResolver(paymentSettingsSchema),
@@ -48,9 +52,9 @@ export function PaymentSettingsForm({ defaultValues }: Props) {
     startTransition(async () => {
       try {
         await updatePaymentSettings(data);
-        toast.success("Payment settings saved");
+        toast.success(t("saved"));
       } catch {
-        toast.error("Failed to save settings");
+        toast.error(t("saveFailed"));
       }
     });
   }
@@ -58,7 +62,7 @@ export function PaymentSettingsForm({ defaultValues }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Payment</CardTitle>
+        <CardTitle>{tf("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -68,11 +72,11 @@ export function PaymentSettingsForm({ defaultValues }: Props) {
               name="currency"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Currency</FormLabel>
+                  <FormLabel>{tf("currency")}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select currency" />
+                        <SelectValue placeholder={tf("selectCurrency")} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -91,7 +95,7 @@ export function PaymentSettingsForm({ defaultValues }: Props) {
               name="defaultTaxRate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Default Tax Rate (%)</FormLabel>
+                  <FormLabel>{tf("defaultTaxRate")}</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -107,9 +111,7 @@ export function PaymentSettingsForm({ defaultValues }: Props) {
                       }}
                     />
                   </FormControl>
-                  <FormDescription>
-                    e.g. 8.1 for Swiss VAT (stored as 0.081)
-                  </FormDescription>
+                  <FormDescription>{tf("taxRateHint")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -117,7 +119,7 @@ export function PaymentSettingsForm({ defaultValues }: Props) {
 
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {tc("saveChanges")}
             </Button>
           </form>
         </Form>

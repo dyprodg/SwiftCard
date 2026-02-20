@@ -44,6 +44,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 export function CheckoutClient() {
   const t = useTranslations("checkout");
   const tCart = useTranslations("cart");
+  const tc = useTranslations("common");
   const locale = useLocale();
   const router = useRouter();
   const items = useCartStore((s) => s.items);
@@ -314,7 +315,7 @@ export function CheckoutClient() {
                     />
                   ) : (
                     <div className="bg-muted flex h-full w-full items-center justify-center text-xs">
-                      No img
+                      {tc("noImageShort")}
                     </div>
                   )}
                 </div>

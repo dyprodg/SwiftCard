@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+
+export const metadata: Metadata = {
+  title: "Order Confirmation",
+  robots: { index: false, follow: false },
+};
 import { CheckCircle, Clock } from "lucide-react";
 
 import { db } from "@/db";
@@ -24,7 +30,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
   if (!order_id) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <p className="text-muted-foreground">No order found.</p>
+        <p className="text-muted-foreground">{t("noOrder")}</p>
         <Button className="mt-4" asChild>
           <Link href={`/${locale}/products`}>{t("continueShopping")}</Link>
         </Button>
@@ -40,7 +46,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
   if (!order) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <p className="text-muted-foreground">Order not found.</p>
+        <p className="text-muted-foreground">{t("noOrder")}</p>
         <Button className="mt-4" asChild>
           <Link href={`/${locale}/products`}>{t("continueShopping")}</Link>
         </Button>
@@ -108,30 +114,32 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
 
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span>Subtotal</span>
+              <span>{t("subtotal")}</span>
               <span>{formatPrice(order.subtotal)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Tax</span>
+              <span>{t("tax")}</span>
               <span>{formatPrice(order.tax)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Shipping</span>
-              <span>{order.shipping === 0 ? "Free" : formatPrice(order.shipping)}</span>
+              <span>{t("shipping")}</span>
+              <span>
+                {order.shipping === 0 ? t("shippingFree") : formatPrice(order.shipping)}
+              </span>
             </div>
           </div>
 
           <Separator />
 
           <div className="flex justify-between text-lg font-bold">
-            <span>Total</span>
+            <span>{t("total")}</span>
             <span>{formatPrice(order.total)}</span>
           </div>
 
           {/* Shipping address */}
           <Separator />
           <div className="text-sm">
-            <p className="mb-1 font-medium">Shipping to:</p>
+            <p className="mb-1 font-medium">{t("shippingTo")}</p>
             <p>{order.shippingName}</p>
             <p>{order.shippingAddress1}</p>
             {order.shippingAddress2 && <p>{order.shippingAddress2}</p>}

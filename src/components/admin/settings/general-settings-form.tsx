@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import {
   generalSettingsSchema,
@@ -33,6 +34,9 @@ type Props = {
 
 export function GeneralSettingsForm({ defaultValues }: Props) {
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("admin.settings");
+  const tf = useTranslations("admin.settings.generalForm");
+  const tc = useTranslations("common");
 
   const form = useForm<GeneralSettingsInput>({
     resolver: zodResolver(generalSettingsSchema),
@@ -43,9 +47,9 @@ export function GeneralSettingsForm({ defaultValues }: Props) {
     startTransition(async () => {
       try {
         await updateGeneralSettings(data);
-        toast.success("General settings saved");
+        toast.success(t("saved"));
       } catch {
-        toast.error("Failed to save settings");
+        toast.error(t("saveFailed"));
       }
     });
   }
@@ -53,7 +57,7 @@ export function GeneralSettingsForm({ defaultValues }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>General</CardTitle>
+        <CardTitle>{tf("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -63,7 +67,7 @@ export function GeneralSettingsForm({ defaultValues }: Props) {
               name="shopName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Shop Name</FormLabel>
+                  <FormLabel>{tf("shopName")}</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -77,11 +81,11 @@ export function GeneralSettingsForm({ defaultValues }: Props) {
               name="shopDescription"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Shop Description</FormLabel>
+                  <FormLabel>{tf("shopDescription")}</FormLabel>
                   <FormControl>
                     <Textarea {...field} value={field.value ?? ""} rows={3} />
                   </FormControl>
-                  <FormDescription>Shown on the homepage hero section</FormDescription>
+                  <FormDescription>{tf("shopDescriptionHint")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -92,7 +96,7 @@ export function GeneralSettingsForm({ defaultValues }: Props) {
               name="contactEmail"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Contact Email</FormLabel>
+                  <FormLabel>{tf("contactEmail")}</FormLabel>
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
@@ -107,10 +111,8 @@ export function GeneralSettingsForm({ defaultValues }: Props) {
               render={({ field }) => (
                 <FormItem className="flex items-center justify-between rounded-lg border p-4">
                   <div>
-                    <FormLabel>Allow Guest Checkout</FormLabel>
-                    <FormDescription>
-                      Let customers check out without creating an account
-                    </FormDescription>
+                    <FormLabel>{tf("allowGuestCheckout")}</FormLabel>
+                    <FormDescription>{tf("allowGuestCheckoutHint")}</FormDescription>
                   </div>
                   <FormControl>
                     <Switch checked={field.value} onCheckedChange={field.onChange} />
@@ -121,7 +123,7 @@ export function GeneralSettingsForm({ defaultValues }: Props) {
 
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {tc("saveChanges")}
             </Button>
           </form>
         </Form>

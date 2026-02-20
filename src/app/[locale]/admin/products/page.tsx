@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Plus } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import { getProducts } from "@/server/queries/products";
 import { formatPrice } from "@/lib/utils/format-price";
@@ -29,6 +30,7 @@ const STATUS_VARIANT = {
 export default async function ProductsPage({ searchParams, params }: Props) {
   const { locale } = await params;
   const sp = await searchParams;
+  const t = await getTranslations("admin.products");
   const page = parseInt(sp.page ?? "1");
   const pageSize = 20;
 
@@ -45,13 +47,13 @@ export default async function ProductsPage({ searchParams, params }: Props) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Products</h1>
-          <p className="text-muted-foreground">{total} products total</p>
+          <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
+          <p className="text-muted-foreground">{t("totalCount", { count: total })}</p>
         </div>
         <Button asChild>
           <Link href={`/${locale}/admin/products/new`}>
             <Plus className="mr-2 h-4 w-4" />
-            Add Product
+            {t("addProduct")}
           </Link>
         </Button>
       </div>
@@ -59,7 +61,7 @@ export default async function ProductsPage({ searchParams, params }: Props) {
       {/* Filters */}
       <div className="flex items-center gap-2">
         <Button variant={!sp.status ? "default" : "outline"} size="sm" asChild>
-          <Link href={`/${locale}/admin/products`}>All</Link>
+          <Link href={`/${locale}/admin/products`}>{t("all")}</Link>
         </Button>
         {(["ACTIVE", "DRAFT", "ARCHIVED"] as const).map((status) => (
           <Button
@@ -69,7 +71,7 @@ export default async function ProductsPage({ searchParams, params }: Props) {
             asChild
           >
             <Link href={`/${locale}/admin/products?status=${status}`}>
-              {status.charAt(0) + status.slice(1).toLowerCase()}
+              {t(status.toLowerCase() as "active" | "draft" | "archived")}
             </Link>
           </Button>
         ))}
@@ -80,12 +82,12 @@ export default async function ProductsPage({ searchParams, params }: Props) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-12">Image</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead className="text-right">Price</TableHead>
-              <TableHead className="text-right">Variants</TableHead>
+              <TableHead className="w-12">{t("image")}</TableHead>
+              <TableHead>{t("name")}</TableHead>
+              <TableHead>{t("statusCol")}</TableHead>
+              <TableHead>{t("category")}</TableHead>
+              <TableHead className="text-right">{t("price")}</TableHead>
+              <TableHead className="text-right">{t("variantsCol")}</TableHead>
               <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
@@ -93,7 +95,7 @@ export default async function ProductsPage({ searchParams, params }: Props) {
             {items.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="h-24 text-center">
-                  No products found.
+                  {t("noProducts")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -118,13 +120,17 @@ export default async function ProductsPage({ searchParams, params }: Props) {
                   </TableCell>
                   <TableCell className="font-medium">{product.name}</TableCell>
                   <TableCell>
-                    <Badge variant={STATUS_VARIANT[product.status]}>
-                      {product.status}
+                    <Badge
+                      variant={
+                        STATUS_VARIANT[product.status as keyof typeof STATUS_VARIANT]
+                      }
+                    >
+                      {t(product.status.toLowerCase() as "active" | "draft" | "archived")}
                     </Badge>
                   </TableCell>
                   <TableCell>
                     {product.category?.name ?? (
-                      <span className="text-muted-foreground">—</span>
+                      <span className="text-muted-foreground">{"\u2014"}</span>
                     )}
                   </TableCell>
                   <TableCell className="text-right">
@@ -134,7 +140,7 @@ export default async function ProductsPage({ searchParams, params }: Props) {
                   <TableCell>
                     <Button variant="ghost" size="sm" asChild>
                       <Link href={`/${locale}/admin/products/${product.id}/edit`}>
-                        Edit
+                        {t("editProduct")}
                       </Link>
                     </Button>
                   </TableCell>
@@ -149,7 +155,7 @@ export default async function ProductsPage({ searchParams, params }: Props) {
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Page {page} of {totalPages}
+            {t("page")} {page} {t("of")} {totalPages}
           </p>
           <div className="flex gap-2">
             {page > 1 && (
@@ -157,7 +163,7 @@ export default async function ProductsPage({ searchParams, params }: Props) {
                 <Link
                   href={`/${locale}/admin/products?page=${page - 1}${sp.status ? `&status=${sp.status}` : ""}`}
                 >
-                  Previous
+                  {t("previous")}
                 </Link>
               </Button>
             )}
@@ -166,7 +172,7 @@ export default async function ProductsPage({ searchParams, params }: Props) {
                 <Link
                   href={`/${locale}/admin/products?page=${page + 1}${sp.status ? `&status=${sp.status}` : ""}`}
                 >
-                  Next
+                  {t("next")}
                 </Link>
               </Button>
             )}

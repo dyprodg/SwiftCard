@@ -20,7 +20,26 @@
     "create": "Create",
     "currency": "CHF",
     "featuredProducts": "Featured Products",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "next": "Next",
+    "previous": "Previous",
+    "page": "Page",
+    "of": "of",
+    "noImage": "No image",
+    "noImageShort": "No img",
+    "featured": "Featured",
+    "inStock": "{count} in stock",
+    "outOfStock": "Out of stock",
+    "size": "Size",
+    "color": "Color",
+    "variant": "variant",
+    "variants": "variants",
+    "noResults": "No results",
+    "failedToAdd": "Failed to add to cart",
+    "showing": "Showing",
+    "all": "All",
+    "updating": "Updating...",
+    "saveChanges": "Save Changes"
   },
   "products": {
     "title": "Products",
@@ -36,7 +55,12 @@
       "price": "Price",
       "sort": "Sort"
     },
-    "addedToCart": "Added to cart"
+    "addedToCart": "Added to cart",
+    "pagination": {
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page"
+    }
   },
   "cart": {
     "title": "Cart",
@@ -82,7 +106,14 @@
       "paymentProcessing": "Payment is being processed...",
       "continueShopping": "Continue Shopping",
       "viewOrder": "View Order",
-      "checkBackLater": "Payment confirmation is taking longer than usual. Please check back in a few minutes."
+      "checkBackLater": "Payment confirmation is taking longer than usual. Please check back in a few minutes.",
+      "noOrder": "No order found.",
+      "subtotal": "Subtotal",
+      "tax": "Tax",
+      "shipping": "Shipping",
+      "shippingFree": "Free",
+      "total": "Total",
+      "shippingTo": "Shipping to:"
     },
     "errors": {
       "cartEmpty": "Your cart is empty",
@@ -101,6 +132,8 @@
     "payment": "Payment",
     "total": "Total",
     "shipped": "Shipped",
+    "paymentLabel": "Payment:",
+    "shippedLabel": "Shipped:",
     "statuses": {
       "PENDING": "Pending",
       "CONFIRMED": "Confirmed",
@@ -131,13 +164,106 @@
     "paymentBeingProcessed": "Payment is being processed. This page will update automatically.",
     "continueShopping": "Continue Shopping"
   },
+  "maintenance": {
+    "title": "We'll be right back",
+    "message": "We're currently performing scheduled maintenance. Please check back shortly."
+  },
   "admin": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "products": "Products",
+      "orders": "Orders",
+      "customers": "Customers",
+      "settings": "Settings",
+      "viewStorefront": "View Storefront",
+      "adminTitle": "SwiftCart Admin"
+    },
     "dashboard": {
       "title": "Dashboard",
-      "revenue": "Revenue",
-      "orders": "Orders",
+      "description": "Overview of your store performance",
+      "revenue": "Total Revenue",
+      "orders": "Total Orders",
+      "paidOrders": "Paid Orders",
+      "avgOrderValue": "Avg. Order Value",
+      "lowStockAlerts": "Low Stock Alerts",
+      "recentOrders": "Recent Orders",
+      "noOrdersYet": "No orders yet",
+      "maintenanceMode": "Maintenance Mode",
+      "maintenanceEnabled": "Maintenance mode enabled",
+      "maintenanceDisabled": "Maintenance mode disabled",
+      "maintenanceFailed": "Failed to update maintenance mode",
       "products": "Products",
-      "customers": "Customers"
+      "customers": "Customers",
+      "sku": "SKU",
+      "product": "Product",
+      "variantLabel": "Variant",
+      "stock": "Stock",
+      "order": "Order",
+      "customer": "Customer",
+      "status": "Status",
+      "paymentCol": "Payment",
+      "total": "Total",
+      "date": "Date"
+    },
+    "products": {
+      "title": "Products",
+      "totalCount": "{count} products total",
+      "addProduct": "Add Product",
+      "createProduct": "Create Product",
+      "createDescription": "Add a new product to your store",
+      "editProduct": "Edit Product",
+      "all": "All",
+      "active": "Active",
+      "draft": "Draft",
+      "archived": "Archived",
+      "image": "Image",
+      "name": "Name",
+      "statusCol": "Status",
+      "category": "Category",
+      "price": "Price",
+      "variantsCol": "Variants",
+      "noProducts": "No products found.",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page",
+      "of": "of",
+      "basicInfo": "Basic Information",
+      "productName": "Product Name",
+      "productNamePlaceholder": "e.g. Classic T-Shirt",
+      "slug": "Slug",
+      "slugPlaceholder": "auto-generated from name",
+      "slugHint": "Leave empty to auto-generate from name",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the product...",
+      "basePrice": "Base Price (Rappen)",
+      "basePriceHint": "Enter price in Rappen (cents)",
+      "selectStatus": "Select status",
+      "selectCategory": "Select category",
+      "featuredProduct": "Featured Product",
+      "images": "Images",
+      "variantsTitle": "Variants",
+      "addVariant": "Add Variant",
+      "noVariants": "No variants. Click \"Add Variant\" to add size, color, or material options.",
+      "skuLabel": "SKU *",
+      "skuPlaceholder": "SKU-001",
+      "sizeLabel": "Size",
+      "sizePlaceholder": "M",
+      "colorLabel": "Color",
+      "colorPlaceholder": "Black",
+      "priceAdjustment": "Price +/- (Rp.)",
+      "stockLabel": "Stock",
+      "seo": "SEO",
+      "metaTitle": "Meta Title",
+      "metaTitlePlaceholder": "Page title for search engines",
+      "metaTitleCount": "{count}/60 characters",
+      "metaDescription": "Meta Description",
+      "metaDescriptionPlaceholder": "Brief description for search engines",
+      "metaDescriptionCount": "{count}/160 characters",
+      "updateProduct": "Update Product",
+      "productUpdated": "Product updated",
+      "productCreated": "Product created",
+      "productError": "Something went wrong",
+      "cancel": "Cancel"
     },
     "orders": {
       "title": "Orders",
@@ -154,7 +280,102 @@
       "customerNote": "Customer Note",
       "addNote": "Add Note",
       "adding": "Adding...",
-      "addNotePlaceholder": "Add a note..."
+      "addNotePlaceholder": "Add a note...",
+      "order": "Order",
+      "status": "Status",
+      "payment": "Payment",
+      "total": "Total",
+      "date": "Date",
+      "changeStatus": "Change status...",
+      "detail": {
+        "subtotal": "Subtotal",
+        "shipping": "Shipping",
+        "shippingFree": "Free",
+        "tax": "Tax",
+        "total": "Total",
+        "paid": "Paid:",
+        "shipped": "Shipped:",
+        "delivered": "Delivered:",
+        "cancelled": "Cancelled:"
+      },
+      "statuses": {
+        "PENDING": "Pending",
+        "CONFIRMED": "Confirmed",
+        "PROCESSING": "Processing",
+        "SHIPPED": "Shipped",
+        "DELIVERED": "Delivered",
+        "CANCELLED": "Cancelled",
+        "REFUNDED": "Refunded"
+      },
+      "paymentStatuses": {
+        "PENDING": "Pending",
+        "PAID": "Paid",
+        "FAILED": "Failed",
+        "REFUNDED": "Refunded"
+      }
+    },
+    "customers": {
+      "title": "Customers",
+      "count": "{count} customer(s)",
+      "email": "Email",
+      "name": "Name",
+      "type": "Type",
+      "ordersCount": "Orders",
+      "totalSpent": "Total Spent",
+      "lastOrder": "Last Order",
+      "noCustomers": "No customers yet",
+      "account": "Account",
+      "guest": "Guest"
+    },
+    "settings": {
+      "title": "Settings",
+      "description": "Manage your shop configuration",
+      "general": "General",
+      "shipping": "Shipping",
+      "payment": "Payment",
+      "legal": "Legal",
+      "saved": "Settings saved",
+      "saveFailed": "Failed to save settings",
+      "generalForm": {
+        "title": "General",
+        "shopName": "Shop Name",
+        "shopDescription": "Shop Description",
+        "shopDescriptionHint": "Shown on the homepage hero section",
+        "contactEmail": "Contact Email",
+        "allowGuestCheckout": "Allow Guest Checkout",
+        "allowGuestCheckoutHint": "Let customers check out without creating an account"
+      },
+      "shippingForm": {
+        "title": "Shipping",
+        "defaultCost": "Default Shipping Cost (cents)",
+        "defaultCostHint": "e.g. 990 = CHF 9.90",
+        "freeThreshold": "Free Shipping Threshold",
+        "freeThresholdHint": "Waive shipping above a certain order total",
+        "thresholdAmount": "Threshold (cents)",
+        "thresholdAmountHint": "e.g. 10000 = free shipping above CHF 100.00"
+      },
+      "paymentForm": {
+        "title": "Payment",
+        "currency": "Currency",
+        "selectCurrency": "Select currency",
+        "defaultTaxRate": "Default Tax Rate (%)",
+        "taxRateHint": "e.g. 8.1 for Swiss VAT (stored as 0.081)"
+      },
+      "legalForm": {
+        "title": "Legal Pages",
+        "termsUrl": "Terms of Service URL",
+        "termsHint": "Link to your terms page",
+        "privacyUrl": "Privacy Policy URL",
+        "imprintUrl": "Imprint URL"
+      }
+    },
+    "dataTable": {
+      "noResults": "No results.",
+      "showing": "Showing",
+      "of": "of",
+      "previous": "Previous",
+      "next": "Next",
+      "page": "Page"
     }
   }
 }

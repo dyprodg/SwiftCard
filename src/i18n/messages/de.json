@@ -20,7 +20,26 @@
     "create": "Erstellen",
     "currency": "CHF",
     "featuredProducts": "Empfohlene Produkte",
-    "viewAll": "Alle anzeigen"
+    "viewAll": "Alle anzeigen",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "page": "Seite",
+    "of": "von",
+    "noImage": "Kein Bild",
+    "noImageShort": "Kein Bild",
+    "featured": "Empfohlen",
+    "inStock": "{count} an Lager",
+    "outOfStock": "Nicht an Lager",
+    "size": "Grösse",
+    "color": "Farbe",
+    "variant": "Variante",
+    "variants": "Varianten",
+    "noResults": "Keine Ergebnisse",
+    "failedToAdd": "Fehler beim Hinzufügen",
+    "showing": "Zeige",
+    "all": "Alle",
+    "updating": "Aktualisieren...",
+    "saveChanges": "Änderungen speichern"
   },
   "products": {
     "title": "Produkte",
@@ -36,7 +55,12 @@
       "price": "Preis",
       "sort": "Sortierung"
     },
-    "addedToCart": "Zum Warenkorb hinzugefügt"
+    "addedToCart": "Zum Warenkorb hinzugefügt",
+    "pagination": {
+      "previous": "Zurück",
+      "next": "Weiter",
+      "page": "Seite"
+    }
   },
   "cart": {
     "title": "Warenkorb",
@@ -82,7 +106,14 @@
       "paymentProcessing": "Zahlung wird verarbeitet...",
       "continueShopping": "Weiter einkaufen",
       "viewOrder": "Bestellung ansehen",
-      "checkBackLater": "Die Zahlungsbestätigung dauert länger als gewöhnlich. Bitte schaue in ein paar Minuten erneut vorbei."
+      "checkBackLater": "Die Zahlungsbestätigung dauert länger als gewöhnlich. Bitte schaue in ein paar Minuten erneut vorbei.",
+      "noOrder": "Keine Bestellung gefunden.",
+      "subtotal": "Zwischensumme",
+      "tax": "MwSt.",
+      "shipping": "Versand",
+      "shippingFree": "Kostenlos",
+      "total": "Gesamtsumme",
+      "shippingTo": "Lieferung an:"
     },
     "errors": {
       "cartEmpty": "Dein Warenkorb ist leer",
@@ -101,6 +132,8 @@
     "payment": "Zahlung",
     "total": "Gesamtsumme",
     "shipped": "Versendet",
+    "paymentLabel": "Zahlung:",
+    "shippedLabel": "Versendet:",
     "statuses": {
       "PENDING": "Ausstehend",
       "CONFIRMED": "Bestätigt",
@@ -131,13 +164,106 @@
     "paymentBeingProcessed": "Zahlung wird verarbeitet. Diese Seite wird automatisch aktualisiert.",
     "continueShopping": "Weiter einkaufen"
   },
+  "maintenance": {
+    "title": "Wir sind gleich zurück",
+    "message": "Wir führen derzeit geplante Wartungsarbeiten durch. Bitte versuche es in Kürze erneut."
+  },
   "admin": {
+    "nav": {
+      "dashboard": "Dashboard",
+      "products": "Produkte",
+      "orders": "Bestellungen",
+      "customers": "Kunden",
+      "settings": "Einstellungen",
+      "viewStorefront": "Zum Shop",
+      "adminTitle": "SwiftCart Admin"
+    },
     "dashboard": {
       "title": "Dashboard",
-      "revenue": "Umsatz",
-      "orders": "Bestellungen",
+      "description": "Übersicht der Shop-Performance",
+      "revenue": "Gesamtumsatz",
+      "orders": "Bestellungen gesamt",
+      "paidOrders": "Bezahlte Bestellungen",
+      "avgOrderValue": "Durchschn. Bestellwert",
+      "lowStockAlerts": "Lagerbestandswarnungen",
+      "recentOrders": "Neueste Bestellungen",
+      "noOrdersYet": "Noch keine Bestellungen",
+      "maintenanceMode": "Wartungsmodus",
+      "maintenanceEnabled": "Wartungsmodus aktiviert",
+      "maintenanceDisabled": "Wartungsmodus deaktiviert",
+      "maintenanceFailed": "Fehler beim Aktualisieren des Wartungsmodus",
       "products": "Produkte",
-      "customers": "Kunden"
+      "customers": "Kunden",
+      "sku": "SKU",
+      "product": "Produkt",
+      "variantLabel": "Variante",
+      "stock": "Bestand",
+      "order": "Bestellung",
+      "customer": "Kunde",
+      "status": "Status",
+      "paymentCol": "Zahlung",
+      "total": "Gesamt",
+      "date": "Datum"
+    },
+    "products": {
+      "title": "Produkte",
+      "totalCount": "{count} Produkte insgesamt",
+      "addProduct": "Produkt hinzufügen",
+      "createProduct": "Produkt erstellen",
+      "createDescription": "Füge ein neues Produkt zu deinem Shop hinzu",
+      "editProduct": "Produkt bearbeiten",
+      "all": "Alle",
+      "active": "Aktiv",
+      "draft": "Entwurf",
+      "archived": "Archiviert",
+      "image": "Bild",
+      "name": "Name",
+      "statusCol": "Status",
+      "category": "Kategorie",
+      "price": "Preis",
+      "variantsCol": "Varianten",
+      "noProducts": "Keine Produkte gefunden.",
+      "previous": "Zurück",
+      "next": "Weiter",
+      "page": "Seite",
+      "of": "von",
+      "basicInfo": "Grundinformationen",
+      "productName": "Produktname",
+      "productNamePlaceholder": "z.B. Klassisches T-Shirt",
+      "slug": "Slug",
+      "slugPlaceholder": "wird automatisch generiert",
+      "slugHint": "Leer lassen für automatische Generierung",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Produkt beschreiben...",
+      "basePrice": "Grundpreis (Rappen)",
+      "basePriceHint": "Preis in Rappen eingeben",
+      "selectStatus": "Status wählen",
+      "selectCategory": "Kategorie wählen",
+      "featuredProduct": "Empfohlenes Produkt",
+      "images": "Bilder",
+      "variantsTitle": "Varianten",
+      "addVariant": "Variante hinzufügen",
+      "noVariants": "Keine Varianten. Klicke auf \"Variante hinzufügen\" um Grösse, Farbe oder Material hinzuzufügen.",
+      "skuLabel": "SKU *",
+      "skuPlaceholder": "SKU-001",
+      "sizeLabel": "Grösse",
+      "sizePlaceholder": "M",
+      "colorLabel": "Farbe",
+      "colorPlaceholder": "Schwarz",
+      "priceAdjustment": "Preis +/- (Rp.)",
+      "stockLabel": "Bestand",
+      "seo": "SEO",
+      "metaTitle": "Meta-Titel",
+      "metaTitlePlaceholder": "Seitentitel für Suchmaschinen",
+      "metaTitleCount": "{count}/60 Zeichen",
+      "metaDescription": "Meta-Beschreibung",
+      "metaDescriptionPlaceholder": "Kurze Beschreibung für Suchmaschinen",
+      "metaDescriptionCount": "{count}/160 Zeichen",
+      "updateProduct": "Produkt aktualisieren",
+      "productUpdated": "Produkt aktualisiert",
+      "productCreated": "Produkt erstellt",
+      "productError": "Etwas ist schiefgelaufen",
+      "cancel": "Abbrechen"
     },
     "orders": {
       "title": "Bestellungen",
@@ -154,7 +280,102 @@
       "customerNote": "Kundennotiz",
       "addNote": "Notiz hinzufügen",
       "adding": "Wird hinzugefügt...",
-      "addNotePlaceholder": "Notiz hinzufügen..."
+      "addNotePlaceholder": "Notiz hinzufügen...",
+      "order": "Bestellung",
+      "status": "Status",
+      "payment": "Zahlung",
+      "total": "Gesamt",
+      "date": "Datum",
+      "changeStatus": "Status ändern...",
+      "detail": {
+        "subtotal": "Zwischensumme",
+        "shipping": "Versand",
+        "shippingFree": "Kostenlos",
+        "tax": "MwSt.",
+        "total": "Gesamtsumme",
+        "paid": "Bezahlt:",
+        "shipped": "Versendet:",
+        "delivered": "Zugestellt:",
+        "cancelled": "Storniert:"
+      },
+      "statuses": {
+        "PENDING": "Ausstehend",
+        "CONFIRMED": "Bestätigt",
+        "PROCESSING": "In Bearbeitung",
+        "SHIPPED": "Versendet",
+        "DELIVERED": "Zugestellt",
+        "CANCELLED": "Storniert",
+        "REFUNDED": "Erstattet"
+      },
+      "paymentStatuses": {
+        "PENDING": "Ausstehend",
+        "PAID": "Bezahlt",
+        "FAILED": "Fehlgeschlagen",
+        "REFUNDED": "Erstattet"
+      }
+    },
+    "customers": {
+      "title": "Kunden",
+      "count": "{count} Kunde(n)",
+      "email": "E-Mail",
+      "name": "Name",
+      "type": "Typ",
+      "ordersCount": "Bestellungen",
+      "totalSpent": "Gesamtausgaben",
+      "lastOrder": "Letzte Bestellung",
+      "noCustomers": "Noch keine Kunden",
+      "account": "Konto",
+      "guest": "Gast"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "description": "Shop-Konfiguration verwalten",
+      "general": "Allgemein",
+      "shipping": "Versand",
+      "payment": "Zahlung",
+      "legal": "Recht",
+      "saved": "Einstellungen gespeichert",
+      "saveFailed": "Fehler beim Speichern",
+      "generalForm": {
+        "title": "Allgemein",
+        "shopName": "Shop-Name",
+        "shopDescription": "Shop-Beschreibung",
+        "shopDescriptionHint": "Wird im Hero-Bereich der Startseite angezeigt",
+        "contactEmail": "Kontakt-E-Mail",
+        "allowGuestCheckout": "Gastkauf erlauben",
+        "allowGuestCheckoutHint": "Kunden ohne Konto bestellen lassen"
+      },
+      "shippingForm": {
+        "title": "Versand",
+        "defaultCost": "Standard-Versandkosten (Rappen)",
+        "defaultCostHint": "z.B. 990 = CHF 9.90",
+        "freeThreshold": "Gratis-Versand-Schwelle",
+        "freeThresholdHint": "Versand ab einem bestimmten Bestellwert erlassen",
+        "thresholdAmount": "Schwellenwert (Rappen)",
+        "thresholdAmountHint": "z.B. 10000 = gratis Versand ab CHF 100.00"
+      },
+      "paymentForm": {
+        "title": "Zahlung",
+        "currency": "Währung",
+        "selectCurrency": "Währung wählen",
+        "defaultTaxRate": "Standard-Steuersatz (%)",
+        "taxRateHint": "z.B. 8.1 für Schweizer MwSt. (gespeichert als 0.081)"
+      },
+      "legalForm": {
+        "title": "Rechtliche Seiten",
+        "termsUrl": "AGB-URL",
+        "termsHint": "Link zu deinen AGB",
+        "privacyUrl": "Datenschutz-URL",
+        "imprintUrl": "Impressum-URL"
+      }
+    },
+    "dataTable": {
+      "noResults": "Keine Ergebnisse.",
+      "showing": "Zeige",
+      "of": "von",
+      "previous": "Zurück",
+      "next": "Weiter",
+      "page": "Seite"
     }
   }
 }

@@ -36,6 +36,7 @@ export async function getProducts(filters: ProductFilters = {}) {
         images: { orderBy: (img, { asc }) => [asc(img.position)] },
         variants: true,
         category: true,
+        translations: true,
       },
       orderBy: [desc(products.createdAt)],
       limit: filters.limit ?? 20,
@@ -83,6 +84,7 @@ export async function getFeaturedProducts(limit: number = 6) {
     with: {
       images: { orderBy: (img, { asc }) => [asc(img.position)], limit: 1 },
       variants: true,
+      translations: true,
     },
     orderBy: [desc(products.createdAt)],
     limit,

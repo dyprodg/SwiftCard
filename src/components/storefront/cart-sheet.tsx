@@ -20,6 +20,7 @@ import { formatPrice } from "@/lib/utils/format-price";
 
 export function CartSheet({ locale }: { locale: string }) {
   const t = useTranslations("cart");
+  const tc = useTranslations("common");
   const items = useCartStore((s) => s.items);
   const isOpen = useCartStore((s) => s.isOpen);
   const setOpen = useCartStore((s) => s.setOpen);
@@ -97,7 +98,7 @@ export function CartSheet({ locale }: { locale: string }) {
                         />
                       ) : (
                         <div className="bg-muted flex h-full w-full items-center justify-center text-xs">
-                          No img
+                          {tc("noImageShort")}
                         </div>
                       )}
                     </div>

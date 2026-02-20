@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import {
   Table,
   TableBody,
@@ -35,6 +36,7 @@ export function DataTable<T extends { id: string }>({
   pageSize,
   onPageChange,
 }: DataTableProps<T>) {
+  const t = useTranslations("admin.dataTable");
   const totalPages = Math.ceil(total / pageSize);
 
   return (
@@ -54,7 +56,7 @@ export function DataTable<T extends { id: string }>({
             {data.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  No results.
+                  {t("noResults")}
                 </TableCell>
               </TableRow>
             ) : (
@@ -79,8 +81,8 @@ export function DataTable<T extends { id: string }>({
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            Showing {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of{" "}
-            {total}
+            {t("showing")} {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)}{" "}
+            {t("of")} {total}
           </p>
           <div className="flex items-center gap-2">
             <Button
@@ -90,10 +92,10 @@ export function DataTable<T extends { id: string }>({
               disabled={page <= 1}
             >
               <ChevronLeft className="h-4 w-4" />
-              Previous
+              {t("previous")}
             </Button>
             <span className="text-muted-foreground text-sm">
-              Page {page} of {totalPages}
+              {t("page")} {page} / {totalPages}
             </span>
             <Button
               variant="outline"
@@ -101,7 +103,7 @@ export function DataTable<T extends { id: string }>({
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
             >
-              Next
+              {t("next")}
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>

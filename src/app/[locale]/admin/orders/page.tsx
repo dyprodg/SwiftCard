@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { getOrders } from "@/server/queries/orders";
 import { OrdersClient } from "./orders-client";
 
@@ -12,6 +13,7 @@ type Props = {
 
 export default async function AdminOrdersPage({ searchParams }: Props) {
   const params = await searchParams;
+  const t = await getTranslations("admin.orders");
   const page = Number(params.page) || 1;
 
   const result = await getOrders({
@@ -25,8 +27,8 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold">Orders</h1>
-        <p className="text-muted-foreground text-sm">Manage and track customer orders</p>
+        <h1 className="text-2xl font-bold">{t("title")}</h1>
+        <p className="text-muted-foreground text-sm">{t("description")}</p>
       </div>
 
       <OrdersClient

@@ -28,6 +28,7 @@ export function ProductDetailClient({
   imageUrl,
 }: Props) {
   const t = useTranslations("products");
+  const tc = useTranslations("common");
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(
     variants[0] ?? null,
   );
@@ -69,7 +70,7 @@ export function ProductDetailClient({
     startTransition(async () => {
       const result = await addToCart(productId, selectedVariant?.id ?? null, 1);
       if (!result.success) {
-        toast.error(result.error ?? "Failed to add to cart");
+        toast.error(result.error ?? tc("failedToAdd"));
       } else {
         toast.success(t("addedToCart"));
       }

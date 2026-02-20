@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
@@ -43,6 +43,7 @@ export function OrdersClient({
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const locale = useLocale();
+  const t = useTranslations("admin.orders");
 
   function updateParams(key: string, value: string | undefined) {
     const params = new URLSearchParams(searchParams.toString());
@@ -57,7 +58,7 @@ export function OrdersClient({
 
   const columns: Column<Order>[] = [
     {
-      header: "Order",
+      header: t("order"),
       cell: (row) => (
         <Link
           href={`/${locale}/admin/orders/${row.id}`}
@@ -68,7 +69,7 @@ export function OrdersClient({
       ),
     },
     {
-      header: "Customer",
+      header: t("customer"),
       cell: (row) => (
         <div>
           <p className="text-sm font-medium">{row.shippingName}</p>
@@ -77,25 +78,27 @@ export function OrdersClient({
       ),
     },
     {
-      header: "Status",
+      header: t("status"),
       cell: (row) => <OrderStatusBadge status={row.status} />,
     },
     {
-      header: "Payment",
+      header: t("payment"),
       cell: (row) => <PaymentStatusBadge status={row.paymentStatus} />,
     },
     {
-      header: "Total",
+      header: t("total"),
       cell: (row) => (
         <span className="font-medium">{formatPrice(row.total, row.currency)}</span>
       ),
       className: "text-right",
     },
     {
-      header: "Date",
+      header: t("date"),
       cell: (row) => (
         <span className="text-muted-foreground text-sm">
-          {new Date(row.createdAt).toLocaleDateString("de-CH")}
+          {new Date(row.createdAt).toLocaleDateString(
+            locale === "de" ? "de-CH" : "en-CH",
+          )}
         </span>
       ),
     },
@@ -108,7 +111,7 @@ export function OrdersClient({
         <div className="relative min-w-[200px] flex-1">
           <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
-            placeholder="Search orders..."
+            placeholder={t("searchPlaceholder")}
             defaultValue={currentSearch}
             className="pl-9"
             onChange={(e) => {
@@ -127,17 +130,17 @@ export function OrdersClient({
           }
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder={t("status")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Statuses</SelectItem>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-            <SelectItem value="PROCESSING">Processing</SelectItem>
-            <SelectItem value="SHIPPED">Shipped</SelectItem>
-            <SelectItem value="DELIVERED">Delivered</SelectItem>
-            <SelectItem value="CANCELLED">Cancelled</SelectItem>
-            <SelectItem value="REFUNDED">Refunded</SelectItem>
+            <SelectItem value="all">{t("allStatuses")}</SelectItem>
+            <SelectItem value="PENDING">{t("statuses.PENDING")}</SelectItem>
+            <SelectItem value="CONFIRMED">{t("statuses.CONFIRMED")}</SelectItem>
+            <SelectItem value="PROCESSING">{t("statuses.PROCESSING")}</SelectItem>
+            <SelectItem value="SHIPPED">{t("statuses.SHIPPED")}</SelectItem>
+            <SelectItem value="DELIVERED">{t("statuses.DELIVERED")}</SelectItem>
+            <SelectItem value="CANCELLED">{t("statuses.CANCELLED")}</SelectItem>
+            <SelectItem value="REFUNDED">{t("statuses.REFUNDED")}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -148,14 +151,14 @@ export function OrdersClient({
           }
         >
           <SelectTrigger className="w-[160px]">
-            <SelectValue placeholder="Payment" />
+            <SelectValue placeholder={t("payment")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Payments</SelectItem>
-            <SelectItem value="PENDING">Pending</SelectItem>
-            <SelectItem value="PAID">Paid</SelectItem>
-            <SelectItem value="FAILED">Failed</SelectItem>
-            <SelectItem value="REFUNDED">Refunded</SelectItem>
+            <SelectItem value="all">{t("allPayments")}</SelectItem>
+            <SelectItem value="PENDING">{t("paymentStatuses.PENDING")}</SelectItem>
+            <SelectItem value="PAID">{t("paymentStatuses.PAID")}</SelectItem>
+            <SelectItem value="FAILED">{t("paymentStatuses.FAILED")}</SelectItem>
+            <SelectItem value="REFUNDED">{t("paymentStatuses.REFUNDED")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -163,7 +166,7 @@ export function OrdersClient({
       {/* Table */}
       <DataTable
         columns={columns}
-        data={orders}
+        data={orders as (Order & { id: string })[]}
         total={total}
         page={page}
         pageSize={pageSize}

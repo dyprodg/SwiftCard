@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useTransition } from "react";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import { legalSettingsSchema, type LegalSettingsInput } from "@/lib/validations/settings";
 import { updateLegalSettings } from "@/server/actions/settings";
@@ -28,6 +29,9 @@ type Props = {
 
 export function LegalSettingsForm({ defaultValues }: Props) {
   const [isPending, startTransition] = useTransition();
+  const t = useTranslations("admin.settings");
+  const tf = useTranslations("admin.settings.legalForm");
+  const tc = useTranslations("common");
 
   const form = useForm<LegalSettingsInput>({
     resolver: zodResolver(legalSettingsSchema),
@@ -38,9 +42,9 @@ export function LegalSettingsForm({ defaultValues }: Props) {
     startTransition(async () => {
       try {
         await updateLegalSettings(data);
-        toast.success("Legal settings saved");
+        toast.success(t("saved"));
       } catch {
-        toast.error("Failed to save settings");
+        toast.error(t("saveFailed"));
       }
     });
   }
@@ -48,7 +52,7 @@ export function LegalSettingsForm({ defaultValues }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Legal Pages</CardTitle>
+        <CardTitle>{tf("title")}</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -58,7 +62,7 @@ export function LegalSettingsForm({ defaultValues }: Props) {
               name="termsUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Terms of Service URL</FormLabel>
+                  <FormLabel>{tf("termsUrl")}</FormLabel>
                   <FormControl>
                     <Input
                       type="url"
@@ -67,7 +71,7 @@ export function LegalSettingsForm({ defaultValues }: Props) {
                       value={field.value ?? ""}
                     />
                   </FormControl>
-                  <FormDescription>Link to your terms page</FormDescription>
+                  <FormDescription>{tf("termsHint")}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -78,7 +82,7 @@ export function LegalSettingsForm({ defaultValues }: Props) {
               name="privacyUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Privacy Policy URL</FormLabel>
+                  <FormLabel>{tf("privacyUrl")}</FormLabel>
                   <FormControl>
                     <Input
                       type="url"
@@ -97,7 +101,7 @@ export function LegalSettingsForm({ defaultValues }: Props) {
               name="imprintUrl"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Imprint URL</FormLabel>
+                  <FormLabel>{tf("imprintUrl")}</FormLabel>
                   <FormControl>
                     <Input
                       type="url"
@@ -113,7 +117,7 @@ export function LegalSettingsForm({ defaultValues }: Props) {
 
             <Button type="submit" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save Changes
+              {tc("saveChanges")}
             </Button>
           </form>
         </Form>

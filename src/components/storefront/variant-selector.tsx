@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils/format-price";
@@ -13,6 +14,7 @@ type VariantSelectorProps = {
 };
 
 export function VariantSelector({ variants, basePrice, onSelect }: VariantSelectorProps) {
+  const t = useTranslations("common");
   const [selectedId, setSelectedId] = useState<string | null>(variants[0]?.id ?? null);
 
   // Extract unique options
@@ -54,7 +56,7 @@ export function VariantSelector({ variants, basePrice, onSelect }: VariantSelect
       {/* Size selector */}
       {sizes.length > 0 && (
         <div>
-          <label className="mb-2 block text-sm font-medium">Size</label>
+          <label className="mb-2 block text-sm font-medium">{t("size")}</label>
           <div className="flex flex-wrap gap-2">
             {sizes.map((size) => {
               const variant = findVariant(size!, selectedColor);
@@ -80,7 +82,7 @@ export function VariantSelector({ variants, basePrice, onSelect }: VariantSelect
       {/* Color selector */}
       {colors.length > 0 && (
         <div>
-          <label className="mb-2 block text-sm font-medium">Color</label>
+          <label className="mb-2 block text-sm font-medium">{t("color")}</label>
           <div className="flex flex-wrap gap-2">
             {colors.map((color) => {
               const variant = findVariant(selectedSize, color!);
@@ -108,9 +110,11 @@ export function VariantSelector({ variants, basePrice, onSelect }: VariantSelect
         <div className="flex items-baseline gap-2">
           <span className="text-2xl font-bold">{formatPrice(totalPrice)}</span>
           {selected.stock > 0 ? (
-            <span className="text-sm text-green-600">{selected.stock} in stock</span>
+            <span className="text-sm text-green-600">
+              {t("inStock", { count: selected.stock })}
+            </span>
           ) : (
-            <span className="text-destructive text-sm">Out of stock</span>
+            <span className="text-destructive text-sm">{t("outOfStock")}</span>
           )}
         </div>
       )}

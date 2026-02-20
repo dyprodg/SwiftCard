@@ -1,11 +1,39 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
 import { ArrowRight } from "lucide-react";
 
 import { getFeaturedProducts } from "@/server/queries/products";
+import { localizeProducts } from "@/lib/utils/localize-product";
+import { organizationJsonLd } from "@/lib/seo/json-ld";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { Button } from "@/components/ui/button";
 import { getShopSettings } from "@/lib/edge-config";
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://localhost:3000";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = await getLocale();
+  const settings = await getShopSettings();
+  const url = `${APP_URL}/${locale}`;
+
+  return {
+    title: settings.shopName,
+    description: settings.shopDescription ?? undefined,
+    alternates: {
+      canonical: url,
+      languages: { de: `${APP_URL}/de`, en: `${APP_URL}/en` },
+    },
+    openGraph: {
+      title: settings.shopName,
+      description: settings.shopDescription ?? undefined,
+      url,
+      siteName: settings.shopName,
+      locale,
+      type: "website",
+    },
+  };
+}
 
 export default async function HomePage() {
   const locale = await getLocale();
@@ -17,6 +45,12 @@ export default async function HomePage() {
 
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationJsonLd(settings.shopName, APP_URL)),
+        }}
+      />
       {/* Hero Section */}
       <section className="bg-muted/30 border-b">
         <div className="container mx-auto px-4 py-20 text-center">
@@ -50,7 +84,7 @@ export default async function HomePage() {
               </Link>
             </Button>
           </div>
-          <ProductGrid products={featured} />
+          <ProductGrid products={localizeProducts(featured, locale)} />
         </section>
       )}
     </div>

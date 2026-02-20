@@ -1,23 +1,19 @@
+import type { Metadata } from "next";
 import { auth, currentUser } from "@clerk/nextjs/server";
+
+export const metadata: Metadata = {
+  title: "My Orders",
+  robots: { index: false, follow: false },
+};
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getLocale } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronRight, Package } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getOrdersByCustomer } from "@/server/queries/orders";
 import { formatPrice } from "@/lib/utils/format-price";
-
-const statusLabels: Record<string, string> = {
-  PENDING: "Pending",
-  CONFIRMED: "Confirmed",
-  PROCESSING: "Processing",
-  SHIPPED: "Shipped",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
-  REFUNDED: "Refunded",
-};
 
 const statusColors: Record<string, string> = {
   PENDING: "bg-yellow-100 text-yellow-800",
@@ -32,6 +28,7 @@ const statusColors: Record<string, string> = {
 export default async function CustomerOrdersPage() {
   const { userId } = await auth();
   const locale = await getLocale();
+  const t = await getTranslations("orders");
 
   if (!userId) {
     redirect(`/${locale}/sign-in`);
@@ -48,20 +45,18 @@ export default async function CustomerOrdersPage() {
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">My Orders</h1>
+      <h1 className="mb-6 text-2xl font-bold">{t("title")}</h1>
 
       {result.orders.length === 0 ? (
         <Card className="flex flex-col items-center justify-center p-12 text-center">
           <Package className="text-muted-foreground mb-4 h-12 w-12" />
-          <h2 className="mb-2 text-lg font-semibold">No orders yet</h2>
-          <p className="text-muted-foreground mb-4 text-sm">
-            When you place an order, it will appear here.
-          </p>
+          <h2 className="mb-2 text-lg font-semibold">{t("empty")}</h2>
+          <p className="text-muted-foreground mb-4 text-sm">{t("emptyDescription")}</p>
           <Link
             href={`/${locale}/products`}
             className="text-primary text-sm font-medium hover:underline"
           >
-            Browse Products
+            {t("browseProducts")}
           </Link>
         </Card>
       ) : (
@@ -73,15 +68,20 @@ export default async function CustomerOrdersPage() {
                   <div>
                     <p className="text-sm font-semibold">{order.orderNumber}</p>
                     <p className="text-muted-foreground text-xs">
-                      {new Date(order.createdAt).toLocaleDateString("de-CH", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}
+                      {new Date(order.createdAt).toLocaleDateString(
+                        locale === "de" ? "de-CH" : "en-CH",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        },
+                      )}
                     </p>
                   </div>
                   <Badge variant="outline" className={statusColors[order.status] ?? ""}>
-                    {statusLabels[order.status] ?? order.status}
+                    {t(
+                      `statuses.${order.status as "PENDING" | "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED" | "REFUNDED"}`,
+                    )}
                   </Badge>
                 </div>
 
@@ -90,13 +90,17 @@ export default async function CustomerOrdersPage() {
                 <div className="flex items-center justify-between text-sm">
                   <div className="space-y-1">
                     <p>
-                      <span className="text-muted-foreground">Payment: </span>
+                      <span className="text-muted-foreground">{t("paymentLabel")} </span>
                       <span className="font-medium">{order.paymentStatus}</span>
                     </p>
                     {order.shippedAt && (
                       <p>
-                        <span className="text-muted-foreground">Shipped: </span>
-                        {new Date(order.shippedAt).toLocaleDateString("de-CH")}
+                        <span className="text-muted-foreground">
+                          {t("shippedLabel")}{" "}
+                        </span>
+                        {new Date(order.shippedAt).toLocaleDateString(
+                          locale === "de" ? "de-CH" : "en-CH",
+                        )}
                       </p>
                     )}
                   </div>

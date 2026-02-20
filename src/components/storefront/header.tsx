@@ -5,6 +5,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./cart-sheet";
+import { LocaleSwitcher } from "./locale-switcher";
 import { getShopSettings } from "@/lib/edge-config";
 
 export async function Header() {
@@ -34,20 +35,7 @@ export async function Header() {
         {/* Actions */}
         <div className="flex items-center gap-2">
           {/* Locale Switcher */}
-          <div className="flex items-center gap-1 text-sm">
-            <Link
-              href={`/de`}
-              className={`rounded px-1.5 py-0.5 text-xs font-medium ${locale === "de" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              DE
-            </Link>
-            <Link
-              href={`/en`}
-              className={`rounded px-1.5 py-0.5 text-xs font-medium ${locale === "en" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
-            >
-              EN
-            </Link>
-          </div>
+          <LocaleSwitcher />
 
           {/* Cart Sheet (client component with badge) */}
           <CartSheet locale={locale} />

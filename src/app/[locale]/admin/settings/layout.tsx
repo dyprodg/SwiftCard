@@ -2,31 +2,33 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-const tabs = [
-  { label: "General", href: "/admin/settings/general" },
-  { label: "Shipping", href: "/admin/settings/shipping" },
-  { label: "Payment", href: "/admin/settings/payment" },
-  { label: "Legal", href: "/admin/settings/legal" },
-];
+const tabKeys = ["general", "shipping", "payment", "legal"] as const;
+const tabHrefs: Record<string, string> = {
+  general: "/admin/settings/general",
+  shipping: "/admin/settings/shipping",
+  payment: "/admin/settings/payment",
+  legal: "/admin/settings/legal",
+};
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const locale = useLocale();
+  const t = useTranslations("admin.settings");
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Settings</h1>
-      <p className="text-muted-foreground mt-1 mb-6">Manage your shop configuration</p>
+      <h1 className="text-2xl font-bold">{t("title")}</h1>
+      <p className="text-muted-foreground mt-1 mb-6">{t("description")}</p>
       <nav className="mb-6 flex gap-1 border-b">
-        {tabs.map((tab) => {
-          const fullHref = `/${locale}${tab.href}`;
+        {tabKeys.map((key) => {
+          const fullHref = `/${locale}${tabHrefs[key]}`;
           const isActive = pathname === fullHref;
           return (
             <Link
-              key={tab.href}
+              key={key}
               href={fullHref}
               className={cn(
                 "border-b-2 px-4 py-2 text-sm font-medium transition-colors",
@@ -35,7 +37,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                   : "text-muted-foreground hover:text-foreground border-transparent",
               )}
             >
-              {tab.label}
+              {t(key)}
             </Link>
           );
         })}

@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -41,12 +41,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { ImageUpload } from "./image-upload";
 import { formatPrice } from "@/lib/utils/format-price";
-import type {
-  ProductWithRelations,
-  Category,
-  ProductImage,
-  ProductVariant,
-} from "@/types";
+import type { ProductWithRelations, Category } from "@/types";
 import { useState, useTransition } from "react";
 
 type ProductFormProps = {
@@ -57,6 +52,7 @@ type ProductFormProps = {
 export function ProductForm({ product, categories }: ProductFormProps) {
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations("admin.products");
   const [isPending, startTransition] = useTransition();
   const [images, setImages] = useState<{ url: string; alt?: string }[]>(
     product?.images?.map((img) => ({ url: img.url, alt: img.alt ?? undefined })) ?? [],
@@ -110,7 +106,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         if (isEditing) {
           savedProduct = await updateProduct({ ...data, id: product!.id });
         } else {
-          savedProduct = await createProduct(data);
+          savedProduct = (await createProduct(data)) as { id: string };
         }
 
         // Handle images
@@ -155,10 +151,10 @@ export function ProductForm({ product, categories }: ProductFormProps) {
           }
         }
 
-        toast.success(isEditing ? "Product updated" : "Product created");
+        toast.success(isEditing ? t("productUpdated") : t("productCreated"));
         router.push(`/${locale}/admin/products`);
       } catch {
-        toast.error("Something went wrong");
+        toast.error(t("productError"));
       }
     });
   }
@@ -195,7 +191,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         {/* Basic Information */}
         <Card>
           <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
+            <CardTitle>{t("basicInfo")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
@@ -204,9 +200,9 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Product Name</FormLabel>
+                    <FormLabel>{t("productName")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="e.g. Classic T-Shirt" {...field} />
+                      <Input placeholder={t("productNamePlaceholder")} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -217,13 +213,11 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                 name="slug"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Slug</FormLabel>
+                    <FormLabel>{t("slug")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="auto-generated from name" {...field} />
+                      <Input placeholder={t("slugPlaceholder")} {...field} />
                     </FormControl>
-                    <FormDescription>
-                      Leave empty to auto-generate from name
-                    </FormDescription>
+                    <FormDescription>{t("slugHint")}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -235,9 +229,13 @@ export function ProductForm({ product, categories }: ProductFormProps) {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t("description")}</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Describe the product..." rows={4} {...field} />
+                    <Textarea
+                      placeholder={t("descriptionPlaceholder")}
+                      rows={4}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -250,7 +248,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                 name="basePrice"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Base Price (Rappen)</FormLabel>
+                    <FormLabel>{t("basePrice")}</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -260,9 +258,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                       />
                     </FormControl>
                     <FormDescription>
-                      {field.value > 0
-                        ? formatPrice(field.value)
-                        : "Enter price in Rappen (cents)"}
+                      {field.value > 0 ? formatPrice(field.value) : t("basePriceHint")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -274,17 +270,17 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel>{t("statusCol")}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select status" />
+                          <SelectValue placeholder={t("selectStatus")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="DRAFT">Draft</SelectItem>
-                        <SelectItem value="ACTIVE">Active</SelectItem>
-                        <SelectItem value="ARCHIVED">Archived</SelectItem>
+                        <SelectItem value="DRAFT">{t("draft")}</SelectItem>
+                        <SelectItem value="ACTIVE">{t("active")}</SelectItem>
+                        <SelectItem value="ARCHIVED">{t("archived")}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -297,11 +293,11 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                 name="categoryId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category</FormLabel>
+                    <FormLabel>{t("category")}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder={t("selectCategory")} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -326,7 +322,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                   <FormControl>
                     <Switch checked={field.value} onCheckedChange={field.onChange} />
                   </FormControl>
-                  <FormLabel className="!mt-0">Featured Product</FormLabel>
+                  <FormLabel className="!mt-0">{t("featuredProduct")}</FormLabel>
                 </FormItem>
               )}
             />
@@ -336,7 +332,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         {/* Images */}
         <Card>
           <CardHeader>
-            <CardTitle>Images</CardTitle>
+            <CardTitle>{t("images")}</CardTitle>
           </CardHeader>
           <CardContent>
             <ImageUpload images={images} onChange={setImages} />
@@ -346,17 +342,16 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         {/* Variants */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Variants</CardTitle>
+            <CardTitle>{t("variantsTitle")}</CardTitle>
             <Button type="button" variant="outline" size="sm" onClick={addVariant}>
               <Plus className="mr-1 h-4 w-4" />
-              Add Variant
+              {t("addVariant")}
             </Button>
           </CardHeader>
           <CardContent>
             {variants.length === 0 ? (
               <p className="text-muted-foreground py-4 text-center text-sm">
-                No variants. Click &quot;Add Variant&quot; to add size, color, or material
-                options.
+                {t("noVariants")}
               </p>
             ) : (
               <div className="space-y-4">
@@ -365,37 +360,39 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                     {index > 0 && <Separator className="mb-4" />}
                     <div className="grid gap-3 sm:grid-cols-6">
                       <div>
-                        <label className="text-sm font-medium">SKU *</label>
+                        <label className="text-sm font-medium">{t("skuLabel")}</label>
                         <Input
                           value={variant.sku}
                           onChange={(e) =>
                             updateVariantField(index, "sku", e.target.value)
                           }
-                          placeholder="SKU-001"
+                          placeholder={t("skuPlaceholder")}
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium">Size</label>
+                        <label className="text-sm font-medium">{t("sizeLabel")}</label>
                         <Input
                           value={variant.size ?? ""}
                           onChange={(e) =>
                             updateVariantField(index, "size", e.target.value)
                           }
-                          placeholder="M"
+                          placeholder={t("sizePlaceholder")}
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium">Color</label>
+                        <label className="text-sm font-medium">{t("colorLabel")}</label>
                         <Input
                           value={variant.color ?? ""}
                           onChange={(e) =>
                             updateVariantField(index, "color", e.target.value)
                           }
-                          placeholder="Black"
+                          placeholder={t("colorPlaceholder")}
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium">Price +/- (Rp.)</label>
+                        <label className="text-sm font-medium">
+                          {t("priceAdjustment")}
+                        </label>
                         <Input
                           type="number"
                           value={variant.priceAdjustment}
@@ -409,7 +406,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                         />
                       </div>
                       <div>
-                        <label className="text-sm font-medium">Stock</label>
+                        <label className="text-sm font-medium">{t("stockLabel")}</label>
                         <Input
                           type="number"
                           min={0}
@@ -444,7 +441,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         {/* SEO */}
         <Card>
           <CardHeader>
-            <CardTitle>SEO</CardTitle>
+            <CardTitle>{t("seo")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <FormField
@@ -452,16 +449,16 @@ export function ProductForm({ product, categories }: ProductFormProps) {
               name="metaTitle"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Meta Title</FormLabel>
+                  <FormLabel>{t("metaTitle")}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Page title for search engines"
+                      placeholder={t("metaTitlePlaceholder")}
                       maxLength={60}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    {field.value?.length ?? 0}/60 characters
+                    {t("metaTitleCount", { count: field.value?.length ?? 0 })}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -472,17 +469,17 @@ export function ProductForm({ product, categories }: ProductFormProps) {
               name="metaDescription"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Meta Description</FormLabel>
+                  <FormLabel>{t("metaDescription")}</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Brief description for search engines"
+                      placeholder={t("metaDescriptionPlaceholder")}
                       maxLength={160}
                       rows={2}
                       {...field}
                     />
                   </FormControl>
                   <FormDescription>
-                    {field.value?.length ?? 0}/160 characters
+                    {t("metaDescriptionCount", { count: field.value?.length ?? 0 })}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -495,10 +492,10 @@ export function ProductForm({ product, categories }: ProductFormProps) {
         <div className="flex items-center gap-4">
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isEditing ? "Update Product" : "Create Product"}
+            {isEditing ? t("updateProduct") : t("createProduct")}
           </Button>
           <Button type="button" variant="outline" onClick={() => router.back()}>
-            Cancel
+            {t("cancel")}
           </Button>
         </div>
       </form>
