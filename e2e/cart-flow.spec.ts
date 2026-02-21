@@ -2,7 +2,6 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Cart page", () => {
   test("shows empty cart message", async ({ page }) => {
-    // Clear any persisted cart by clearing localStorage
     await page.goto("/de/cart");
     await page.evaluate(() => localStorage.clear());
     await page.reload();
@@ -13,14 +12,15 @@ test.describe("Cart page", () => {
     await page.goto("/de/cart");
     await page.evaluate(() => localStorage.clear());
     await page.reload();
-    await expect(page.getByRole("link", { name: /einkaufen|Produkte/i })).toBeVisible();
+    // Use the main content area link, not header nav
+    const main = page.locator("main");
+    await expect(main.getByRole("link", { name: /einkaufen|Produkte/i })).toBeVisible();
   });
 });
 
 test.describe("Product to cart flow", () => {
   test("products page lists products and can click into detail", async ({ page }) => {
     await page.goto("/de/products");
-    // Wait for the product grid to load
     const productLinks = page.locator('a[href*="/de/products/"]');
     const count = await productLinks.count();
 
@@ -29,10 +29,8 @@ test.describe("Product to cart flow", () => {
       return;
     }
 
-    // Click first product
     await productLinks.first().click();
     await expect(page).toHaveURL(/\/de\/products\/.+/);
-    // Product detail page should have the product name as heading
     await expect(page.locator("h1")).toBeVisible();
   });
 

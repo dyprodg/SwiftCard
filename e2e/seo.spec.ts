@@ -47,13 +47,13 @@ test.describe("Robots meta", () => {
 
   test("products page does not have noindex", async ({ page }) => {
     await page.goto("/de/products");
-    const robotsContent = await page
-      .locator('meta[name="robots"]')
-      .getAttribute("content");
-    // Should either not exist or not contain noindex
-    if (robotsContent) {
-      expect(robotsContent).not.toContain("noindex");
+    const robotsMeta = page.locator('meta[name="robots"]');
+    const count = await robotsMeta.count();
+    if (count > 0) {
+      const content = await robotsMeta.getAttribute("content");
+      expect(content).not.toContain("noindex");
     }
+    // If no robots meta exists, that's fine (defaults to index)
   });
 });
 

@@ -1,18 +1,32 @@
 import { test, expect } from "@playwright/test";
 
+// Dismiss cookie banner by setting consent in localStorage
+async function dismissCookieBanner(page: import("@playwright/test").Page) {
+  await page.evaluate(() => {
+    localStorage.setItem(
+      "swiftcart-cookie-consent",
+      JSON.stringify({
+        state: { consent: { essential: true, analytics: false } },
+        version: 0,
+      }),
+    );
+  });
+  await page.reload();
+}
+
 test.describe("Storefront", () => {
   test("homepage loads and has products nav link", async ({ page }) => {
     await page.goto("/de");
     await expect(page).toHaveURL(/\/de/);
-    const productsLink = page.getByRole("link", { name: /Produkte/i });
+    const productsLink = page.locator("header").getByRole("link", { name: /Produkte/i });
     await expect(productsLink).toBeVisible();
   });
 
   test("navigates to products page", async ({ page }) => {
     await page.goto("/de");
     await page
+      .locator("header")
       .getByRole("link", { name: /Produkte/i })
-      .first()
       .click();
     await expect(page).toHaveURL(/\/de\/products/);
   });
@@ -69,6 +83,7 @@ test.describe("Legal pages (EN)", () => {
 test.describe("Footer", () => {
   test("contains legal links", async ({ page }) => {
     await page.goto("/de");
+    await dismissCookieBanner(page);
     const footer = page.locator("footer");
     await expect(footer.getByRole("link", { name: /AGB/i })).toBeVisible();
     await expect(footer.getByRole("link", { name: /Datenschutz/i })).toBeVisible();
