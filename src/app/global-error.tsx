@@ -19,6 +19,9 @@ export default function GlobalError({
       <body>
         <div className="flex min-h-screen flex-col items-center justify-center gap-4">
           <h2 className="text-2xl font-bold">Something went wrong!</h2>
+          <p className="text-muted-foreground">
+            A critical error occurred. Please try refreshing the page.
+          </p>
           <button
             onClick={() => reset()}
             className="bg-primary text-primary-foreground rounded-md px-4 py-2"

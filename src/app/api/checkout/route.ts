@@ -7,7 +7,7 @@ import { products, productVariants, shopSettings } from "@/db/schema";
 import { orders, orderItems } from "@/db/schema/orders";
 import { eq, sql } from "drizzle-orm";
 import { stripe } from "@/lib/stripe/client";
-import { getCart, guestCartKey } from "@/lib/kv";
+import { getCart, guestCartKey, rateLimit } from "@/lib/kv";
 import { checkoutSchema } from "@/lib/validations/checkout";
 import { generateOrderNumber } from "@/lib/utils/order-number";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
@@ -15,6 +15,29 @@ import { sendOrderCreatedEmail } from "@/lib/resend";
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit by IP: 10 requests per 60 seconds
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const ipLimit = await rateLimit(`checkout:ip:${ip}`, 10, 60);
+    if (!ipLimit.success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": "60" } },
+      );
+    }
+
+    // Session idempotency: 1 request per 5 seconds per session
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get("cart_session")?.value;
+    if (sessionId) {
+      const sessionLimit = await rateLimit(`checkout:session:${sessionId}`, 1, 5);
+      if (!sessionLimit.success) {
+        return NextResponse.json(
+          { error: "Please wait before submitting again." },
+          { status: 429, headers: { "Retry-After": "5" } },
+        );
+      }
+    }
+
     // Parse & validate body
     const body = await req.json();
     const validation = checkoutSchema.safeParse(body);
@@ -30,8 +53,6 @@ export async function POST(req: NextRequest) {
 
     // Get cart via cookie (works for both guests and logged-in users)
     // API routes are excluded from Clerk middleware, so we use the cart_session cookie
-    const cookieStore = await cookies();
-    const sessionId = cookieStore.get("cart_session")?.value;
     if (!sessionId) {
       return NextResponse.json({ error: "No cart session" }, { status: 400 });
     }

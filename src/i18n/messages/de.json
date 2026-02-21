@@ -377,5 +377,109 @@
       "next": "Weiter",
       "page": "Seite"
     }
+  },
+  "footer": {
+    "legal": "Rechtliches",
+    "terms": "AGB",
+    "privacy": "Datenschutz",
+    "imprint": "Impressum",
+    "copyright": "Alle Rechte vorbehalten.",
+    "gdpr": "Deine Daten",
+    "cookieSettings": "Cookie-Einstellungen"
+  },
+  "legal": {
+    "terms": {
+      "title": "Allgemeine Geschäftsbedingungen",
+      "meta": "Allgemeine Geschäftsbedingungen für den SwiftCart Online-Shop",
+      "lastUpdated": "Zuletzt aktualisiert: Februar 2026",
+      "generalTitle": "Allgemeines",
+      "generalContent": "Diese Allgemeinen Geschäftsbedingungen regeln die Nutzung unseres Online-Shops und den Kauf von Produkten. Mit der Aufgabe einer Bestellung stimmen Sie diesen Bedingungen zu. Vertragssprache ist Deutsch oder Englisch.",
+      "ordersTitle": "Bestellungen & Vertrag",
+      "ordersContent": "Eine Bestellung stellt ein verbindliches Angebot dar. Der Vertrag kommt zustande, wenn wir eine Bestellbestätigung per E-Mail senden. Wir behalten uns das Recht vor, Bestellungen nach eigenem Ermessen abzulehnen oder zu stornieren, beispielsweise bei Preisfehlern oder Produktverfügbarkeit.",
+      "shippingTitle": "Versand & Lieferung",
+      "shippingContent": "Wir versenden innerhalb der Schweiz. Lieferzeiten sind nur Schätzungen und werden nicht garantiert. Das Verlustrisiko geht mit der Übergabe an den Versanddienstleister auf den Kunden über. Versandkosten werden an der Kasse angezeigt.",
+      "returnsTitle": "Rücksendungen & Erstattungen",
+      "returnsContent": "Sie können unbenutzte Produkte innerhalb von 14 Tagen nach Erhalt zurücksenden. Produkte müssen sich in der Originalverpackung und in unbeschädigtem Zustand befinden. Erstattungen werden innerhalb von 14 Werktagen nach Erhalt der Rücksendung bearbeitet. Die Versandkosten für Rücksendungen trägt der Kunde.",
+      "liabilityTitle": "Haftung",
+      "liabilityContent": "Wir haften nur für Schäden, die durch Vorsatz oder grobe Fahrlässigkeit verursacht wurden. Die Haftung für indirekte Schäden oder Folgeschäden ist im gesetzlich zulässigen Rahmen ausgeschlossen. Produktbilder können geringfügig vom tatsächlichen Produkt abweichen.",
+      "jurisdictionTitle": "Gerichtsstand & Anwendbares Recht",
+      "jurisdictionContent": "Diese Bedingungen unterliegen dem Schweizer Recht. Ausschliesslicher Gerichtsstand für alle Streitigkeiten ist der Sitz unseres Unternehmens in der Schweiz."
+    },
+    "privacy": {
+      "title": "Datenschutzerklärung",
+      "meta": "Datenschutzerklärung — wie wir Ihre Daten erheben, verwenden und schützen",
+      "lastUpdated": "Zuletzt aktualisiert: Februar 2026",
+      "introTitle": "Einleitung",
+      "introContent": "Wir nehmen den Schutz Ihrer persönlichen Daten ernst. Diese Datenschutzerklärung erläutert, welche Daten wir erheben, wie wir sie verwenden und welche Rechte Ihnen nach den geltenden Datenschutzgesetzen zustehen, einschliesslich des Schweizer Datenschutzgesetzes (DSG) und der EU-Datenschutz-Grundverordnung (DSGVO).",
+      "dataCollectedTitle": "Erhobene Daten",
+      "dataCollectedContent": "Wir erheben folgende personenbezogene Daten: Name, E-Mail-Adresse, Lieferadresse und Zahlungsinformationen (sicher verarbeitet durch Stripe). Wir erfassen auch technische Daten wie IP-Adressen, Browsertyp und Geräteinformationen für Sicherheits- und Analysezwecke.",
+      "purposeTitle": "Zweck der Verarbeitung",
+      "purposeContent": "Ihre Daten werden für folgende Zwecke verarbeitet: Bestellabwicklung und -erfüllung, Zahlungsabwicklung, Kundenkommunikation, Betrugsprävention und Serviceverbesserung. Die Datenverarbeitung erfolgt auf Grundlage vertraglicher Notwendigkeit und berechtigter Interessen.",
+      "thirdPartiesTitle": "Drittanbieter-Dienste",
+      "thirdPartiesContent": "Wir nutzen folgende Drittanbieter-Dienste: Stripe (Zahlungsabwicklung), Clerk (Authentifizierung), Vercel (Hosting und Infrastruktur), Sentry (Fehlerüberwachung) und Resend (Transaktions-E-Mails). Jeder Anbieter verarbeitet Daten gemäss seiner eigenen Datenschutzerklärung.",
+      "cookiesTitle": "Cookies",
+      "cookiesContent": "Wir verwenden essentielle Cookies, die für die Funktion des Shops erforderlich sind (Sitzungsverwaltung, Warenkorb, Authentifizierung). Analyse-Cookies werden nur mit Ihrer ausdrücklichen Einwilligung verwendet. Sie können Ihre Cookie-Einstellungen jederzeit über die Cookie-Einstellungen in der Fusszeile verwalten.",
+      "rightsTitle": "Ihre Rechte",
+      "rightsContent": "Sie haben das Recht auf Auskunft, Berichtigung, Löschung oder Export Ihrer personenbezogenen Daten. Sie können der Verarbeitung auch widersprechen oder eine Einschränkung der Verarbeitung verlangen. Um diese Rechte auszuüben, besuchen Sie die Seite \"Deine Daten\" in Ihrem Konto oder kontaktieren Sie uns per E-Mail.",
+      "retentionTitle": "Datenspeicherung",
+      "retentionContent": "Personenbezogene Daten werden nur so lange aufbewahrt, wie es für die beschriebenen Zwecke erforderlich ist. Bestelldaten werden gemäss dem Schweizer Buchführungsrecht 10 Jahre aufbewahrt. Sie können jederzeit die Löschung Ihres Kontos beantragen; Bestelldatensätze werden anonymisiert, aber zur gesetzlichen Compliance aufbewahrt.",
+      "contactTitle": "Kontakt",
+      "contactContent": "Für datenschutzbezogene Anfragen kontaktieren Sie uns bitte unter {email}."
+    },
+    "imprint": {
+      "title": "Impressum",
+      "meta": "Impressum und Firmeninformationen",
+      "companyInfo": "Firmeninformationen",
+      "contact": "Kontakt",
+      "email": "E-Mail",
+      "disclaimer": "Haftungsausschluss",
+      "disclaimerText": "Trotz sorgfältiger inhaltlicher Kontrolle übernehmen wir keine Haftung für die Inhalte externer Links. Für den Inhalt der verlinkten Seiten sind ausschliesslich deren Betreiber verantwortlich."
+    }
+  },
+  "cookie": {
+    "title": "Cookie-Einstellungen",
+    "message": "Wir verwenden Cookies, um die grundlegende Funktionalität unseres Shops sicherzustellen. Analyse-Cookies helfen uns, unsere Dienste zu verbessern, und werden nur mit Ihrer Einwilligung aktiviert.",
+    "essential": "Essentielle Cookies (immer aktiv)",
+    "analytics": "Analyse-Cookies",
+    "acceptAll": "Alle akzeptieren",
+    "acceptEssential": "Nur essentielle"
+  },
+  "gdpr": {
+    "title": "Deine Daten",
+    "description": "Verwalte deine persönlichen Daten. Du kannst alle mit deinem Konto verbundenen Daten exportieren oder die dauerhafte Kontolöschung beantragen.",
+    "export": {
+      "title": "Daten exportieren",
+      "description": "Lade alle mit deinem Konto verbundenen persönlichen Daten herunter, einschliesslich Profilinformationen und Bestellverlauf, als JSON-Datei.",
+      "button": "Meine Daten herunterladen",
+      "success": "Deine Daten wurden erfolgreich exportiert.",
+      "error": "Datenexport fehlgeschlagen. Bitte versuche es erneut."
+    },
+    "delete": {
+      "title": "Konto löschen",
+      "description": "Lösche dein Konto dauerhaft und anonymisiere alle zugehörigen Bestelldatensätze. Diese Aktion kann nicht rückgängig gemacht werden.",
+      "button": "Mein Konto löschen",
+      "confirm": "Möchtest du dein Konto wirklich löschen?",
+      "confirmDescription": "Dadurch wird dein Konto dauerhaft gelöscht und alle Bestelldatensätze werden anonymisiert. Dein Bestellverlauf wird in anonymisierter Form zur gesetzlichen Compliance aufbewahrt (Schweizer 10-Jahres-Aufbewahrungspflicht). Diese Aktion kann nicht rückgängig gemacht werden.",
+      "confirmButton": "Ja, Konto löschen",
+      "success": "Dein Konto wurde gelöscht.",
+      "error": "Kontolöschung fehlgeschlagen. Bitte versuche es erneut."
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "Seite nicht gefunden",
+      "description": "Die gesuchte Seite existiert nicht.",
+      "button": "Zur Startseite"
+    },
+    "generic": {
+      "title": "Etwas ist schiefgelaufen",
+      "description": "Ein unerwarteter Fehler ist aufgetreten.",
+      "button": "Erneut versuchen"
+    },
+    "global": {
+      "title": "Etwas ist schiefgelaufen!",
+      "description": "Ein kritischer Fehler ist aufgetreten. Bitte versuche die Seite neu zu laden.",
+      "button": "Erneut versuchen"
+    }
   }
 }

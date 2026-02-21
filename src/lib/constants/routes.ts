@@ -8,6 +8,7 @@ export const ROUTES = {
   account: {
     orders: "/account/orders",
     settings: "/account/settings",
+    data: "/account/data",
   },
   admin: {
     dashboard: "/admin/dashboard",
