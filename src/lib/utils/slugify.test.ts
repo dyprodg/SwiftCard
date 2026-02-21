@@ -49,4 +49,8 @@ describe("slugify", () => {
   it("handles mixed umlauts and special chars", () => {
     expect(slugify("Größe & Farbe!")).toBe("groesse-farbe");
   });
+
+  it("handles only special characters", () => {
+    expect(slugify("!!!@@@###")).toBe("");
+  });
 });
