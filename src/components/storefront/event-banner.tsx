@@ -18,8 +18,8 @@ export async function EventBanner() {
 
   return (
     <div className={`${bgColor} text-primary-foreground overflow-hidden py-2 text-sm`}>
-      <div className="animate-marquee flex whitespace-nowrap">
-        <span className="inline-block min-w-full">
+      <div className="animate-marquee flex">
+        <span className="shrink-0 whitespace-nowrap">
           {banner.linkUrl ? (
             <Link href={banner.linkUrl} className="hover:underline">
               {repeated}
@@ -28,7 +28,7 @@ export async function EventBanner() {
             repeated
           )}
         </span>
-        <span className="inline-block min-w-full" aria-hidden>
+        <span className="shrink-0 whitespace-nowrap" aria-hidden>
           {banner.linkUrl ? (
             <Link href={banner.linkUrl} className="hover:underline" tabIndex={-1}>
               {repeated}
