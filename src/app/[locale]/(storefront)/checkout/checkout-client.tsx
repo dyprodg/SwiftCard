@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/form";
 import { useCartStore, selectSubtotal, selectTotalItems } from "@/stores/cart-store";
 import { formatPrice } from "@/lib/utils/format-price";
+import { getItemDiscount } from "@/lib/utils/item-discount";
 import { checkoutFormSchema, type CheckoutFormValues } from "@/lib/validations/checkout";
 import { SHIPPING_COUNTRIES } from "@/lib/constants/countries";
 import { CouponInput } from "@/components/storefront/coupon-input";
@@ -303,38 +304,56 @@ export function CheckoutClient() {
             <CardTitle>{t("review.title")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {items.map((item) => (
-              <div
-                key={`${item.productId}:${item.variantId ?? "default"}`}
-                className="flex gap-3"
-              >
-                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border">
-                  {item.imageUrl ? (
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.productName}
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
-                  ) : (
-                    <div className="bg-muted flex h-full w-full items-center justify-center text-xs">
-                      {tc("noImageShort")}
+            {items.map((item) => {
+              const { discountedPrice, hasDiscount } = getItemDiscount(
+                item,
+                appliedDiscount,
+              );
+              const lineTotal = item.unitPrice * item.quantity;
+              const discountedLineTotal = discountedPrice * item.quantity;
+
+              return (
+                <div
+                  key={`${item.productId}:${item.variantId ?? "default"}`}
+                  className="flex gap-3"
+                >
+                  <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md border">
+                    {item.imageUrl ? (
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.productName}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
+                    ) : (
+                      <div className="bg-muted flex h-full w-full items-center justify-center text-xs">
+                        {tc("noImageShort")}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{item.productName}</p>
+                    {item.variantName && (
+                      <p className="text-muted-foreground text-xs">{item.variantName}</p>
+                    )}
+                    <p className="text-muted-foreground text-xs">× {item.quantity}</p>
+                  </div>
+                  {hasDiscount ? (
+                    <div className="text-right">
+                      <p className="text-sm font-medium text-green-600">
+                        {formatPrice(discountedLineTotal)}
+                      </p>
+                      <p className="text-muted-foreground text-xs line-through">
+                        {formatPrice(lineTotal)}
+                      </p>
                     </div>
+                  ) : (
+                    <p className="text-sm font-medium">{formatPrice(lineTotal)}</p>
                   )}
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{item.productName}</p>
-                  {item.variantName && (
-                    <p className="text-muted-foreground text-xs">{item.variantName}</p>
-                  )}
-                  <p className="text-muted-foreground text-xs">× {item.quantity}</p>
-                </div>
-                <p className="text-sm font-medium">
-                  {formatPrice(item.unitPrice * item.quantity)}
-                </p>
-              </div>
-            ))}
+              );
+            })}
 
             <Separator />
 
@@ -370,11 +389,7 @@ export function CheckoutClient() {
 
             <div className="flex justify-between font-semibold">
               <span>{tCart("total")}</span>
-              <span>
-                {formatPrice(
-                  subtotal - (appliedDiscount?.amount ?? 0),
-                )}
-              </span>
+              <span>{formatPrice(subtotal - (appliedDiscount?.amount ?? 0))}</span>
             </div>
           </CardContent>
         </Card>

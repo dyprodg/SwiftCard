@@ -119,6 +119,7 @@ export async function addToCart(
         variantName,
         unitPrice,
         imageUrl,
+        categoryId: product.categoryId,
       });
     }
 

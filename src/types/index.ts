@@ -77,6 +77,8 @@ export type AppliedDiscount = {
   value: number;
   amount: number; // calculated discount amount in cents
   freeShipping: boolean;
+  productIds: string[];
+  categoryIds: string[];
 };
 
 // Cart types
@@ -88,6 +90,7 @@ export type CartItem = {
   variantName: string | null;
   unitPrice: number; // cents
   imageUrl: string | null;
+  categoryId: string | null;
 };
 
 // Checkout types

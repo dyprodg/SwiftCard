@@ -11,9 +11,29 @@ type VariantSelectorProps = {
   variants: ProductVariant[];
   basePrice: number;
   onSelect: (variant: ProductVariant) => void;
+  discount?: { type: "PERCENTAGE" | "FIXED" | "FREE_SHIPPING"; value: number } | null;
 };
 
-export function VariantSelector({ variants, basePrice, onSelect }: VariantSelectorProps) {
+function applyDiscount(
+  price: number,
+  discount: NonNullable<VariantSelectorProps["discount"]>,
+): number {
+  switch (discount.type) {
+    case "PERCENTAGE":
+      return Math.round(price - (price * discount.value) / 10000);
+    case "FIXED":
+      return Math.max(0, price - discount.value);
+    case "FREE_SHIPPING":
+      return price;
+  }
+}
+
+export function VariantSelector({
+  variants,
+  basePrice,
+  onSelect,
+  discount,
+}: VariantSelectorProps) {
   const t = useTranslations("common");
   const [selectedId, setSelectedId] = useState<string | null>(variants[0]?.id ?? null);
 
@@ -50,6 +70,8 @@ export function VariantSelector({ variants, basePrice, onSelect }: VariantSelect
 
   const selected = variants.find((v) => v.id === selectedId);
   const totalPrice = basePrice + (selected?.priceAdjustment ?? 0);
+  const hasDiscount = discount && discount.type !== "FREE_SHIPPING";
+  const discountedPrice = hasDiscount ? applyDiscount(totalPrice, discount) : totalPrice;
 
   return (
     <div className="space-y-4">
@@ -108,7 +130,12 @@ export function VariantSelector({ variants, basePrice, onSelect }: VariantSelect
       {/* Price display */}
       {selected && (
         <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold">{formatPrice(totalPrice)}</span>
+          <span className="text-2xl font-bold">{formatPrice(discountedPrice)}</span>
+          {hasDiscount && discountedPrice < totalPrice && (
+            <span className="text-muted-foreground text-lg line-through">
+              {formatPrice(totalPrice)}
+            </span>
+          )}
           {selected.stock > 0 ? (
             <span className="text-sm text-green-600">
               {t("inStock", { count: selected.stock })}

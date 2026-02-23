@@ -11,7 +11,10 @@ import {
   type CreateDiscountInput,
   type UpdateDiscountInput,
 } from "@/lib/validations/discount";
-import { getDiscountByCode, getActiveAutomaticDiscounts } from "@/server/queries/discounts";
+import {
+  getDiscountByCode,
+  getActiveAutomaticDiscounts,
+} from "@/server/queries/discounts";
 import {
   calculateDiscount,
   findBestAutomaticDiscount,
@@ -45,7 +48,7 @@ export async function createDiscount(input: CreateDiscountInput) {
       value: data.value,
       active: data.active,
       automatic: data.automatic,
-      code: data.automatic ? null : (data.code?.toUpperCase() || null),
+      code: data.automatic ? null : data.code?.toUpperCase() || null,
       minOrderAmount: data.minOrderAmount || null,
       maxUses: data.maxUses || null,
       maxUsesPerCustomer: data.maxUsesPerCustomer || null,
@@ -93,7 +96,7 @@ export async function updateDiscount(input: UpdateDiscountInput) {
       value: updates.value,
       active: updates.active,
       automatic: updates.automatic,
-      code: updates.automatic ? null : (updates.code?.toUpperCase() || null),
+      code: updates.automatic ? null : updates.code?.toUpperCase() || null,
       minOrderAmount: updates.minOrderAmount || null,
       maxUses: updates.maxUses || null,
       maxUsesPerCustomer: updates.maxUsesPerCustomer || null,
@@ -185,6 +188,8 @@ export async function validateCoupon(
       value: discount.value,
       amount: 0, // Will be calculated with cart context
       freeShipping: discount.type === "FREE_SHIPPING",
+      productIds: discount.products.map((p) => p.productId),
+      categoryIds: discount.categories.map((c) => c.categoryId),
     },
   };
 }

@@ -20,6 +20,8 @@ export type DiscountCalculationResult = {
   value: number;
   amount: number; // discount amount in cents
   freeShipping: boolean;
+  productIds: string[];
+  categoryIds: string[];
 };
 
 /**
@@ -86,6 +88,8 @@ export function calculateDiscount(
     value: discount.value,
     amount,
     freeShipping,
+    productIds: discount.productIds,
+    categoryIds: discount.categoryIds,
   };
 }
 
@@ -112,7 +116,11 @@ export function findBestAutomaticDiscount(
     // Prefer higher monetary discount; fall back to free shipping
     if (result.amount > best.amount) {
       best = result;
-    } else if (result.amount === best.amount && result.freeShipping && !best.freeShipping) {
+    } else if (
+      result.amount === best.amount &&
+      result.freeShipping &&
+      !best.freeShipping
+    ) {
       best = result;
     }
   }
@@ -132,5 +140,7 @@ export function toAppliedDiscount(result: DiscountCalculationResult): AppliedDis
     value: result.value,
     amount: result.amount,
     freeShipping: result.freeShipping,
+    productIds: result.productIds,
+    categoryIds: result.categoryIds,
   };
 }

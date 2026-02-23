@@ -14,9 +14,15 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { useCartStore, selectTotalItems, selectSubtotal } from "@/stores/cart-store";
+import {
+  useCartStore,
+  selectTotalItems,
+  selectSubtotal,
+  selectDiscountAmount,
+} from "@/stores/cart-store";
 import { updateCartItem, removeFromCart } from "@/server/actions/cart";
 import { formatPrice } from "@/lib/utils/format-price";
+import { getItemDiscount } from "@/lib/utils/item-discount";
 
 export function CartSheet({ locale }: { locale: string }) {
   const t = useTranslations("cart");
@@ -26,6 +32,8 @@ export function CartSheet({ locale }: { locale: string }) {
   const setOpen = useCartStore((s) => s.setOpen);
   const totalItems = useCartStore(selectTotalItems);
   const subtotal = useCartStore(selectSubtotal);
+  const appliedDiscount = useCartStore((s) => s.appliedDiscount);
+  const discountAmount = useCartStore(selectDiscountAmount);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
 
@@ -81,87 +89,107 @@ export function CartSheet({ locale }: { locale: string }) {
             {/* Cart items */}
             <div className="flex-1 overflow-y-auto py-4">
               <div className="space-y-4">
-                {items.map((item) => (
-                  <div
-                    key={`${item.productId}:${item.variantId ?? "default"}`}
-                    className="flex gap-3"
-                  >
-                    {/* Image */}
-                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border">
-                      {item.imageUrl ? (
-                        <Image
-                          src={item.imageUrl}
-                          alt={item.productName}
-                          fill
-                          className="object-cover"
-                          sizes="80px"
-                        />
-                      ) : (
-                        <div className="bg-muted flex h-full w-full items-center justify-center text-xs">
-                          {tc("noImageShort")}
-                        </div>
-                      )}
-                    </div>
+                {items.map((item) => {
+                  const { discountedPrice, hasDiscount } = getItemDiscount(
+                    item,
+                    appliedDiscount,
+                  );
+                  const lineTotal = item.unitPrice * item.quantity;
+                  const discountedLineTotal = discountedPrice * item.quantity;
 
-                    {/* Details */}
-                    <div className="flex flex-1 flex-col justify-between">
-                      <div>
-                        <p className="text-sm leading-tight font-medium">
-                          {item.productName}
-                        </p>
-                        {item.variantName && (
-                          <p className="text-muted-foreground text-xs">
-                            {item.variantName}
-                          </p>
+                  return (
+                    <div
+                      key={`${item.productId}:${item.variantId ?? "default"}`}
+                      className="flex gap-3"
+                    >
+                      {/* Image */}
+                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md border">
+                        {item.imageUrl ? (
+                          <Image
+                            src={item.imageUrl}
+                            alt={item.productName}
+                            fill
+                            className="object-cover"
+                            sizes="80px"
+                          />
+                        ) : (
+                          <div className="bg-muted flex h-full w-full items-center justify-center text-xs">
+                            {tc("noImageShort")}
+                          </div>
                         )}
-                        <p className="text-sm font-semibold">
-                          {formatPrice(item.unitPrice * item.quantity)}
-                        </p>
                       </div>
 
-                      {/* Quantity controls */}
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7"
-                          onClick={() =>
-                            handleUpdateQuantity(
-                              item.productId,
-                              item.variantId,
-                              item.quantity - 1,
-                            )
-                          }
-                        >
-                          <Minus className="h-3 w-3" />
-                        </Button>
-                        <span className="w-8 text-center text-sm">{item.quantity}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-7 w-7"
-                          onClick={() =>
-                            handleUpdateQuantity(
-                              item.productId,
-                              item.variantId,
-                              item.quantity + 1,
-                            )
-                          }
-                        >
-                          <Plus className="h-3 w-3" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-destructive hover:text-destructive ml-auto h-7 w-7"
-                          onClick={() => handleRemove(item.productId, item.variantId)}
-                        >
-                          <Trash2 className="h-3 w-3" />
-                        </Button>
+                      {/* Details */}
+                      <div className="flex flex-1 flex-col justify-between">
+                        <div>
+                          <p className="text-sm leading-tight font-medium">
+                            {item.productName}
+                          </p>
+                          {item.variantName && (
+                            <p className="text-muted-foreground text-xs">
+                              {item.variantName}
+                            </p>
+                          )}
+                          {hasDiscount ? (
+                            <div className="flex items-baseline gap-1.5">
+                              <p className="text-sm font-semibold text-green-600">
+                                {formatPrice(discountedLineTotal)}
+                              </p>
+                              <p className="text-muted-foreground text-xs line-through">
+                                {formatPrice(lineTotal)}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-sm font-semibold">
+                              {formatPrice(lineTotal)}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Quantity controls */}
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.productId,
+                                item.variantId,
+                                item.quantity - 1,
+                              )
+                            }
+                          >
+                            <Minus className="h-3 w-3" />
+                          </Button>
+                          <span className="w-8 text-center text-sm">{item.quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() =>
+                              handleUpdateQuantity(
+                                item.productId,
+                                item.variantId,
+                                item.quantity + 1,
+                              )
+                            }
+                          >
+                            <Plus className="h-3 w-3" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-destructive hover:text-destructive ml-auto h-7 w-7"
+                            onClick={() => handleRemove(item.productId, item.variantId)}
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -173,6 +201,16 @@ export function CartSheet({ locale }: { locale: string }) {
                 <span>{t("subtotal")}</span>
                 <span className="font-semibold">{formatPrice(subtotal)}</span>
               </div>
+
+              {appliedDiscount && discountAmount > 0 && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span>
+                    {t("discount")}
+                    {appliedDiscount.code && ` (${appliedDiscount.code})`}
+                  </span>
+                  <span>-{formatPrice(discountAmount)}</span>
+                </div>
+              )}
 
               <div className="grid gap-2">
                 <Button asChild onClick={() => setOpen(false)}>

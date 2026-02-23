@@ -8,9 +8,15 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useCartStore, selectTotalItems, selectSubtotal, selectDiscountAmount } from "@/stores/cart-store";
+import {
+  useCartStore,
+  selectTotalItems,
+  selectSubtotal,
+  selectDiscountAmount,
+} from "@/stores/cart-store";
 import { updateCartItem, removeFromCart } from "@/server/actions/cart";
 import { formatPrice } from "@/lib/utils/format-price";
+import { getItemDiscount } from "@/lib/utils/item-discount";
 import { CouponInput } from "@/components/storefront/coupon-input";
 
 export function CartPageClient() {
@@ -56,90 +62,122 @@ export function CartPageClient() {
       {/* Cart Items */}
       <div className="lg:col-span-2">
         <div className="space-y-4">
-          {items.map((item) => (
-            <div
-              key={`${item.productId}:${item.variantId ?? "default"}`}
-              className="flex gap-4 rounded-lg border p-4"
-            >
-              {/* Image */}
-              <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md border">
-                {item.imageUrl ? (
-                  <Image
-                    src={item.imageUrl}
-                    alt={item.productName}
-                    fill
-                    className="object-cover"
-                    sizes="96px"
-                  />
-                ) : (
-                  <div className="bg-muted flex h-full w-full items-center justify-center text-xs">
-                    {tc("noImageShort")}
-                  </div>
-                )}
-              </div>
+          {items.map((item) => {
+            const { discountedPrice, hasDiscount } = getItemDiscount(
+              item,
+              appliedDiscount,
+            );
+            const lineTotal = item.unitPrice * item.quantity;
+            const discountedLineTotal = discountedPrice * item.quantity;
 
-              {/* Details */}
-              <div className="flex flex-1 flex-col justify-between">
-                <div>
-                  <h3 className="font-medium">{item.productName}</h3>
-                  {item.variantName && (
-                    <p className="text-muted-foreground text-sm">{item.variantName}</p>
+            return (
+              <div
+                key={`${item.productId}:${item.variantId ?? "default"}`}
+                className="flex gap-4 rounded-lg border p-4"
+              >
+                {/* Image */}
+                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-md border">
+                  {item.imageUrl ? (
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.productName}
+                      fill
+                      className="object-cover"
+                      sizes="96px"
+                    />
+                  ) : (
+                    <div className="bg-muted flex h-full w-full items-center justify-center text-xs">
+                      {tc("noImageShort")}
+                    </div>
                   )}
-                  <p className="text-sm">
-                    {formatPrice(item.unitPrice)} / {t("items")}
-                  </p>
                 </div>
 
-                <div className="flex items-center justify-between">
-                  {/* Quantity controls */}
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() =>
-                        handleUpdateQuantity(
-                          item.productId,
-                          item.variantId,
-                          item.quantity - 1,
-                        )
-                      }
-                    >
-                      <Minus className="h-3 w-3" />
-                    </Button>
-                    <span className="w-10 text-center font-medium">{item.quantity}</span>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="h-8 w-8"
-                      onClick={() =>
-                        handleUpdateQuantity(
-                          item.productId,
-                          item.variantId,
-                          item.quantity + 1,
-                        )
-                      }
-                    >
-                      <Plus className="h-3 w-3" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="text-destructive hover:text-destructive h-8 w-8"
-                      onClick={() => handleRemove(item.productId, item.variantId)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                {/* Details */}
+                <div className="flex flex-1 flex-col justify-between">
+                  <div>
+                    <h3 className="font-medium">{item.productName}</h3>
+                    {item.variantName && (
+                      <p className="text-muted-foreground text-sm">{item.variantName}</p>
+                    )}
+                    {hasDiscount ? (
+                      <div className="flex items-baseline gap-1.5 text-sm">
+                        <span className="text-green-600">
+                          {formatPrice(discountedPrice)}
+                        </span>
+                        <span className="text-muted-foreground line-through">
+                          {formatPrice(item.unitPrice)}
+                        </span>
+                        <span>/ {t("items")}</span>
+                      </div>
+                    ) : (
+                      <p className="text-sm">
+                        {formatPrice(item.unitPrice)} / {t("items")}
+                      </p>
+                    )}
                   </div>
 
-                  {/* Line total */}
-                  <p className="text-lg font-semibold">
-                    {formatPrice(item.unitPrice * item.quantity)}
-                  </p>
+                  <div className="flex items-center justify-between">
+                    {/* Quantity controls */}
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() =>
+                          handleUpdateQuantity(
+                            item.productId,
+                            item.variantId,
+                            item.quantity - 1,
+                          )
+                        }
+                      >
+                        <Minus className="h-3 w-3" />
+                      </Button>
+                      <span className="w-10 text-center font-medium">
+                        {item.quantity}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() =>
+                          handleUpdateQuantity(
+                            item.productId,
+                            item.variantId,
+                            item.quantity + 1,
+                          )
+                        }
+                      >
+                        <Plus className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive h-8 w-8"
+                        onClick={() => handleRemove(item.productId, item.variantId)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    {/* Line total */}
+                    {hasDiscount ? (
+                      <div className="flex items-baseline gap-1.5">
+                        <p className="text-lg font-semibold text-green-600">
+                          {formatPrice(discountedLineTotal)}
+                        </p>
+                        <p className="text-muted-foreground text-sm line-through">
+                          {formatPrice(lineTotal)}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-lg font-semibold">{formatPrice(lineTotal)}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-4">

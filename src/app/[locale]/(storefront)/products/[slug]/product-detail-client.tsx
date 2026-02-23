@@ -9,7 +9,6 @@ import { VariantSelector } from "@/components/storefront/variant-selector";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cart-store";
 import { addToCart } from "@/server/actions/cart";
-import { formatPrice } from "@/lib/utils/format-price";
 import type { ProductVariant } from "@/types";
 
 type Props = {
@@ -18,6 +17,8 @@ type Props = {
   variants: ProductVariant[];
   basePrice: number;
   imageUrl: string | null;
+  categoryId: string | null;
+  discount: { type: "PERCENTAGE" | "FIXED" | "FREE_SHIPPING"; value: number } | null;
 };
 
 export function ProductDetailClient({
@@ -26,6 +27,8 @@ export function ProductDetailClient({
   variants,
   basePrice,
   imageUrl,
+  categoryId,
+  discount,
 }: Props) {
   const t = useTranslations("products");
   const tc = useTranslations("common");
@@ -57,6 +60,7 @@ export function ProductDetailClient({
       variantName,
       unitPrice,
       imageUrl,
+      categoryId,
     });
 
     // Visual feedback
@@ -85,12 +89,8 @@ export function ProductDetailClient({
           variants={variants}
           basePrice={basePrice}
           onSelect={(variant) => setSelectedVariant(variant)}
+          discount={discount}
         />
-      )}
-
-      {/* Price (shown when no variants) */}
-      {variants.length === 0 && (
-        <p className="text-2xl font-bold">{formatPrice(basePrice)}</p>
       )}
 
       {/* Add to Cart */}

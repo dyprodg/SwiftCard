@@ -90,6 +90,7 @@ describe("setCart", () => {
         variantName: null,
         unitPrice: 500,
         imageUrl: null,
+        categoryId: null,
       },
     ];
     await setCart("cart:user-1", items);

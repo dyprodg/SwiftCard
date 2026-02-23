@@ -116,13 +116,24 @@ export const selectSubtotal = (state: CartStore) =>
 
 export const selectDiscountAmount = (state: CartStore) => {
   if (!state.appliedDiscount) return 0;
-  const subtotal = state.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
   const d = state.appliedDiscount;
+  const isScoped = d.productIds.length > 0 || d.categoryIds.length > 0;
+
+  const applicableSubtotal = state.items.reduce((sum, item) => {
+    if (isScoped) {
+      const matchesProduct = d.productIds.includes(item.productId);
+      const matchesCategory =
+        item.categoryId !== null && d.categoryIds.includes(item.categoryId);
+      if (!matchesProduct && !matchesCategory) return sum;
+    }
+    return sum + item.unitPrice * item.quantity;
+  }, 0);
+
   switch (d.type) {
     case "PERCENTAGE":
-      return Math.round((subtotal * d.value) / 10000);
+      return Math.round((applicableSubtotal * d.value) / 10000);
     case "FIXED":
-      return Math.min(d.amount, subtotal);
+      return Math.min(d.amount, applicableSubtotal);
     case "FREE_SHIPPING":
       return 0;
   }

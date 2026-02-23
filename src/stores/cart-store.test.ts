@@ -11,6 +11,7 @@ function makeItem(overrides: Partial<CartItem> = {}): CartItem {
     variantName: null,
     unitPrice: 1000,
     imageUrl: null,
+    categoryId: null,
     ...overrides,
   };
 }

@@ -17,6 +17,7 @@ export type CartItem = {
   variantName: string | null;
   unitPrice: number; // cents
   imageUrl: string | null;
+  categoryId: string | null;
 };
 
 // ==================== KEYS ====================

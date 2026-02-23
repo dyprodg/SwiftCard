@@ -66,7 +66,8 @@ function findBestDiscountForProduct(
     if (isScoped) {
       const matchesProduct = d.products.some((p) => p.productId === product.id);
       const matchesCategory =
-        product.categoryId && d.categories.some((c) => c.categoryId === product.categoryId);
+        product.categoryId &&
+        d.categories.some((c) => c.categoryId === product.categoryId);
       if (!matchesProduct && !matchesCategory) continue;
     }
 
@@ -229,8 +230,8 @@ export default async function ProductDetailPage({ params }: Props) {
           </div>
 
           {/* Price (shown when no variants) */}
-          {product.variants.length === 0 && (
-            discount && discount.type !== "FREE_SHIPPING" ? (
+          {product.variants.length === 0 &&
+            (discount && discount.type !== "FREE_SHIPPING" ? (
               <div className="flex items-baseline gap-3">
                 <span className="text-2xl font-bold">
                   {formatPrice(applyDiscountToPrice(product.basePrice, discount))}
@@ -241,8 +242,7 @@ export default async function ProductDetailPage({ params }: Props) {
               </div>
             ) : (
               <p className="text-2xl font-bold">{formatPrice(product.basePrice)}</p>
-            )
-          )}
+            ))}
 
           {/* Variant Selector + Add to Cart */}
           <ProductDetailClient
@@ -251,6 +251,8 @@ export default async function ProductDetailPage({ params }: Props) {
             variants={product.variants}
             basePrice={product.basePrice}
             imageUrl={product.images[0]?.url ?? null}
+            categoryId={product.categoryId}
+            discount={discount ? { type: discount.type, value: discount.value } : null}
           />
 
           {/* Description */}
