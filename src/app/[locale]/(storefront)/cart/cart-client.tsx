@@ -8,7 +8,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { useCartStore, selectTotalItems, selectSubtotal } from "@/stores/cart-store";
+import { useCartStore, selectTotalItems, selectSubtotal, selectDiscountAmount } from "@/stores/cart-store";
 import { updateCartItem, removeFromCart } from "@/server/actions/cart";
 import { formatPrice } from "@/lib/utils/format-price";
 import { CouponInput } from "@/components/storefront/coupon-input";
@@ -20,6 +20,8 @@ export function CartPageClient() {
   const items = useCartStore((s) => s.items);
   const totalItems = useCartStore(selectTotalItems);
   const subtotal = useCartStore(selectSubtotal);
+  const appliedDiscount = useCartStore((s) => s.appliedDiscount);
+  const discountAmount = useCartStore(selectDiscountAmount);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
 
@@ -160,9 +162,24 @@ export function CartPageClient() {
               </span>
               <span>{formatPrice(subtotal)}</span>
             </div>
+
+            {appliedDiscount && discountAmount > 0 && (
+              <div className="flex justify-between text-sm text-green-600">
+                <span>
+                  {t("discount")}
+                  {appliedDiscount.code && ` (${appliedDiscount.code})`}
+                </span>
+                <span>-{formatPrice(discountAmount)}</span>
+              </div>
+            )}
+
             <div className="flex justify-between text-sm">
               <span>{t("shipping")}</span>
-              <span className="text-muted-foreground">{t("estimatedShipping")}</span>
+              <span className="text-muted-foreground">
+                {appliedDiscount?.freeShipping
+                  ? t("freeShipping")
+                  : t("estimatedShipping")}
+              </span>
             </div>
 
             <CouponInput />
@@ -171,7 +188,7 @@ export function CartPageClient() {
 
             <div className="flex justify-between font-semibold">
               <span>{t("total")}</span>
-              <span className="text-lg">{formatPrice(subtotal)}</span>
+              <span className="text-lg">{formatPrice(subtotal - discountAmount)}</span>
             </div>
 
             <Button className="w-full" size="lg" asChild>

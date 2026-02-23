@@ -6,11 +6,14 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { ChevronRight } from "lucide-react";
 
 import { getProductBySlug } from "@/server/queries/products";
+import { getActiveDiscountsForDisplay } from "@/server/queries/discounts";
 import { localizeProduct } from "@/lib/utils/localize-product";
 import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { formatPrice } from "@/lib/utils/format-price";
 import { Badge } from "@/components/ui/badge";
+import { DiscountBadge } from "@/components/storefront/discount-badge";
 import { ProductDetailClient } from "./product-detail-client";
+import type { DiscountWithRelations } from "@/types";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://localhost:3000";
 
@@ -52,12 +55,62 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
+function findBestDiscountForProduct(
+  product: { id: string; categoryId: string | null; basePrice: number },
+  discounts: DiscountWithRelations[],
+): DiscountWithRelations | null {
+  let best: { discount: DiscountWithRelations; score: number } | null = null;
+
+  for (const d of discounts) {
+    const isScoped = d.products.length > 0 || d.categories.length > 0;
+    if (isScoped) {
+      const matchesProduct = d.products.some((p) => p.productId === product.id);
+      const matchesCategory =
+        product.categoryId && d.categories.some((c) => c.categoryId === product.categoryId);
+      if (!matchesProduct && !matchesCategory) continue;
+    }
+
+    let score = 0;
+    switch (d.type) {
+      case "PERCENTAGE":
+        score = Math.round((product.basePrice * d.value) / 10000);
+        break;
+      case "FIXED":
+        score = Math.min(d.value, product.basePrice);
+        break;
+      case "FREE_SHIPPING":
+        score = 0;
+        break;
+    }
+
+    if (!best || score > best.score) {
+      best = { discount: d, score };
+    }
+  }
+
+  return best?.discount ?? null;
+}
+
+function applyDiscountToPrice(price: number, discount: DiscountWithRelations): number {
+  switch (discount.type) {
+    case "PERCENTAGE":
+      return Math.round(price - (price * discount.value) / 10000);
+    case "FIXED":
+      return Math.max(0, price - discount.value);
+    case "FREE_SHIPPING":
+      return price;
+  }
+}
+
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = await params;
   const locale = await getLocale();
   const t = await getTranslations("products");
   const tc = await getTranslations("common");
-  const product = await getProductBySlug(slug);
+  const [product, activeDiscounts] = await Promise.all([
+    getProductBySlug(slug),
+    getActiveDiscountsForDisplay(),
+  ]);
 
   if (!product || product.status !== "ACTIVE") {
     notFound();
@@ -65,6 +118,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   const localized = localizeProduct(product, locale);
   const primaryImage = localized.images[0];
+  const discount = findBestDiscountForProduct(product, activeDiscounts);
 
   const breadcrumbItems = [
     { name: tc("home"), url: `${APP_URL}/${locale}` },
@@ -162,7 +216,10 @@ export default async function ProductDetailPage({ params }: Props) {
         {/* Product Info */}
         <div className="space-y-6">
           <div>
-            {product.featured && <Badge className="mb-2">{tc("featured")}</Badge>}
+            <div className="mb-2 flex flex-wrap gap-1">
+              {product.featured && <Badge>{tc("featured")}</Badge>}
+              {discount && <DiscountBadge type={discount.type} value={discount.value} />}
+            </div>
             <h1 className="text-3xl font-bold tracking-tight">{localized.name}</h1>
             {product.category && (
               <p className="text-muted-foreground mt-1 text-sm">
@@ -173,7 +230,18 @@ export default async function ProductDetailPage({ params }: Props) {
 
           {/* Price (shown when no variants) */}
           {product.variants.length === 0 && (
-            <p className="text-2xl font-bold">{formatPrice(product.basePrice)}</p>
+            discount && discount.type !== "FREE_SHIPPING" ? (
+              <div className="flex items-baseline gap-3">
+                <span className="text-2xl font-bold">
+                  {formatPrice(applyDiscountToPrice(product.basePrice, discount))}
+                </span>
+                <span className="text-muted-foreground text-lg line-through">
+                  {formatPrice(product.basePrice)}
+                </span>
+              </div>
+            ) : (
+              <p className="text-2xl font-bold">{formatPrice(product.basePrice)}</p>
+            )
           )}
 
           {/* Variant Selector + Add to Cart */}

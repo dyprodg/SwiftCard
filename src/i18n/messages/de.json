@@ -76,7 +76,8 @@
     "estimatedShipping": "Wird an der Kasse berechnet",
     "freeShipping": "Kostenlos",
     "orderSummary": "Bestellübersicht",
-    "items": "Artikel"
+    "items": "Artikel",
+    "discount": "Rabatt"
   },
   "checkout": {
     "title": "Kasse",
@@ -429,6 +430,9 @@
       "startsAt": "Beginnt am",
       "expiresAt": "Endet am",
       "scope": "Produktbereich",
+      "appliesTo": "Gilt für",
+      "appliesToEverything": "Alles",
+      "appliesToSpecific": "Bestimmte Produkte/Kategorien",
       "scopeHint": "Leer lassen, um auf alle Produkte anzuwenden",
       "scopeProducts": "Produkte",
       "scopeCategories": "Kategorien",

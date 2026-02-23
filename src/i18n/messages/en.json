@@ -76,7 +76,8 @@
     "estimatedShipping": "Estimated at checkout",
     "freeShipping": "Free",
     "orderSummary": "Order Summary",
-    "items": "items"
+    "items": "items",
+    "discount": "Discount"
   },
   "checkout": {
     "title": "Checkout",
@@ -429,6 +430,9 @@
       "startsAt": "Starts At",
       "expiresAt": "Expires At",
       "scope": "Product Scope",
+      "appliesTo": "Applies to",
+      "appliesToEverything": "Everything",
+      "appliesToSpecific": "Specific products/categories",
       "scopeHint": "Leave empty to apply to all products",
       "scopeProducts": "Products",
       "scopeCategories": "Categories",

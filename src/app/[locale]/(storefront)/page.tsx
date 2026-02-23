@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react";
 
 import { getFeaturedProducts } from "@/server/queries/products";
 import { localizeProducts } from "@/lib/utils/localize-product";
+import { getActiveDiscountsForDisplay } from "@/server/queries/discounts";
 import { organizationJsonLd } from "@/lib/seo/json-ld";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { ProductGridSkeleton } from "@/components/storefront/product-grid-skeleton";
@@ -87,7 +88,10 @@ export default async function HomePage() {
 
 async function FeaturedProducts({ locale }: { locale: string }) {
   const t = await getTranslations("common");
-  const featured = await getFeaturedProducts(6);
+  const [featured, activeDiscounts] = await Promise.all([
+    getFeaturedProducts(6),
+    getActiveDiscountsForDisplay(),
+  ]);
 
   if (featured.length === 0) return null;
 
@@ -102,7 +106,7 @@ async function FeaturedProducts({ locale }: { locale: string }) {
           </Link>
         </Button>
       </div>
-      <ProductGrid products={localizeProducts(featured, locale)} locale={locale} />
+      <ProductGrid products={localizeProducts(featured, locale)} locale={locale} discounts={activeDiscounts} />
     </section>
   );
 }

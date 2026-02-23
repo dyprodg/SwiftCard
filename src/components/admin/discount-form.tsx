@@ -45,6 +45,12 @@ export function DiscountForm({ discount, products, categories }: Props) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
+  const initialScope =
+    discount && (discount.products.length > 0 || discount.categories.length > 0)
+      ? "specific"
+      : "everything";
+  const [appliesTo, setAppliesTo] = useState<"everything" | "specific">(initialScope);
+
   const form = useForm<DiscountFormValues>({
     resolver: zodResolver(discountFormSchema),
     defaultValues: {
@@ -90,6 +96,8 @@ export function DiscountForm({ discount, products, categories }: Props) {
         const payload = {
           ...values,
           value: serverValue,
+          productIds: appliesTo === "everything" ? [] : values.productIds,
+          categoryIds: appliesTo === "everything" ? [] : values.categoryIds,
         };
 
         if (discount) {
@@ -390,85 +398,109 @@ export function DiscountForm({ discount, products, categories }: Props) {
             <CardTitle>{t("scope")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-muted-foreground text-sm">{t("scopeHint")}</p>
+            <div>
+              <FormLabel>{t("appliesTo")}</FormLabel>
+              <div className="mt-2 flex gap-2">
+                <Button
+                  type="button"
+                  variant={appliesTo === "everything" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setAppliesTo("everything")}
+                >
+                  {t("appliesToEverything")}
+                </Button>
+                <Button
+                  type="button"
+                  variant={appliesTo === "specific" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setAppliesTo("specific")}
+                >
+                  {t("appliesToSpecific")}
+                </Button>
+              </div>
+            </div>
 
-            <FormField
-              control={form.control}
-              name="productIds"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("scopeProducts")}</FormLabel>
-                  <div className="max-h-48 space-y-2 overflow-y-auto rounded-md border p-3">
-                    {products.length === 0 ? (
-                      <p className="text-muted-foreground text-sm">{t("noProductsAvailable")}</p>
-                    ) : (
-                      products.map((product) => (
-                        <label
-                          key={product.id}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={field.value.includes(product.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                field.onChange([...field.value, product.id]);
-                              } else {
-                                field.onChange(
-                                  field.value.filter((id) => id !== product.id),
-                                );
-                              }
-                            }}
-                            className="rounded"
-                          />
-                          {product.name}
-                        </label>
-                      ))
-                    )}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {appliesTo === "specific" && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="productIds"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("scopeProducts")}</FormLabel>
+                      <div className="max-h-48 space-y-2 overflow-y-auto rounded-md border p-3">
+                        {products.length === 0 ? (
+                          <p className="text-muted-foreground text-sm">{t("noProductsAvailable")}</p>
+                        ) : (
+                          products.map((product) => (
+                            <label
+                              key={product.id}
+                              className="flex items-center gap-2 text-sm"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={field.value.includes(product.id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    field.onChange([...field.value, product.id]);
+                                  } else {
+                                    field.onChange(
+                                      field.value.filter((id) => id !== product.id),
+                                    );
+                                  }
+                                }}
+                                className="rounded"
+                              />
+                              {product.name}
+                            </label>
+                          ))
+                        )}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-            <FormField
-              control={form.control}
-              name="categoryIds"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t("scopeCategories")}</FormLabel>
-                  <div className="max-h-48 space-y-2 overflow-y-auto rounded-md border p-3">
-                    {categories.length === 0 ? (
-                      <p className="text-muted-foreground text-sm">{t("noCategoriesAvailable")}</p>
-                    ) : (
-                      categories.map((category) => (
-                        <label
-                          key={category.id}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={field.value.includes(category.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                field.onChange([...field.value, category.id]);
-                              } else {
-                                field.onChange(
-                                  field.value.filter((id) => id !== category.id),
-                                );
-                              }
-                            }}
-                            className="rounded"
-                          />
-                          {category.name}
-                        </label>
-                      ))
-                    )}
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                <FormField
+                  control={form.control}
+                  name="categoryIds"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("scopeCategories")}</FormLabel>
+                      <div className="max-h-48 space-y-2 overflow-y-auto rounded-md border p-3">
+                        {categories.length === 0 ? (
+                          <p className="text-muted-foreground text-sm">{t("noCategoriesAvailable")}</p>
+                        ) : (
+                          categories.map((category) => (
+                            <label
+                              key={category.id}
+                              className="flex items-center gap-2 text-sm"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={field.value.includes(category.id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    field.onChange([...field.value, category.id]);
+                                  } else {
+                                    field.onChange(
+                                      field.value.filter((id) => id !== category.id),
+                                    );
+                                  }
+                                }}
+                                className="rounded"
+                              />
+                              {category.name}
+                            </label>
+                          ))
+                        )}
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
           </CardContent>
         </Card>
 

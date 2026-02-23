@@ -113,3 +113,17 @@ export const selectTotalItems = (state: CartStore) =>
 
 export const selectSubtotal = (state: CartStore) =>
   state.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+
+export const selectDiscountAmount = (state: CartStore) => {
+  if (!state.appliedDiscount) return 0;
+  const subtotal = state.items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+  const d = state.appliedDiscount;
+  switch (d.type) {
+    case "PERCENTAGE":
+      return Math.round((subtotal * d.value) / 10000);
+    case "FIXED":
+      return Math.min(d.amount, subtotal);
+    case "FREE_SHIPPING":
+      return 0;
+  }
+};

@@ -4,8 +4,14 @@ import { getTranslations } from "next-intl/server";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { DiscountBadge } from "@/components/storefront/discount-badge";
 import { formatPrice } from "@/lib/utils/format-price";
 import type { Product, ProductImage, ProductVariant } from "@/types";
+
+export type ProductDiscount = {
+  type: "PERCENTAGE" | "FIXED" | "FREE_SHIPPING";
+  value: number; // basis points for %, cents for fixed
+} | null;
 
 type ProductCardProps = {
   product: Product & {
@@ -13,9 +19,22 @@ type ProductCardProps = {
     variants: ProductVariant[];
   };
   locale: string;
+  discount?: ProductDiscount;
 };
 
-export async function ProductCard({ product, locale }: ProductCardProps) {
+function applyDiscount(price: number, discount: ProductDiscount): number {
+  if (!discount) return price;
+  switch (discount.type) {
+    case "PERCENTAGE":
+      return Math.round(price - (price * discount.value) / 10000);
+    case "FIXED":
+      return Math.max(0, price - discount.value);
+    case "FREE_SHIPPING":
+      return price;
+  }
+}
+
+export async function ProductCard({ product, locale, discount }: ProductCardProps) {
   const t = await getTranslations("common");
   const primaryImage = product.images[0];
 
@@ -26,6 +45,11 @@ export async function ProductCard({ product, locale }: ProductCardProps) {
       : [product.basePrice];
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
+
+  const hasMonetaryDiscount =
+    discount && discount.type !== "FREE_SHIPPING";
+  const discountedMin = applyDiscount(minPrice, discount ?? null);
+  const discountedMax = applyDiscount(maxPrice, discount ?? null);
 
   return (
     <Link href={`/${locale}/products/${product.slug}`}>
@@ -44,17 +68,33 @@ export async function ProductCard({ product, locale }: ProductCardProps) {
               <span className="text-muted-foreground">{t("noImage")}</span>
             </div>
           )}
-          {product.featured && (
-            <Badge className="absolute top-2 left-2">{t("featured")}</Badge>
-          )}
+          <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+            {product.featured && <Badge>{t("featured")}</Badge>}
+            {discount && <DiscountBadge type={discount.type} value={discount.value} />}
+          </div>
         </div>
         <CardContent className="p-4">
           <h3 className="line-clamp-2 leading-tight font-medium">{product.name}</h3>
-          <p className="text-primary mt-1 text-sm font-semibold">
-            {minPrice === maxPrice
-              ? formatPrice(minPrice)
-              : `${formatPrice(minPrice)} – ${formatPrice(maxPrice)}`}
-          </p>
+          {hasMonetaryDiscount ? (
+            <div className="mt-1 flex items-baseline gap-2">
+              <span className="text-primary text-sm font-semibold">
+                {discountedMin === discountedMax
+                  ? formatPrice(discountedMin)
+                  : `${formatPrice(discountedMin)} – ${formatPrice(discountedMax)}`}
+              </span>
+              <span className="text-muted-foreground text-xs line-through">
+                {minPrice === maxPrice
+                  ? formatPrice(minPrice)
+                  : `${formatPrice(minPrice)} – ${formatPrice(maxPrice)}`}
+              </span>
+            </div>
+          ) : (
+            <p className="text-primary mt-1 text-sm font-semibold">
+              {minPrice === maxPrice
+                ? formatPrice(minPrice)
+                : `${formatPrice(minPrice)} – ${formatPrice(maxPrice)}`}
+            </p>
+          )}
           {product.variants.length > 0 && (
             <p className="text-muted-foreground mt-1 text-xs">
               {product.variants.length}{" "}

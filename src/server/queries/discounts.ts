@@ -88,6 +88,30 @@ export async function getActiveAutomaticDiscounts() {
 }
 
 /**
+ * All active, non-expired discounts for storefront display (badges, prices).
+ * Returns discounts with their product/category scopes.
+ */
+export async function getActiveDiscountsForDisplay() {
+  "use cache";
+  cacheTag("discounts");
+  cacheLife("minutes");
+
+  const now = new Date();
+
+  return db.query.discounts.findMany({
+    where: and(
+      eq(discounts.active, true),
+      or(isNull(discounts.startsAt), lte(discounts.startsAt, now)),
+      or(isNull(discounts.expiresAt), gte(discounts.expiresAt, now)),
+    ),
+    with: {
+      products: true,
+      categories: true,
+    },
+  });
+}
+
+/**
  * Validate a coupon code — NOT cached (real-time check).
  */
 export async function getDiscountByCode(code: string) {

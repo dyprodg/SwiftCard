@@ -6,6 +6,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 import { getActiveProducts } from "@/server/queries/products";
 import { localizeProducts } from "@/lib/utils/localize-product";
 import { getCategories } from "@/server/queries/categories";
+import { getActiveDiscountsForDisplay } from "@/server/queries/discounts";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { ProductGridSkeleton } from "@/components/storefront/product-grid-skeleton";
 import { Button } from "@/components/ui/button";
@@ -73,9 +74,10 @@ async function ProductsContent({
   const t = await getTranslations("products");
   const pageSize = 12;
 
-  const [{ items, total }, categories] = await Promise.all([
+  const [{ items, total }, categories, activeDiscounts] = await Promise.all([
     getActiveProducts(pageSize, (page - 1) * pageSize),
     getCategories(),
+    getActiveDiscountsForDisplay(),
   ]);
 
   const totalPages = Math.ceil(total / pageSize);
@@ -115,7 +117,7 @@ async function ProductsContent({
 
         {/* Products */}
         <div className="flex-1">
-          <ProductGrid products={localizeProducts(items, locale)} locale={locale} />
+          <ProductGrid products={localizeProducts(items, locale)} locale={locale} discounts={activeDiscounts} />
 
           {/* Pagination */}
           {totalPages > 1 && (
