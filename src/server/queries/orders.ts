@@ -3,7 +3,11 @@
 import { db } from "@/db";
 import { orders } from "@/db/schema/orders";
 import { eq, desc, sql, and, ilike, or } from "drizzle-orm";
-import type { OrderWithItems, OrderWithItemsAndRefunds } from "@/types";
+import type {
+  OrderWithItems,
+  OrderWithItemsAndRefunds,
+  OrderWithItemsAndRefundsAndFulfillments,
+} from "@/types";
 
 type OrderFilters = {
   page?: number;
@@ -83,6 +87,21 @@ export async function getOrderByIdWithRefunds(
     with: {
       items: true,
       refunds: { with: { items: true } },
+    },
+  });
+
+  return order ?? null;
+}
+
+export async function getOrderByIdFull(
+  id: string,
+): Promise<OrderWithItemsAndRefundsAndFulfillments | null> {
+  const order = await db.query.orders.findFirst({
+    where: eq(orders.id, id),
+    with: {
+      items: true,
+      refunds: { with: { items: true } },
+      fulfillments: { with: { items: true } },
     },
   });
 

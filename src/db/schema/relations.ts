@@ -9,6 +9,7 @@ import {
 import { orders, orderItems, orderRefunds, orderRefundItems } from "./orders";
 import { discounts, discountProducts, discountCategories } from "./discounts";
 import { stockReservations } from "./reservations";
+import { fulfillments, fulfillmentItems } from "./fulfillments";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -57,6 +58,7 @@ export const productTranslationsRelations = relations(productTranslations, ({ on
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   items: many(orderItems),
   refunds: many(orderRefunds),
+  fulfillments: many(fulfillments),
   reservations: many(stockReservations),
   discount: one(discounts, {
     fields: [orders.discountId],
@@ -136,5 +138,25 @@ export const stockReservationsRelations = relations(stockReservations, ({ one })
   order: one(orders, {
     fields: [stockReservations.orderId],
     references: [orders.id],
+  }),
+}));
+
+// Fulfillment relations
+export const fulfillmentsRelations = relations(fulfillments, ({ one, many }) => ({
+  order: one(orders, {
+    fields: [fulfillments.orderId],
+    references: [orders.id],
+  }),
+  items: many(fulfillmentItems),
+}));
+
+export const fulfillmentItemsRelations = relations(fulfillmentItems, ({ one }) => ({
+  fulfillment: one(fulfillments, {
+    fields: [fulfillmentItems.fulfillmentId],
+    references: [fulfillments.id],
+  }),
+  orderItem: one(orderItems, {
+    fields: [fulfillmentItems.orderItemId],
+    references: [orderItems.id],
   }),
 }));

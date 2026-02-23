@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getOrderByIdWithRefunds } from "@/server/queries/orders";
+import { getOrderByIdFull } from "@/server/queries/orders";
 import { OrderDetailClient } from "./order-detail-client";
 
 type Props = {
@@ -8,7 +8,7 @@ type Props = {
 
 export default async function AdminOrderDetailPage({ params }: Props) {
   const { id } = await params;
-  const order = await getOrderByIdWithRefunds(id);
+  const order = await getOrderByIdFull(id);
 
   if (!order) {
     notFound();
