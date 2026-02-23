@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { orders } from "@/db/schema/orders";
 import { and, eq, isNotNull, lt } from "drizzle-orm";
 import { reconcileOrderWithStripe } from "@/lib/stripe/reconcile";
+import { expireReservations } from "@/lib/reservations";
 
 export async function POST() {
   const { userId, sessionClaims } = await auth();
@@ -34,6 +35,9 @@ export async function POST() {
     const result = await reconcileOrderWithStripe(order.id);
     if (result.reconciled) {
       reconciled++;
+    } else {
+      // Expire dangling reservations for stale orders that weren't reconciled
+      await expireReservations(order.id);
     }
     details.push({
       orderId: order.id,

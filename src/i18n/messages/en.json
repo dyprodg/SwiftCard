@@ -28,8 +28,9 @@
     "noImage": "No image",
     "noImageShort": "No img",
     "featured": "Featured",
-    "inStock": "{count} in stock",
+    "inStock": "In stock",
     "outOfStock": "Out of stock",
+    "onlyXLeft": "Only {count} left",
     "size": "Size",
     "color": "Color",
     "variant": "variant",
@@ -194,6 +195,7 @@
       "orders": "Orders",
       "customers": "Customers",
       "discounts": "Discounts",
+      "reservations": "Reservations",
       "settings": "Settings",
       "viewStorefront": "View Storefront",
       "adminTitle": "SwiftCard Admin"
@@ -457,6 +459,24 @@
       "account": "Account",
       "guest": "Guest"
     },
+    "reservations": {
+      "title": "Stock Reservations",
+      "description": "Track stock holds for active checkouts",
+      "activeReservations": "Active reservations",
+      "unitsHeld": "Units held",
+      "allStatuses": "All Statuses",
+      "statusReserved": "Reserved",
+      "statusConverted": "Converted",
+      "statusExpired": "Expired",
+      "variant": "Variant",
+      "quantity": "Qty",
+      "session": "Session",
+      "order": "Order",
+      "status": "Status",
+      "expiresAt": "Expires At",
+      "createdAt": "Created At",
+      "empty": "No reservations found"
+    },
     "settings": {
       "title": "Settings",
       "description": "Manage your shop configuration",
@@ -497,6 +517,12 @@
         "termsHint": "Link to your terms page",
         "privacyUrl": "Privacy Policy URL",
         "imprintUrl": "Imprint URL"
+      },
+      "reservations": "Reservations",
+      "reservationsForm": {
+        "title": "Stock Reservation Settings",
+        "timeoutLabel": "Reservation Timeout (minutes)",
+        "timeoutDescription": "How long stock is held for a checkout before being released (5-60 minutes)"
       },
       "banner": "Banner",
       "bannerForm": {

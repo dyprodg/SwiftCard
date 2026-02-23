@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { db } from "@/db";
 import { orders, orderItems } from "@/db/schema/orders";
-import { productVariants } from "@/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { stripe } from "@/lib/stripe/client";
+import { createReservationsInTx } from "@/lib/reservations";
+import { getReservationSettings } from "@/lib/edge-config";
 
 export async function POST(
   req: NextRequest,
@@ -58,25 +60,23 @@ export async function POST(
     // Get order items for stock re-lock
     const items = await db.select().from(orderItems).where(eq(orderItems.orderId, id));
 
-    // Re-lock stock in a transaction (stock was restored on failure)
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        if (item.variantId) {
-          const result = await tx
-            .update(productVariants)
-            .set({
-              stock: sql`${productVariants.stock} - ${item.quantity}`,
-            })
-            .where(
-              sql`${productVariants.id} = ${item.variantId} AND ${productVariants.stock} >= ${item.quantity}`,
-            )
-            .returning();
+    // Re-lock stock via reservations (old reservations were expired on payment failure)
+    const cookieStore = await cookies();
+    const sessionId = cookieStore.get("cart_session")?.value ?? "retry";
+    const reservationSettings = await getReservationSettings();
 
-          if (result.length === 0) {
-            throw new Error(`Not enough stock for "${item.productName}"`);
-          }
-        }
-      }
+    await db.transaction(async (tx) => {
+      await createReservationsInTx(
+        tx,
+        items.map((item) => ({
+          variantId: item.variantId,
+          quantity: item.quantity,
+          productName: item.productName,
+        })),
+        sessionId,
+        id,
+        reservationSettings.timeoutMinutes,
+      );
     });
 
     // Create a NEW PaymentIntent (old one may be expired/terminal)

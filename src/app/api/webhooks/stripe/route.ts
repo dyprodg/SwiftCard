@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { db } from "@/db";
-import { orders, orderItems, orderRefunds } from "@/db/schema/orders";
-import { productVariants } from "@/db/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { orders, orderRefunds } from "@/db/schema/orders";
+import { eq, and } from "drizzle-orm";
 import { constructEvent } from "@/lib/stripe/webhooks";
 import { deleteCart } from "@/lib/kv";
 import { handlePaymentSuccess } from "@/server/actions/orders";
 import { sendPaymentFailedEmail } from "@/lib/resend";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
+import { convertReservations, expireReservations } from "@/lib/reservations";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -58,6 +58,9 @@ export async function POST(req: NextRequest) {
             break;
           }
 
+          // Convert reservations to permanent (stock stays decremented)
+          await convertReservations(orderId);
+
           // Clear the cart
           if (cartId) {
             await deleteCart(cartId).catch(() => {});
@@ -98,22 +101,8 @@ export async function POST(req: NextRequest) {
             break;
           }
 
-          // Restore stock for each order item
-          const items = await db
-            .select()
-            .from(orderItems)
-            .where(eq(orderItems.orderId, orderId));
-
-          for (const item of items) {
-            if (item.variantId) {
-              await db
-                .update(productVariants)
-                .set({
-                  stock: sql`${productVariants.stock} + ${item.quantity}`,
-                })
-                .where(eq(productVariants.id, item.variantId));
-            }
-          }
+          // Expire reservations (restores stock)
+          await expireReservations(orderId);
 
           // Send payment-failed email
           const orderViewUrl = buildOrderViewUrl(

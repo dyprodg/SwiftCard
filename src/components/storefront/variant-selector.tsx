@@ -136,12 +136,14 @@ export function VariantSelector({
               {formatPrice(totalPrice)}
             </span>
           )}
-          {selected.stock > 0 ? (
-            <span className="text-sm text-green-600">
-              {t("inStock", { count: selected.stock })}
+          {selected.stock === 0 ? (
+            <span className="text-destructive text-sm">{t("outOfStock")}</span>
+          ) : selected.stock <= 5 ? (
+            <span className="text-sm text-orange-600">
+              {t("onlyXLeft", { count: selected.stock })}
             </span>
           ) : (
-            <span className="text-destructive text-sm">{t("outOfStock")}</span>
+            <span className="text-sm text-green-600">{t("inStock")}</span>
           )}
         </div>
       )}

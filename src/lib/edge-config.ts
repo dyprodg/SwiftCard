@@ -70,6 +70,29 @@ export async function getEventBanner(): Promise<EventBanner | null> {
   }
 }
 
+export type ReservationSettings = {
+  timeoutMinutes: number;
+};
+
+const RESERVATION_DEFAULTS: ReservationSettings = {
+  timeoutMinutes: 15,
+};
+
+export async function getReservationSettings(): Promise<ReservationSettings> {
+  "use cache";
+  cacheTag("reservation-settings");
+  cacheLife("hours");
+
+  try {
+    const client = getClient();
+    if (!client) return RESERVATION_DEFAULTS;
+    const settings = await client.get<ReservationSettings>("reservationSettings");
+    return settings ?? RESERVATION_DEFAULTS;
+  } catch {
+    return RESERVATION_DEFAULTS;
+  }
+}
+
 export async function isMaintenanceMode(): Promise<boolean> {
   try {
     const client = getClient();

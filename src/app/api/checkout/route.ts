@@ -14,6 +14,8 @@ import {
   calculateDiscount,
   findBestAutomaticDiscount,
 } from "@/lib/utils/discount-calculator";
+import { createReservationsInTx } from "@/lib/reservations";
+import { getReservationSettings } from "@/lib/edge-config";
 
 export async function POST(req: NextRequest) {
   try {
@@ -91,23 +93,18 @@ export async function POST(req: NextRequest) {
 
         let unitPrice = product.basePrice;
 
-        // If there's a variant, verify stock and lock it
+        // If there's a variant, look up price adjustment (stock is reserved after order creation)
         if (item.variantId) {
-          const result = await tx
-            .update(productVariants)
-            .set({
-              stock: sql`${productVariants.stock} - ${item.quantity}`,
-            })
-            .where(
-              sql`${productVariants.id} = ${item.variantId} AND ${productVariants.stock} >= ${item.quantity}`,
-            )
-            .returning();
+          const [variant] = await tx
+            .select()
+            .from(productVariants)
+            .where(eq(productVariants.id, item.variantId));
 
-          if (result.length === 0) {
-            throw new Error(`Not enough stock for "${item.productName}"`);
+          if (!variant) {
+            throw new Error(`Variant not found for "${item.productName}"`);
           }
 
-          unitPrice = product.basePrice + result[0].priceAdjustment;
+          unitPrice = product.basePrice + variant.priceAdjustment;
         }
 
         const lineTotal = unitPrice * item.quantity;
@@ -171,7 +168,9 @@ export async function POST(req: NextRequest) {
               ),
             );
           if ((usageResult?.count ?? 0) >= discount.maxUsesPerCustomer) {
-            throw new Error("You have already used this coupon the maximum number of times");
+            throw new Error(
+              "You have already used this coupon the maximum number of times",
+            );
           }
         }
 
@@ -304,6 +303,20 @@ export async function POST(req: NextRequest) {
           unitPrice: item.unitPrice,
           total: item.unitPrice * item.quantity,
         })),
+      );
+
+      // Reserve stock (atomic decrement + tracking rows)
+      const reservationSettings = await getReservationSettings();
+      await createReservationsInTx(
+        tx,
+        validatedItems.map((item) => ({
+          variantId: item.variantId,
+          quantity: item.quantity,
+          productName: item.productName,
+        })),
+        sessionId!,
+        order.id,
+        reservationSettings.timeoutMinutes,
       );
 
       return { order, validatedItems, total, currency, discountCode, discountAmount };

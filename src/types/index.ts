@@ -18,6 +18,7 @@ import type {
   discountProducts,
   discountCategories,
 } from "@/db/schema/discounts";
+import type { stockReservations } from "@/db/schema/reservations";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -80,6 +81,9 @@ export type AppliedDiscount = {
   productIds: string[];
   categoryIds: string[];
 };
+
+// Reservation types
+export type StockReservation = InferSelectModel<typeof stockReservations>;
 
 // Cart types
 export type CartItem = {

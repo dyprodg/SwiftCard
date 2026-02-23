@@ -11,6 +11,7 @@ import {
   Settings,
   Store,
   Tag,
+  Clock,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ const navItems = [
   { key: "orders" as const, href: "/admin/orders", icon: ShoppingCart },
   { key: "discounts" as const, href: "/admin/discounts", icon: Tag },
   { key: "customers" as const, href: "/admin/customers", icon: Users },
+  { key: "reservations" as const, href: "/admin/reservations", icon: Clock },
   { key: "settings" as const, href: "/admin/settings/general", icon: Settings },
 ];
 

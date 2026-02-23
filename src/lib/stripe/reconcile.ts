@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { stripe } from "@/lib/stripe/client";
 import { deleteCart } from "@/lib/kv";
 import { handlePaymentSuccess } from "@/server/actions/orders";
+import { convertReservations } from "@/lib/reservations";
 
 export type ReconcileResult =
   | { reconciled: true; orderId: string; paymentStatus: "PAID" }
@@ -67,6 +68,9 @@ export async function reconcileOrderWithStripe(
   if (cartId) {
     await deleteCart(cartId).catch(() => {});
   }
+
+  // Convert reservations to permanent
+  await convertReservations(orderId);
 
   // Send confirmation email
   await handlePaymentSuccess(orderId).catch((err) =>

@@ -8,6 +8,7 @@ import {
 } from "./products";
 import { orders, orderItems, orderRefunds, orderRefundItems } from "./orders";
 import { discounts, discountProducts, discountCategories } from "./discounts";
+import { stockReservations } from "./reservations";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -33,6 +34,7 @@ export const productVariantsRelations = relations(productVariants, ({ one, many 
     references: [products.id],
   }),
   orderItems: many(orderItems),
+  reservations: many(stockReservations),
 }));
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({
@@ -55,6 +57,7 @@ export const productTranslationsRelations = relations(productTranslations, ({ on
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   items: many(orderItems),
   refunds: many(orderRefunds),
+  reservations: many(stockReservations),
   discount: one(discounts, {
     fields: [orders.discountId],
     references: [discounts.id],
@@ -121,5 +124,17 @@ export const discountCategoriesRelations = relations(discountCategories, ({ one 
   category: one(categories, {
     fields: [discountCategories.categoryId],
     references: [categories.id],
+  }),
+}));
+
+// Reservation relations
+export const stockReservationsRelations = relations(stockReservations, ({ one }) => ({
+  variant: one(productVariants, {
+    fields: [stockReservations.variantId],
+    references: [productVariants.id],
+  }),
+  order: one(orders, {
+    fields: [stockReservations.orderId],
+    references: [orders.id],
   }),
 }));

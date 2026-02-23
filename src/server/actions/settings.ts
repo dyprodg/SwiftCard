@@ -140,6 +140,17 @@ export async function updateLegalSettings(input: LegalSettingsInput) {
   return result;
 }
 
+export async function updateReservationSettings(input: { timeoutMinutes: number }) {
+  await requireAdmin();
+
+  const timeoutMinutes = Math.min(60, Math.max(5, Math.round(input.timeoutMinutes)));
+
+  await updateEdgeConfig([{ key: "reservationSettings", value: { timeoutMinutes } }]);
+
+  updateTag("reservation-settings");
+  revalidatePath("/", "layout");
+}
+
 export async function updateMaintenanceMode(enabled: boolean) {
   await requireAdmin();
   await updateEdgeConfig([{ key: "maintenanceMode", value: enabled }]);

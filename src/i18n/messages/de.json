@@ -28,8 +28,9 @@
     "noImage": "Kein Bild",
     "noImageShort": "Kein Bild",
     "featured": "Empfohlen",
-    "inStock": "{count} an Lager",
+    "inStock": "An Lager",
     "outOfStock": "Nicht an Lager",
+    "onlyXLeft": "Nur noch {count} verfügbar",
     "size": "Grösse",
     "color": "Farbe",
     "variant": "Variante",
@@ -194,6 +195,7 @@
       "orders": "Bestellungen",
       "customers": "Kunden",
       "discounts": "Rabatte",
+      "reservations": "Reservierungen",
       "settings": "Einstellungen",
       "viewStorefront": "Zum Shop",
       "adminTitle": "SwiftCard Admin"
@@ -457,6 +459,24 @@
       "account": "Konto",
       "guest": "Gast"
     },
+    "reservations": {
+      "title": "Lagerreservierungen",
+      "description": "Bestandsreservierungen für aktive Bestellvorgänge verfolgen",
+      "activeReservations": "Aktive Reservierungen",
+      "unitsHeld": "Reservierte Einheiten",
+      "allStatuses": "Alle Status",
+      "statusReserved": "Reserviert",
+      "statusConverted": "Umgewandelt",
+      "statusExpired": "Abgelaufen",
+      "variant": "Variante",
+      "quantity": "Menge",
+      "session": "Sitzung",
+      "order": "Bestellung",
+      "status": "Status",
+      "expiresAt": "Läuft ab",
+      "createdAt": "Erstellt am",
+      "empty": "Keine Reservierungen gefunden"
+    },
     "settings": {
       "title": "Einstellungen",
       "description": "Shop-Konfiguration verwalten",
@@ -497,6 +517,12 @@
         "termsHint": "Link zu deinen AGB",
         "privacyUrl": "Datenschutz-URL",
         "imprintUrl": "Impressum-URL"
+      },
+      "reservations": "Reservierungen",
+      "reservationsForm": {
+        "title": "Lagerreservierungs-Einstellungen",
+        "timeoutLabel": "Reservierungs-Timeout (Minuten)",
+        "timeoutDescription": "Wie lange der Bestand für einen Bestellvorgang reserviert wird, bevor er freigegeben wird (5-60 Minuten)"
       },
       "banner": "Banner",
       "bannerForm": {
