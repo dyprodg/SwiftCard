@@ -13,6 +13,7 @@ export const checkoutSchema = z.object({
   shippingAddress: shippingAddressSchema,
   customerEmail: z.string().email("Invalid email address"),
   customerNote: z.string().max(500).optional().default(""),
+  couponCode: z.string().trim().max(50).optional(),
 });
 
 export type ShippingAddress = z.infer<typeof shippingAddressSchema>;

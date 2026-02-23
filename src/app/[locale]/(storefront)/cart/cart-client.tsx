@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCartStore, selectTotalItems, selectSubtotal } from "@/stores/cart-store";
 import { updateCartItem, removeFromCart } from "@/server/actions/cart";
 import { formatPrice } from "@/lib/utils/format-price";
+import { CouponInput } from "@/components/storefront/coupon-input";
 
 export function CartPageClient() {
   const t = useTranslations("cart");
@@ -163,6 +164,8 @@ export function CartPageClient() {
               <span>{t("shipping")}</span>
               <span className="text-muted-foreground">{t("estimatedShipping")}</span>
             </div>
+
+            <CouponInput />
 
             <Separator />
 

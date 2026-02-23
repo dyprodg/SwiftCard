@@ -120,6 +120,15 @@ export function OrderDetailClient({ order }: { order: OrderWithItemsAndRefunds }
               <span className="text-muted-foreground">{td("subtotal")}</span>
               <span>{formatPrice(order.subtotal, order.currency)}</span>
             </div>
+            {order.discountAmount > 0 && (
+              <div className="flex justify-between text-green-600">
+                <span>
+                  {td("discount")}
+                  {order.discountCode && ` (${order.discountCode})`}
+                </span>
+                <span>-{formatPrice(order.discountAmount, order.currency)}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span className="text-muted-foreground">{td("shipping")}</span>
               <span>

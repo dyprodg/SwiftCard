@@ -5,12 +5,13 @@ import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-const tabKeys = ["general", "shipping", "payment", "legal"] as const;
+const tabKeys = ["general", "shipping", "payment", "legal", "banner"] as const;
 const tabHrefs: Record<string, string> = {
   general: "/admin/settings/general",
   shipping: "/admin/settings/shipping",
   payment: "/admin/settings/payment",
   legal: "/admin/settings/legal",
+  banner: "/admin/settings/banner",
 };
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {

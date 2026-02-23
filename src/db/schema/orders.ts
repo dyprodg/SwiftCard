@@ -86,6 +86,9 @@ export const orders = pgTable(
     shippedAt: timestamp("shipped_at"),
     deliveredAt: timestamp("delivered_at"),
     cancelledAt: timestamp("cancelled_at"),
+    discountId: text("discount_id"),
+    discountAmount: integer("discount_amount").default(0).notNull(),
+    discountCode: text("discount_code"), // snapshot for history
     totalRefunded: integer("total_refunded").default(0).notNull(),
     guestAccessToken: text("guest_access_token")
       .$defaultFn(() => createId())

@@ -117,6 +117,15 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
               <span>{t("subtotal")}</span>
               <span>{formatPrice(order.subtotal)}</span>
             </div>
+            {order.discountAmount > 0 && (
+              <div className="flex justify-between text-green-600">
+                <span>
+                  {t("discount")}
+                  {order.discountCode && ` (${order.discountCode})`}
+                </span>
+                <span>-{formatPrice(order.discountAmount)}</span>
+              </div>
+            )}
             <div className="flex justify-between">
               <span>{t("tax")}</span>
               <span>{formatPrice(order.tax)}</span>

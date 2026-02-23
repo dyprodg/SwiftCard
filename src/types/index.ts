@@ -13,6 +13,11 @@ import type {
   orderRefundItems,
 } from "@/db/schema/orders";
 import type { shopSettings } from "@/db/schema/settings";
+import type {
+  discounts,
+  discountProducts,
+  discountCategories,
+} from "@/db/schema/discounts";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -52,6 +57,26 @@ export type OrderRefundWithItems = OrderRefund & {
 export type OrderWithItemsAndRefunds = Order & {
   items: OrderItem[];
   refunds: OrderRefundWithItems[];
+};
+
+// Discount types
+export type Discount = InferSelectModel<typeof discounts>;
+export type DiscountProduct = InferSelectModel<typeof discountProducts>;
+export type DiscountCategory = InferSelectModel<typeof discountCategories>;
+
+export type DiscountWithRelations = Discount & {
+  products: DiscountProduct[];
+  categories: DiscountCategory[];
+};
+
+export type AppliedDiscount = {
+  id: string;
+  code: string | null;
+  name: string;
+  type: "PERCENTAGE" | "FIXED" | "FREE_SHIPPING";
+  value: number;
+  amount: number; // calculated discount amount in cents
+  freeShipping: boolean;
 };
 
 // Cart types

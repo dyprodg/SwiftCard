@@ -44,6 +44,32 @@ export async function getShopSettings(): Promise<EdgeShopSettings> {
   }
 }
 
+export type EventBanner = {
+  enabled: boolean;
+  textEn: string;
+  textDe: string;
+  linkUrl?: string;
+  linkTextEn?: string;
+  linkTextDe?: string;
+  bgColor?: string;
+};
+
+export async function getEventBanner(): Promise<EventBanner | null> {
+  "use cache";
+  cacheTag("event-banner");
+  cacheLife("hours");
+
+  try {
+    const client = getClient();
+    if (!client) return null;
+    const banner = await client.get<EventBanner>("eventBanner");
+    if (!banner || !banner.enabled) return null;
+    return banner;
+  } catch {
+    return null;
+  }
+}
+
 export async function isMaintenanceMode(): Promise<boolean> {
   try {
     const client = getClient();

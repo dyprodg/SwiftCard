@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { db } from "@/db";
-import { products, productVariants, shopSettings } from "@/db/schema";
+import { products, productVariants, shopSettings, discounts } from "@/db/schema";
 import { orders, orderItems } from "@/db/schema/orders";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and, or, isNull, lte, gte } from "drizzle-orm";
 import { stripe } from "@/lib/stripe/client";
 import { getCart, guestCartKey, rateLimit } from "@/lib/kv";
 import { checkoutSchema } from "@/lib/validations/checkout";
 import { generateOrderNumber } from "@/lib/utils/order-number";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
 import { sendOrderCreatedEmail } from "@/lib/resend";
+import {
+  calculateDiscount,
+  findBestAutomaticDiscount,
+} from "@/lib/utils/discount-calculator";
 
 export async function POST(req: NextRequest) {
   try {
@@ -47,7 +51,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { shippingAddress, customerEmail, customerNote } = validation.data;
+    const { shippingAddress, customerEmail, customerNote, couponCode } = validation.data;
 
     // Get cart via cookie (works for both guests and logged-in users)
     // API routes are excluded from Clerk middleware, so we use the cart_session cookie
@@ -71,6 +75,7 @@ export async function POST(req: NextRequest) {
         variantName: string | null;
         quantity: number;
         unitPrice: number;
+        categoryId: string | null;
       }[] = [];
 
       for (const item of cartItems) {
@@ -115,8 +120,126 @@ export async function POST(req: NextRequest) {
           variantName: item.variantName,
           quantity: item.quantity,
           unitPrice,
+          categoryId: product.categoryId,
         });
       }
+
+      // ===== DISCOUNT CALCULATION =====
+      let discountId: string | null = null;
+      let discountAmount = 0;
+      let discountCode: string | null = null;
+      let freeShipping = false;
+
+      const enrichedItems = validatedItems.map((item) => ({
+        productId: item.productId,
+        categoryId: item.categoryId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+      }));
+
+      if (couponCode) {
+        // Validate coupon code
+        const now = new Date();
+        const discount = await tx.query.discounts.findFirst({
+          where: and(
+            eq(discounts.code, couponCode.toUpperCase()),
+            eq(discounts.active, true),
+            eq(discounts.automatic, false),
+            or(isNull(discounts.startsAt), lte(discounts.startsAt, now)),
+            or(isNull(discounts.expiresAt), gte(discounts.expiresAt, now)),
+          ),
+          with: { products: true, categories: true },
+        });
+
+        if (!discount) {
+          throw new Error("Invalid or expired coupon code");
+        }
+
+        if (discount.maxUses && discount.usedCount >= discount.maxUses) {
+          throw new Error("This coupon has reached its usage limit");
+        }
+
+        // Per-customer usage check
+        if (discount.maxUsesPerCustomer) {
+          const [usageResult] = await tx
+            .select({ count: sql<number>`count(*)::int` })
+            .from(orders)
+            .where(
+              and(
+                eq(orders.discountId, discount.id),
+                eq(orders.customerEmail, customerEmail),
+              ),
+            );
+          if ((usageResult?.count ?? 0) >= discount.maxUsesPerCustomer) {
+            throw new Error("You have already used this coupon the maximum number of times");
+          }
+        }
+
+        const result = calculateDiscount(
+          {
+            ...discount,
+            productIds: discount.products.map((p) => p.productId),
+            categoryIds: discount.categories.map((c) => c.categoryId),
+          },
+          enrichedItems,
+          subtotal,
+        );
+
+        if (result) {
+          discountId = discount.id;
+          discountAmount = result.amount;
+          discountCode = discount.code;
+          freeShipping = result.freeShipping;
+
+          // Increment usedCount atomically
+          await tx
+            .update(discounts)
+            .set({ usedCount: sql`${discounts.usedCount} + 1` })
+            .where(eq(discounts.id, discount.id));
+        }
+      } else {
+        // Try automatic discounts
+        const now = new Date();
+        const autoDiscounts = await tx.query.discounts.findMany({
+          where: and(
+            eq(discounts.active, true),
+            eq(discounts.automatic, true),
+            or(isNull(discounts.startsAt), lte(discounts.startsAt, now)),
+            or(isNull(discounts.expiresAt), gte(discounts.expiresAt, now)),
+          ),
+          with: { products: true, categories: true },
+        });
+
+        if (autoDiscounts.length > 0) {
+          const enrichedAutoDiscounts = autoDiscounts.map((d) => ({
+            ...d,
+            productIds: d.products.map((p) => p.productId),
+            categoryIds: d.categories.map((c) => c.categoryId),
+          }));
+
+          const best = findBestAutomaticDiscount(
+            enrichedAutoDiscounts,
+            enrichedItems,
+            subtotal,
+          );
+
+          if (best) {
+            discountId = best.discountId;
+            discountAmount = best.amount;
+            discountCode = best.code;
+            freeShipping = best.freeShipping;
+
+            // Increment usedCount atomically
+            await tx
+              .update(discounts)
+              .set({ usedCount: sql`${discounts.usedCount} + 1` })
+              .where(eq(discounts.id, best.discountId));
+          }
+        }
+      }
+
+      // ===== TOTALS =====
+      const discountedSubtotal = subtotal - discountAmount;
 
       // Get shop settings for tax & shipping
       const [settings] = await tx
@@ -125,14 +248,15 @@ export async function POST(req: NextRequest) {
         .where(eq(shopSettings.id, "singleton"));
 
       const taxRate = settings?.defaultTaxRate ?? 0.081;
-      const shippingCost =
+      const baseShippingCost =
         settings?.freeShippingThreshold && subtotal >= settings.freeShippingThreshold
           ? 0
           : (settings?.defaultShippingCost ?? 0);
+      const shippingCost = freeShipping ? 0 : baseShippingCost;
       const currency = settings?.currency ?? "CHF";
 
-      const tax = Math.round(subtotal * taxRate);
-      const total = subtotal + tax + shippingCost;
+      const tax = Math.round(discountedSubtotal * taxRate);
+      const total = discountedSubtotal + tax + shippingCost;
 
       // Generate order number (simple sequential)
       const [countResult] = await tx
@@ -162,6 +286,9 @@ export async function POST(req: NextRequest) {
           shippingZip: shippingAddress.zip,
           shippingCountry: shippingAddress.country,
           customerNote: customerNote || null,
+          discountId,
+          discountAmount,
+          discountCode,
         })
         .returning();
 
@@ -179,7 +306,7 @@ export async function POST(req: NextRequest) {
         })),
       );
 
-      return { order, validatedItems, total, currency };
+      return { order, validatedItems, total, currency, discountCode, discountAmount };
     });
 
     // Create Stripe PaymentIntent
@@ -191,6 +318,10 @@ export async function POST(req: NextRequest) {
         orderNumber: result.order.orderNumber,
         cartId,
         customerEmail,
+        ...(result.discountCode && { discountCode: result.discountCode }),
+        ...(result.discountAmount > 0 && {
+          discountAmount: result.discountAmount.toString(),
+        }),
       },
       automatic_payment_methods: {
         enabled: true,

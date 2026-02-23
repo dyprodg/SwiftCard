@@ -10,6 +10,7 @@ import {
   Users,
   Settings,
   Store,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,6 +18,7 @@ const navItems = [
   { key: "dashboard" as const, href: "/admin/dashboard", icon: LayoutDashboard },
   { key: "products" as const, href: "/admin/products", icon: Package },
   { key: "orders" as const, href: "/admin/orders", icon: ShoppingCart },
+  { key: "discounts" as const, href: "/admin/discounts", icon: Tag },
   { key: "customers" as const, href: "/admin/customers", icon: Users },
   { key: "settings" as const, href: "/admin/settings/general", icon: Settings },
 ];

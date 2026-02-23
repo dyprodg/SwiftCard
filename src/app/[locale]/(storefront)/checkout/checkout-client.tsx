@@ -38,6 +38,7 @@ import { useCartStore, selectSubtotal, selectTotalItems } from "@/stores/cart-st
 import { formatPrice } from "@/lib/utils/format-price";
 import { checkoutFormSchema, type CheckoutFormValues } from "@/lib/validations/checkout";
 import { SHIPPING_COUNTRIES } from "@/lib/constants/countries";
+import { CouponInput } from "@/components/storefront/coupon-input";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -51,6 +52,8 @@ export function CheckoutClient() {
   const subtotal = useCartStore(selectSubtotal);
   const totalItems = useCartStore(selectTotalItems);
   const clearCart = useCartStore((s) => s.clearCart);
+  const couponCode = useCartStore((s) => s.couponCode);
+  const appliedDiscount = useCartStore((s) => s.appliedDiscount);
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -101,6 +104,7 @@ export function CheckoutClient() {
           },
           customerEmail: values.email,
           customerNote: values.customerNote || "",
+          ...(couponCode && { couponCode }),
         }),
       });
 
@@ -334,6 +338,8 @@ export function CheckoutClient() {
 
             <Separator />
 
+            <CouponInput />
+
             <div className="flex justify-between text-sm">
               <span>
                 {tCart("subtotal")} ({totalItems} {tCart("items")})
@@ -341,16 +347,34 @@ export function CheckoutClient() {
               <span>{formatPrice(subtotal)}</span>
             </div>
 
+            {appliedDiscount && appliedDiscount.amount > 0 && (
+              <div className="flex justify-between text-sm text-green-600">
+                <span>
+                  {t("discount")}
+                  {appliedDiscount.code && ` (${appliedDiscount.code})`}
+                </span>
+                <span>-{formatPrice(appliedDiscount.amount)}</span>
+              </div>
+            )}
+
             <div className="flex justify-between text-sm">
               <span>{tCart("shipping")}</span>
-              <span className="text-muted-foreground">{tCart("estimatedShipping")}</span>
+              <span className="text-muted-foreground">
+                {appliedDiscount?.freeShipping
+                  ? tCart("freeShipping")
+                  : tCart("estimatedShipping")}
+              </span>
             </div>
 
             <Separator />
 
             <div className="flex justify-between font-semibold">
               <span>{tCart("total")}</span>
-              <span>{formatPrice(subtotal)}</span>
+              <span>
+                {formatPrice(
+                  subtotal - (appliedDiscount?.amount ?? 0),
+                )}
+              </span>
             </div>
           </CardContent>
         </Card>

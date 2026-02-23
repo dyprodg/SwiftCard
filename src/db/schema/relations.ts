@@ -7,6 +7,7 @@ import {
   productTranslations,
 } from "./products";
 import { orders, orderItems, orderRefunds, orderRefundItems } from "./orders";
+import { discounts, discountProducts, discountCategories } from "./discounts";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -51,9 +52,13 @@ export const productTranslationsRelations = relations(productTranslations, ({ on
   }),
 }));
 
-export const ordersRelations = relations(orders, ({ many }) => ({
+export const ordersRelations = relations(orders, ({ one, many }) => ({
   items: many(orderItems),
   refunds: many(orderRefunds),
+  discount: one(discounts, {
+    fields: [orders.discountId],
+    references: [discounts.id],
+  }),
 }));
 
 export const orderItemsRelations = relations(orderItems, ({ one }) => ({
@@ -87,5 +92,34 @@ export const orderRefundItemsRelations = relations(orderRefundItems, ({ one }) =
   orderItem: one(orderItems, {
     fields: [orderRefundItems.orderItemId],
     references: [orderItems.id],
+  }),
+}));
+
+// Discount relations
+export const discountsRelations = relations(discounts, ({ many }) => ({
+  products: many(discountProducts),
+  categories: many(discountCategories),
+  orders: many(orders),
+}));
+
+export const discountProductsRelations = relations(discountProducts, ({ one }) => ({
+  discount: one(discounts, {
+    fields: [discountProducts.discountId],
+    references: [discounts.id],
+  }),
+  product: one(products, {
+    fields: [discountProducts.productId],
+    references: [products.id],
+  }),
+}));
+
+export const discountCategoriesRelations = relations(discountCategories, ({ one }) => ({
+  discount: one(discounts, {
+    fields: [discountCategories.discountId],
+    references: [discounts.id],
+  }),
+  category: one(categories, {
+    fields: [discountCategories.categoryId],
+    references: [categories.id],
   }),
 }));

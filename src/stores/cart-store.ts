@@ -2,12 +2,14 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { CartItem } from "@/types";
+import type { CartItem, AppliedDiscount } from "@/types";
 
 type CartState = {
   items: CartItem[];
   isLoading: boolean;
   isOpen: boolean; // sheet open state
+  couponCode: string | null;
+  appliedDiscount: AppliedDiscount | null;
 };
 
 type CartActions = {
@@ -18,6 +20,7 @@ type CartActions = {
   setItems: (items: CartItem[]) => void;
   setLoading: (loading: boolean) => void;
   setOpen: (open: boolean) => void;
+  setCoupon: (code: string | null, discount: AppliedDiscount | null) => void;
 };
 
 type CartStore = CartState & CartActions;
@@ -33,6 +36,8 @@ export const useCartStore = create<CartStore>()(
       items: [],
       isLoading: false,
       isOpen: false,
+      couponCode: null,
+      appliedDiscount: null,
 
       // Actions
       addItem: (item) =>
@@ -84,13 +89,15 @@ export const useCartStore = create<CartStore>()(
           ),
         })),
 
-      clearCart: () => set({ items: [] }),
+      clearCart: () => set({ items: [], couponCode: null, appliedDiscount: null }),
 
       setItems: (items) => set({ items }),
 
       setLoading: (isLoading) => set({ isLoading }),
 
       setOpen: (isOpen) => set({ isOpen }),
+
+      setCoupon: (couponCode, appliedDiscount) => set({ couponCode, appliedDiscount }),
     }),
     {
       name: "swiftcard-cart",

@@ -145,3 +145,33 @@ export async function updateMaintenanceMode(enabled: boolean) {
   await updateEdgeConfig([{ key: "maintenanceMode", value: enabled }]);
   revalidatePath("/", "layout");
 }
+
+export async function updateEventBanner(input: {
+  enabled: boolean;
+  textEn: string;
+  textDe: string;
+  linkUrl?: string;
+  linkTextEn?: string;
+  linkTextDe?: string;
+  bgColor?: string;
+}) {
+  await requireAdmin();
+
+  await updateEdgeConfig([
+    {
+      key: "eventBanner",
+      value: {
+        enabled: input.enabled,
+        textEn: input.textEn,
+        textDe: input.textDe,
+        linkUrl: input.linkUrl || undefined,
+        linkTextEn: input.linkTextEn || undefined,
+        linkTextDe: input.linkTextDe || undefined,
+        bgColor: input.bgColor || "bg-primary",
+      },
+    },
+  ]);
+
+  updateTag("event-banner");
+  revalidatePath("/", "layout");
+}
