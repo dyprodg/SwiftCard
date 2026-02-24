@@ -1,9 +1,23 @@
 import Stripe from "stripe";
 
-// Server-side Stripe client (singleton)
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2026-01-28.clover",
-  typescript: true,
+// Server-side Stripe client (lazy singleton — avoids crash when env var is missing at build time)
+let _stripe: Stripe | null = null;
+
+export function getStripeServer() {
+  if (!_stripe) {
+    _stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+      apiVersion: "2026-01-28.clover",
+      typescript: true,
+    });
+  }
+  return _stripe;
+}
+
+/** @deprecated Use getStripeServer() instead */
+export const stripe = new Proxy({} as Stripe, {
+  get(_, prop) {
+    return (getStripeServer() as Record<string | symbol, unknown>)[prop];
+  },
 });
 
 // Client-side: lazy-loaded Stripe.js
