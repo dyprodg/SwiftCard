@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { shippingZoneSchema, taxZoneSchema, shippingRateFormSchema } from "./shipping";
 import {
   filterApplicableRates,
+  calculateTaxAndTotal,
   type ShippingRateInput,
 } from "../utils/shipping-calculator";
 
@@ -181,6 +182,31 @@ describe("taxZoneSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("defaults taxInclusive to true", () => {
+    const result = taxZoneSchema.safeParse({
+      name: "Swiss VAT",
+      countries: ["CH"],
+      taxRate: 0.081,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.taxInclusive).toBe(true);
+    }
+  });
+
+  it("accepts taxInclusive = false", () => {
+    const result = taxZoneSchema.safeParse({
+      name: "US Tax",
+      countries: ["US"],
+      taxRate: 0.08,
+      taxInclusive: false,
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.taxInclusive).toBe(false);
+    }
+  });
 });
 
 // ---- Shipping Calculator ----
@@ -319,5 +345,66 @@ describe("filterApplicableRates", () => {
   it("returns empty array for empty rates", () => {
     const result = filterApplicableRates([], 500, 3000);
     expect(result).toHaveLength(0);
+  });
+});
+
+// ---- Tax Calculation ----
+
+describe("calculateTaxAndTotal", () => {
+  it("extracts tax from inclusive price (CH 8.1%)", () => {
+    // Product costs CHF 89.90 (8990 cents), tax inclusive at 8.1%
+    const { tax, total } = calculateTaxAndTotal(8990, 0, 0.081, true);
+    // tax = round(8990 * 0.081 / 1.081) = round(673.63) = 674
+    expect(tax).toBe(674);
+    // total = 8990 + 0 shipping (tax already in subtotal)
+    expect(total).toBe(8990);
+  });
+
+  it("adds tax on top for exclusive pricing", () => {
+    // Product costs 8990 cents, tax exclusive at 8.1%
+    const { tax, total } = calculateTaxAndTotal(8990, 0, 0.081, false);
+    // tax = 8990 * 0.081 = 728.19 → 728
+    expect(tax).toBe(728);
+    // total = 8990 + 728 = 9718
+    expect(total).toBe(9718);
+  });
+
+  it("inclusive: total = subtotal + shipping (tax not added)", () => {
+    const { tax, total } = calculateTaxAndTotal(8990, 790, 0.081, true);
+    expect(tax).toBe(674);
+    expect(total).toBe(8990 + 790); // 9780
+  });
+
+  it("exclusive: total = subtotal + tax + shipping", () => {
+    const { tax, total } = calculateTaxAndTotal(8990, 790, 0.081, false);
+    expect(tax).toBe(728);
+    expect(total).toBe(8990 + 728 + 790); // 10508
+  });
+
+  it("handles 0% tax rate", () => {
+    const { tax, total } = calculateTaxAndTotal(10000, 500, 0, true);
+    expect(tax).toBe(0);
+    expect(total).toBe(10500);
+  });
+
+  it("handles German 19% inclusive", () => {
+    // 100 EUR product (10000 cents), 19% inclusive
+    const { tax, total } = calculateTaxAndTotal(10000, 0, 0.19, true);
+    // tax = 10000 * 0.19 / 1.19 = 1596.64 → 1597
+    expect(tax).toBe(1597);
+    expect(total).toBe(10000);
+  });
+
+  it("handles German 19% exclusive", () => {
+    const { tax, total } = calculateTaxAndTotal(10000, 0, 0.19, false);
+    // tax = 10000 * 0.19 = 1900
+    expect(tax).toBe(1900);
+    expect(total).toBe(11900);
+  });
+
+  it("handles zero subtotal", () => {
+    const { tax, total } = calculateTaxAndTotal(0, 790, 0.081, true);
+    expect(tax).toBe(0);
+    expect(total).toBe(790);
   });
 });

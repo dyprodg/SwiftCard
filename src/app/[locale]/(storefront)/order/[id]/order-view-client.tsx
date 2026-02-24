@@ -52,6 +52,7 @@ type OrderData = {
   currency: string;
   discountAmount: number;
   discountCode: string | null;
+  taxInclusive: boolean;
   shippingName: string;
   shippingAddress1: string;
   shippingAddress2: string | null;
@@ -80,6 +81,7 @@ type Translations = {
   subtotal: string;
   discount: string;
   tax: string;
+  taxIncluded: string;
   shipping: string;
   shippingFree: string;
   total: string;
@@ -309,7 +311,7 @@ export function OrderViewClient({
               </div>
             )}
             <div className="flex justify-between">
-              <span>{t.tax}</span>
+              <span>{order.taxInclusive ? t.taxIncluded : t.tax}</span>
               <span>{formatPrice(order.tax, order.currency)}</span>
             </div>
             <div className="flex justify-between">

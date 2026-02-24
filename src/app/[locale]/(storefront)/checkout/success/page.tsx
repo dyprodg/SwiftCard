@@ -127,7 +127,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
               </div>
             )}
             <div className="flex justify-between">
-              <span>{t("tax")}</span>
+              <span>{order.taxInclusive ? t("taxIncluded") : t("tax")}</span>
               <span>{formatPrice(order.tax)}</span>
             </div>
             <div className="flex justify-between">

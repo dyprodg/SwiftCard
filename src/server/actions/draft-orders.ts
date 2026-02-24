@@ -17,10 +17,13 @@ import {
 } from "@/lib/validations/draft-order";
 import {
   getShippingZoneForCountry,
-  getTaxRateForCountry,
+  getTaxInfoForCountry,
   getCartWeight,
 } from "@/server/queries/shipping";
-import { filterApplicableRates } from "@/lib/utils/shipping-calculator";
+import {
+  filterApplicableRates,
+  calculateTaxAndTotal,
+} from "@/lib/utils/shipping-calculator";
 import { generateOrderNumber } from "@/lib/utils/order-number";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
 import {
@@ -147,8 +150,9 @@ async function calculateDraftTotals(
   const currency = settings?.currency ?? "CHF";
 
   // Zone-based tax
-  const zoneTaxRate = await getTaxRateForCountry(country);
-  const taxRate = zoneTaxRate ?? settings?.defaultTaxRate ?? 0.081;
+  const taxInfo = await getTaxInfoForCountry(country);
+  const taxRate = taxInfo?.rate ?? settings?.defaultTaxRate ?? 0.081;
+  const taxInclusive = taxInfo?.taxInclusive ?? true;
 
   // Zone-based shipping
   let shippingCost: number;
@@ -179,8 +183,12 @@ async function calculateDraftTotals(
     shippingCost = freeShipping ? 0 : baseShippingCost;
   }
 
-  const tax = Math.round(discountedSubtotal * taxRate);
-  const total = discountedSubtotal + tax + shippingCost;
+  const { tax, total } = calculateTaxAndTotal(
+    discountedSubtotal,
+    shippingCost,
+    taxRate,
+    taxInclusive,
+  );
 
   return {
     subtotal,
@@ -193,6 +201,7 @@ async function calculateDraftTotals(
     tax,
     total,
     currency,
+    taxInclusive,
   };
 }
 
@@ -272,6 +281,7 @@ export async function createDraftOrder(input: CreateDraftOrderInput) {
         discountId: totals.discountId,
         discountAmount: totals.discountAmount,
         discountCode: totals.discountCode,
+        taxInclusive: totals.taxInclusive,
         isDraft: true,
         createdByAdmin: adminUserId,
       })
@@ -391,6 +401,7 @@ export async function updateDraftOrder(input: UpdateDraftOrderInput) {
         shipping: totals.shippingCost,
         total: totals.total,
         currency: totals.currency,
+        taxInclusive: totals.taxInclusive,
         customerEmail: data.customerEmail,
         phone: data.phone || null,
         shippingName: data.shippingName,
@@ -522,7 +533,7 @@ export async function sendPaymentLink(input: SendPaymentLinkInput) {
     );
 
     // Update order with recalculated totals if changed
-    if (totals.total !== order.total) {
+    if (totals.total !== order.total || totals.taxInclusive !== order.taxInclusive) {
       await tx
         .update(orders)
         .set({
@@ -530,6 +541,7 @@ export async function sendPaymentLink(input: SendPaymentLinkInput) {
           tax: totals.tax,
           shipping: totals.shippingCost,
           total: totals.total,
+          taxInclusive: totals.taxInclusive,
           discountAmount: totals.discountAmount,
         })
         .where(eq(orders.id, order.id));

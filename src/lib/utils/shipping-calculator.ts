@@ -1,5 +1,5 @@
 /**
- * Pure utility for filtering shipping rates and calculating prices.
+ * Pure utility for filtering shipping rates, calculating prices and tax.
  * No DB dependency — can be unit tested.
  */
 
@@ -19,6 +19,28 @@ export type ShippingOption = {
   price: number; // cents (0 if free threshold met)
   originalPrice?: number; // if free, shows original for strikethrough
 };
+
+/**
+ * Calculate tax and total for an order.
+ * - Tax-inclusive: prices already contain tax. Tax is extracted for display.
+ *   Total = discountedSubtotal + shippingCost (tax NOT added)
+ * - Tax-exclusive: tax is added on top.
+ *   Total = discountedSubtotal + tax + shippingCost
+ */
+export function calculateTaxAndTotal(
+  discountedSubtotal: number,
+  shippingCost: number,
+  taxRate: number,
+  taxInclusive: boolean,
+): { tax: number; total: number } {
+  const tax = taxInclusive
+    ? Math.round((discountedSubtotal * taxRate) / (1 + taxRate))
+    : Math.round(discountedSubtotal * taxRate);
+  const total = taxInclusive
+    ? discountedSubtotal + shippingCost
+    : discountedSubtotal + tax + shippingCost;
+  return { tax, total };
+}
 
 /**
  * Filters shipping rates by cart weight and subtotal,

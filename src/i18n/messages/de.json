@@ -120,6 +120,7 @@
       "subtotal": "Zwischensumme",
       "discount": "Rabatt",
       "tax": "MwSt.",
+      "taxIncluded": "inkl. MwSt.",
       "shipping": "Versand",
       "shippingFree": "Kostenlos",
       "total": "Gesamtsumme",
@@ -225,6 +226,7 @@
     "subtotal": "Zwischensumme",
     "discount": "Rabatt",
     "tax": "MwSt.",
+    "taxIncluded": "inkl. MwSt.",
     "shipping": "Versand",
     "shippingFree": "Kostenlos",
     "total": "Gesamtsumme",
@@ -415,6 +417,7 @@
         "shipping": "Versand",
         "shippingFree": "Kostenlos",
         "tax": "MwSt.",
+        "taxIncluded": "inkl. MwSt.",
         "total": "Gesamtsumme",
         "refunded": "Erstattet",
         "paid": "Bezahlt:",
@@ -840,7 +843,9 @@
       "created": "Versandzone erstellt",
       "updated": "Versandzone aktualisiert",
       "deleted": "Versandzone gelöscht",
-      "error": "Versandzone konnte nicht gespeichert werden"
+      "error": "Versandzone konnte nicht gespeichert werden",
+      "seedDefaults": "CH/DE Standards laden",
+      "seedSuccess": "{count} Standardzone(n) erstellt"
     },
     "tax": {
       "title": "Steuerzonen",
@@ -856,12 +861,18 @@
       "zoneNamePlaceholder": "z.B. Schweizer MwSt., EU-Standard",
       "taxRateLabel": "Steuersatz",
       "defaultZone": "Standardzone",
+      "taxInclusive": "Steuer inklusive",
+      "taxInclusiveHint": "Preise enthalten bereits die Steuer (Standard in CH/DE)",
+      "inclusive": "Inklusiv",
+      "exclusive": "Exklusiv",
       "countries": "Länder",
       "cancel": "Abbrechen",
       "created": "Steuerzone erstellt",
       "updated": "Steuerzone aktualisiert",
       "deleted": "Steuerzone gelöscht",
-      "error": "Steuerzone konnte nicht gespeichert werden"
+      "error": "Steuerzone konnte nicht gespeichert werden",
+      "seedDefaults": "CH/DE Standards laden",
+      "seedSuccess": "{count} Standardzone(n) erstellt"
     },
     "reservations": {
       "title": "Lagerreservierungen",

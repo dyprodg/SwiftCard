@@ -215,7 +215,9 @@ export function OrderDetailClient({
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{td("tax")}</span>
+              <span className="text-muted-foreground">
+                {order.taxInclusive ? td("taxIncluded") : td("tax")}
+              </span>
               <span>{formatPrice(order.tax, order.currency)}</span>
             </div>
             <Separator />

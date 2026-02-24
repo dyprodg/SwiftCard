@@ -9,6 +9,7 @@ import { getAllShippingZones } from "@/server/queries/shipping";
 import { SHIPPING_COUNTRIES } from "@/lib/constants/countries";
 import { formatPrice } from "@/lib/utils/format-price";
 import { ShippingZoneDeleteButton } from "./shipping-zone-delete-button";
+import { ShippingZoneSeedButton } from "./shipping-zone-seed-button";
 
 export default async function ShippingPage({
   params,
@@ -43,12 +44,15 @@ export default async function ShippingPage({
           <CardContent className="flex flex-col items-center py-12 text-center">
             <Globe className="text-muted-foreground mb-3 h-10 w-10" />
             <p className="text-muted-foreground mb-4 text-sm">{t("empty")}</p>
-            <Button asChild>
-              <Link href={`/${locale}/admin/shipping/new`}>
-                <Plus className="mr-2 h-4 w-4" />
-                {t("createZone")}
-              </Link>
-            </Button>
+            <div className="flex gap-2">
+              <Button asChild>
+                <Link href={`/${locale}/admin/shipping/new`}>
+                  <Plus className="mr-2 h-4 w-4" />
+                  {t("createZone")}
+                </Link>
+              </Button>
+              <ShippingZoneSeedButton />
+            </div>
           </CardContent>
         </Card>
       ) : (

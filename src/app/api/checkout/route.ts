@@ -9,10 +9,13 @@ import { getCart, guestCartKey, rateLimit } from "@/lib/kv";
 import { checkoutSchema } from "@/lib/validations/checkout";
 import {
   getShippingZoneForCountry,
-  getTaxRateForCountry,
+  getTaxInfoForCountry,
   getCartWeight,
 } from "@/server/queries/shipping";
-import { filterApplicableRates } from "@/lib/utils/shipping-calculator";
+import {
+  filterApplicableRates,
+  calculateTaxAndTotal,
+} from "@/lib/utils/shipping-calculator";
 import { generateOrderNumber } from "@/lib/utils/order-number";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
 import { sendOrderCreatedEmail } from "@/lib/resend";
@@ -269,8 +272,9 @@ export async function POST(req: NextRequest) {
       const currency = settings?.currency ?? "CHF";
 
       // --- Zone-based tax ---
-      const zoneTaxRate = await getTaxRateForCountry(shippingAddress.country);
-      const taxRate = zoneTaxRate ?? settings?.defaultTaxRate ?? 0.081;
+      const taxInfo = await getTaxInfoForCountry(shippingAddress.country);
+      const taxRate = taxInfo?.rate ?? settings?.defaultTaxRate ?? 0.081;
+      const taxInclusive = taxInfo?.taxInclusive ?? true; // CH/DE default: inclusive
 
       // --- Zone-based shipping ---
       let shippingCost: number;
@@ -304,8 +308,12 @@ export async function POST(req: NextRequest) {
         shippingCost = freeShipping ? 0 : baseShippingCost;
       }
 
-      const tax = Math.round(discountedSubtotal * taxRate);
-      const total = discountedSubtotal + tax + shippingCost;
+      const { tax, total } = calculateTaxAndTotal(
+        discountedSubtotal,
+        shippingCost,
+        taxRate,
+        taxInclusive,
+      );
 
       // Generate order number (simple sequential)
       const [countResult] = await tx
@@ -340,6 +348,7 @@ export async function POST(req: NextRequest) {
           discountId,
           discountAmount,
           discountCode,
+          taxInclusive,
         })
         .returning();
 

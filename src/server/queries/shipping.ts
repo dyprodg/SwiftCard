@@ -27,20 +27,35 @@ export async function getShippingZoneForCountry(country: string) {
   });
 }
 
+export type TaxInfo = {
+  rate: number;
+  taxInclusive: boolean;
+};
+
 /**
- * Get the tax rate for a country.
+ * Get the tax rate + inclusive flag for a country.
  * Falls back to default tax zone, then null (use shop settings).
  */
-export async function getTaxRateForCountry(country: string): Promise<number | null> {
+export async function getTaxInfoForCountry(country: string): Promise<TaxInfo | null> {
   const zone = await db.query.taxZones.findFirst({
     where: sql`${country} = ANY(${taxZones.countries})`,
   });
-  if (zone) return zone.taxRate;
+  if (zone) return { rate: zone.taxRate, taxInclusive: zone.taxInclusive };
 
   const defaultZone = await db.query.taxZones.findFirst({
     where: eq(taxZones.isDefault, true),
   });
-  return defaultZone?.taxRate ?? null;
+  if (defaultZone)
+    return { rate: defaultZone.taxRate, taxInclusive: defaultZone.taxInclusive };
+  return null;
+}
+
+/**
+ * @deprecated Use getTaxInfoForCountry instead
+ */
+export async function getTaxRateForCountry(country: string): Promise<number | null> {
+  const info = await getTaxInfoForCountry(country);
+  return info?.rate ?? null;
 }
 
 /**

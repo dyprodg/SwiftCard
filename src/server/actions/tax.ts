@@ -31,6 +31,7 @@ export async function createTaxZone(data: TaxZoneFormValues) {
         name: parsed.name,
         countries: parsed.countries,
         taxRate: parsed.taxRate,
+        taxInclusive: parsed.taxInclusive,
         isDefault: parsed.isDefault,
       })
       .returning();
@@ -58,6 +59,7 @@ export async function updateTaxZone(id: string, data: TaxZoneFormValues) {
         name: parsed.name,
         countries: parsed.countries,
         taxRate: parsed.taxRate,
+        taxInclusive: parsed.taxInclusive,
         isDefault: parsed.isDefault,
       })
       .where(eq(taxZones.id, id));
@@ -70,4 +72,49 @@ export async function deleteTaxZone(id: string) {
   await requireAdmin();
   await db.delete(taxZones).where(eq(taxZones.id, id));
   updateTag("tax-zones");
+}
+
+/**
+ * Seed default tax zones for Switzerland and Germany.
+ * Skips creation if a zone with the same name already exists.
+ */
+export async function seedDefaultTaxZones() {
+  await requireAdmin();
+
+  const existing = await db.query.taxZones.findMany();
+  const existingNames = new Set(existing.map((z) => z.name));
+
+  const defaults = [
+    {
+      name: "Schweiz (MwSt. 8.1%)",
+      countries: ["CH", "LI"],
+      taxRate: 0.081,
+      taxInclusive: true,
+      isDefault: true,
+    },
+    {
+      name: "Deutschland (MwSt. 19%)",
+      countries: ["DE"],
+      taxRate: 0.19,
+      taxInclusive: true,
+      isDefault: false,
+    },
+  ];
+
+  let created = 0;
+  for (const zone of defaults) {
+    if (existingNames.has(zone.name)) continue;
+
+    // If this is the default zone and there's already a default, don't override
+    const zoneData = { ...zone };
+    if (zoneData.isDefault && existing.some((z) => z.isDefault)) {
+      zoneData.isDefault = false;
+    }
+
+    await db.insert(taxZones).values(zoneData);
+    created++;
+  }
+
+  updateTag("tax-zones");
+  return { created };
 }

@@ -140,3 +140,70 @@ export async function deleteShippingZone(id: string) {
 
   updateTag("shipping-zones");
 }
+
+/**
+ * Seed default shipping zones for Switzerland and Germany.
+ * Skips creation if a zone with the same name already exists.
+ */
+export async function seedDefaultShippingZones() {
+  await requireAdmin();
+
+  const existing = await db.query.shippingZones.findMany();
+  const existingNames = new Set(existing.map((z) => z.name));
+
+  const defaults: {
+    name: string;
+    countries: string[];
+    isDefault: boolean;
+    rates: { name: string; type: "FLAT"; price: number; freeAbove: number | null }[];
+  }[] = [
+    {
+      name: "Schweiz",
+      countries: ["CH", "LI"],
+      isDefault: true,
+      rates: [
+        { name: "Standardversand", type: "FLAT", price: 790, freeAbove: 5000 },
+        { name: "Expressversand", type: "FLAT", price: 1490, freeAbove: null },
+      ],
+    },
+    {
+      name: "Deutschland",
+      countries: ["DE"],
+      isDefault: false,
+      rates: [
+        { name: "Standardversand", type: "FLAT", price: 990, freeAbove: 7500 },
+        { name: "Expressversand", type: "FLAT", price: 1990, freeAbove: null },
+      ],
+    },
+  ];
+
+  let created = 0;
+  for (const zone of defaults) {
+    if (existingNames.has(zone.name)) continue;
+
+    const zoneData = {
+      name: zone.name,
+      countries: zone.countries,
+      isDefault: zone.isDefault && !existing.some((z) => z.isDefault),
+    };
+
+    await db.transaction(async (tx) => {
+      const [newZone] = await tx.insert(shippingZones).values(zoneData).returning();
+      if (zone.rates.length > 0) {
+        await tx.insert(shippingRates).values(
+          zone.rates.map((rate) => ({
+            zoneId: newZone.id,
+            name: rate.name,
+            type: rate.type,
+            price: rate.price,
+            freeAbove: rate.freeAbove,
+          })),
+        );
+      }
+    });
+    created++;
+  }
+
+  updateTag("shipping-zones");
+  return { created };
+}

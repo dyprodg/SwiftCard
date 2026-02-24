@@ -102,6 +102,7 @@ export const orders = pgTable(
     paymentLinkUrl: text("payment_link_url"),
     paymentLinkExpiresAt: timestamp("payment_link_expires_at"),
     paymentLinkSentAt: timestamp("payment_link_sent_at"),
+    taxInclusive: boolean("tax_inclusive").default(true).notNull(),
   },
   (table) => [
     uniqueIndex("orders_order_number_idx").on(table.orderNumber),

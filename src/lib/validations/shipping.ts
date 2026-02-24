@@ -46,6 +46,7 @@ export const taxZoneSchema = z.object({
     .number()
     .min(0, "Tax rate must be 0 or more")
     .max(1, "Tax rate must be at most 100%"),
+  taxInclusive: z.boolean().default(true),
   isDefault: z.boolean().default(false),
 });
 

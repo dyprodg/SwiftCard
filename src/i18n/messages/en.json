@@ -120,6 +120,7 @@
       "subtotal": "Subtotal",
       "discount": "Discount",
       "tax": "Tax",
+      "taxIncluded": "incl. VAT",
       "shipping": "Shipping",
       "shippingFree": "Free",
       "total": "Total",
@@ -225,6 +226,7 @@
     "subtotal": "Subtotal",
     "discount": "Discount",
     "tax": "Tax",
+    "taxIncluded": "incl. VAT",
     "shipping": "Shipping",
     "shippingFree": "Free",
     "total": "Total",
@@ -415,6 +417,7 @@
         "shipping": "Shipping",
         "shippingFree": "Free",
         "tax": "Tax",
+        "taxIncluded": "incl. VAT",
         "total": "Total",
         "refunded": "Refunded",
         "paid": "Paid:",
@@ -840,7 +843,9 @@
       "created": "Shipping zone created",
       "updated": "Shipping zone updated",
       "deleted": "Shipping zone deleted",
-      "error": "Failed to save shipping zone"
+      "error": "Failed to save shipping zone",
+      "seedDefaults": "Load CH/DE Defaults",
+      "seedSuccess": "{count} default zone(s) created"
     },
     "tax": {
       "title": "Tax Zones",
@@ -856,12 +861,18 @@
       "zoneNamePlaceholder": "e.g. Swiss VAT, EU Standard",
       "taxRateLabel": "Tax Rate",
       "defaultZone": "Default Zone",
+      "taxInclusive": "Tax Inclusive",
+      "taxInclusiveHint": "Prices already include tax (standard in CH/DE)",
+      "inclusive": "Inclusive",
+      "exclusive": "Exclusive",
       "countries": "Countries",
       "cancel": "Cancel",
       "created": "Tax zone created",
       "updated": "Tax zone updated",
       "deleted": "Tax zone deleted",
-      "error": "Failed to save tax zone"
+      "error": "Failed to save tax zone",
+      "seedDefaults": "Load CH/DE Defaults",
+      "seedSuccess": "{count} default zone(s) created"
     },
     "reservations": {
       "title": "Stock Reservations",

@@ -14,7 +14,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { SHIPPING_COUNTRIES } from "@/lib/constants/countries";
-import { createTaxZone, updateTaxZone, deleteTaxZone } from "@/server/actions/tax";
+import {
+  createTaxZone,
+  updateTaxZone,
+  deleteTaxZone,
+  seedDefaultTaxZones,
+} from "@/server/actions/tax";
 import type { TaxZone } from "@/types";
 
 type Props = {
@@ -33,6 +38,7 @@ export function TaxZonesClient({ initialZones }: Props) {
   // Form state
   const [name, setName] = useState("");
   const [taxRate, setTaxRate] = useState(0);
+  const [taxInclusive, setTaxInclusive] = useState(true);
   const [isDefault, setIsDefault] = useState(false);
   const [selectedCountries, setSelectedCountries] = useState<Set<string>>(new Set());
 
@@ -44,6 +50,7 @@ export function TaxZonesClient({ initialZones }: Props) {
     setEditingZone(null);
     setName("");
     setTaxRate(0);
+    setTaxInclusive(true);
     setIsDefault(false);
     setSelectedCountries(new Set());
     setShowForm(true);
@@ -53,6 +60,7 @@ export function TaxZonesClient({ initialZones }: Props) {
     setEditingZone(zone);
     setName(zone.name);
     setTaxRate(zone.taxRate);
+    setTaxInclusive(zone.taxInclusive);
     setIsDefault(zone.isDefault);
     setSelectedCountries(new Set(zone.countries));
     setShowForm(true);
@@ -73,6 +81,7 @@ export function TaxZonesClient({ initialZones }: Props) {
       name,
       countries: [...selectedCountries],
       taxRate,
+      taxInclusive,
       isDefault,
     };
 
@@ -120,10 +129,31 @@ export function TaxZonesClient({ initialZones }: Props) {
           <CardContent className="flex flex-col items-center py-12 text-center">
             <Percent className="text-muted-foreground mb-3 h-10 w-10" />
             <p className="text-muted-foreground mb-4 text-sm">{t("empty")}</p>
-            <Button onClick={openCreate}>
-              <Plus className="mr-2 h-4 w-4" />
-              {t("addZone")}
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={openCreate}>
+                <Plus className="mr-2 h-4 w-4" />
+                {t("addZone")}
+              </Button>
+              <Button
+                variant="outline"
+                disabled={isPending}
+                onClick={() => {
+                  startTransition(async () => {
+                    try {
+                      const result = await seedDefaultTaxZones();
+                      toast.success(
+                        t("seedSuccess").replace("{count}", String(result.created)),
+                      );
+                      router.refresh();
+                    } catch {
+                      toast.error(t("error"));
+                    }
+                  });
+                }}
+              >
+                {t("seedDefaults")}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       ) : (
@@ -135,6 +165,9 @@ export function TaxZonesClient({ initialZones }: Props) {
                   <div className="flex items-center gap-2">
                     <span className="font-medium">{zone.name}</span>
                     <Badge variant="secondary">{(zone.taxRate * 100).toFixed(1)}%</Badge>
+                    <Badge variant={zone.taxInclusive ? "default" : "outline"}>
+                      {zone.taxInclusive ? t("inclusive") : t("exclusive")}
+                    </Badge>
                     {zone.isDefault && (
                       <Badge variant="outline">
                         <Star className="mr-1 h-3 w-3" />
@@ -199,6 +232,13 @@ export function TaxZonesClient({ initialZones }: Props) {
                   className="w-32"
                 />
                 <span className="text-muted-foreground text-sm">%</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <Switch checked={taxInclusive} onCheckedChange={setTaxInclusive} />
+              <div>
+                <label className="text-sm font-medium">{t("taxInclusive")}</label>
+                <p className="text-muted-foreground text-xs">{t("taxInclusiveHint")}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">

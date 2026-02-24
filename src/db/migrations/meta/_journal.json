@@ -92,6 +92,13 @@
       "when": 1771973007628,
       "tag": "0012_harsh_namora",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1771975730783,
+      "tag": "0013_silent_legion",
+      "breakpoints": true
     }
   ]
 }

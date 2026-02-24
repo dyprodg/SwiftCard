@@ -55,6 +55,7 @@ export const taxZones = pgTable("tax_zones", {
   name: text("name").notNull(),
   countries: text("countries").array().notNull(),
   taxRate: real("tax_rate").notNull(), // e.g. 0.081 for 8.1%
+  taxInclusive: boolean("tax_inclusive").default(true).notNull(), // true = prices include tax (CH/DE standard)
   isDefault: boolean("is_default").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
