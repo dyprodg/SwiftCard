@@ -15,6 +15,8 @@ import {
   BarChart3,
   MessageSquare,
   ShoppingBag,
+  Truck,
+  Percent,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +28,8 @@ const navItems = [
   { key: "customers" as const, href: "/admin/customers", icon: Users },
   { key: "reviews" as const, href: "/admin/reviews", icon: MessageSquare },
   { key: "abandonedCarts" as const, href: "/admin/abandoned-carts", icon: ShoppingBag },
+  { key: "shipping" as const, href: "/admin/shipping", icon: Truck },
+  { key: "tax" as const, href: "/admin/tax", icon: Percent },
   { key: "reservations" as const, href: "/admin/reservations", icon: Clock },
   { key: "analytics" as const, href: "/admin/analytics", icon: BarChart3 },
   { key: "settings" as const, href: "/admin/settings/general", icon: Settings },

@@ -65,6 +65,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
       color?: string;
       material?: string;
       priceAdjustment: number;
+      weight?: number | null;
       stock: number;
       isAvailable: boolean;
     }>
@@ -76,6 +77,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
       color: v.color ?? undefined,
       material: v.material ?? undefined,
       priceAdjustment: v.priceAdjustment,
+      weight: v.weight,
       stock: v.stock,
       isAvailable: v.isAvailable,
     })) ?? [],
@@ -165,6 +167,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
       {
         sku: "",
         priceAdjustment: 0,
+        weight: null,
         stock: 0,
         isAvailable: true,
       },
@@ -178,7 +181,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
   function updateVariantField(
     index: number,
     field: string,
-    value: string | number | boolean,
+    value: string | number | boolean | null,
   ) {
     const updated = [...variants];
     updated[index] = { ...updated[index], [field]: value };
@@ -358,7 +361,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                 {variants.map((variant, index) => (
                   <div key={index}>
                     {index > 0 && <Separator className="mb-4" />}
-                    <div className="grid gap-3 sm:grid-cols-6">
+                    <div className="grid gap-3 sm:grid-cols-7">
                       <div>
                         <label className="text-sm font-medium">{t("skuLabel")}</label>
                         <Input
@@ -403,6 +406,22 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                               parseInt(e.target.value) || 0,
                             )
                           }
+                        />
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium">{t("weightLabel")}</label>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={variant.weight ?? ""}
+                          onChange={(e) =>
+                            updateVariantField(
+                              index,
+                              "weight",
+                              e.target.value ? parseInt(e.target.value) : null,
+                            )
+                          }
+                          placeholder="g"
                         />
                       </div>
                       <div>

@@ -13,6 +13,7 @@ import { fulfillments, fulfillmentItems } from "./fulfillments";
 import { orderEvents } from "./order-events";
 import { wishlists, productReviews, stockNotifications } from "./customer-features";
 import { customerAddresses } from "./customer-profiles";
+import { shippingZones, shippingRates, taxZones } from "./shipping";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -207,3 +208,18 @@ export const stockNotificationsRelations = relations(stockNotifications, ({ one 
 
 // Customer address relations (no FK — userId is Clerk ID, not a DB column)
 export const customerAddressesRelations = relations(customerAddresses, () => ({}));
+
+// Shipping zone relations
+export const shippingZonesRelations = relations(shippingZones, ({ many }) => ({
+  rates: many(shippingRates),
+}));
+
+export const shippingRatesRelations = relations(shippingRates, ({ one }) => ({
+  zone: one(shippingZones, {
+    fields: [shippingRates.zoneId],
+    references: [shippingZones.id],
+  }),
+}));
+
+// Tax zone relations (no FKs)
+export const taxZonesRelations = relations(taxZones, () => ({}));

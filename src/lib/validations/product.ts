@@ -37,6 +37,7 @@ export const createVariantSchema = z.object({
   color: z.string().max(50).optional(),
   material: z.string().max(100).optional(),
   priceAdjustment: z.number().int().default(0),
+  weight: z.number().int().min(0).nullable().optional(),
   stock: z.number().int().min(0).default(0),
   isAvailable: z.boolean().default(true),
 });

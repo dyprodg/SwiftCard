@@ -27,6 +27,7 @@ import type {
   stockNotifications,
 } from "@/db/schema/customer-features";
 import type { customerAddresses, abandonedCarts } from "@/db/schema/customer-profiles";
+import type { shippingZones, shippingRates, taxZones } from "@/db/schema/shipping";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -132,6 +133,15 @@ export type ReviewRatingStats = {
 export type CustomerAddress = InferSelectModel<typeof customerAddresses>;
 export type NewCustomerAddress = InferInsertModel<typeof customerAddresses>;
 export type AbandonedCart = InferSelectModel<typeof abandonedCarts>;
+
+// Shipping & tax types
+export type ShippingZone = InferSelectModel<typeof shippingZones>;
+export type ShippingRate = InferSelectModel<typeof shippingRates>;
+export type TaxZone = InferSelectModel<typeof taxZones>;
+
+export type ShippingZoneWithRates = ShippingZone & {
+  rates: ShippingRate[];
+};
 
 // Cart types
 export type CartItem = {

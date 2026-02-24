@@ -76,6 +76,7 @@ export const orders = pgTable(
     billingZip: text("billing_zip"),
     billingCountry: text("billing_country"),
     stripePaymentIntentId: text("stripe_payment_intent_id"),
+    shippingMethod: text("shipping_method"),
     customerNote: text("customer_note"),
     internalNote: text("internal_note"),
     createdAt: timestamp("created_at").defaultNow().notNull(),

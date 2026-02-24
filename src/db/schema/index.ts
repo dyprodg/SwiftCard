@@ -8,4 +8,5 @@ export * from "./fulfillments";
 export * from "./order-events";
 export * from "./customer-features";
 export * from "./customer-profiles";
+export * from "./shipping";
 export * from "./relations";

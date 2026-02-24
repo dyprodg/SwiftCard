@@ -71,6 +71,13 @@
       "when": 1771964655185,
       "tag": "0009_crazy_quentin_quire",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1771967805326,
+      "tag": "0010_yellow_junta",
+      "breakpoints": true
     }
   ]
 }

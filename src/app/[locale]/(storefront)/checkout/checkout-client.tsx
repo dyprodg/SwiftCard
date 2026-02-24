@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -41,7 +41,10 @@ import { checkoutFormSchema, type CheckoutFormValues } from "@/lib/validations/c
 import { SHIPPING_COUNTRIES } from "@/lib/constants/countries";
 import { CouponInput } from "@/components/storefront/coupon-input";
 import { AddressSelector } from "@/components/storefront/address-selector";
+import { ShippingMethodSelector } from "@/components/storefront/shipping-method-selector";
 import { Checkbox } from "@/components/ui/checkbox";
+import { getShippingOptions } from "@/server/queries/shipping";
+import type { ShippingOption } from "@/lib/utils/shipping-calculator";
 import type { CustomerAddress } from "@/types";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -74,6 +77,12 @@ export function CheckoutClient({
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Shipping options state
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([]);
+  const [selectedShippingRate, setSelectedShippingRate] = useState<string | null>(null);
+  const [isLoadingShipping, setIsLoadingShipping] = useState(false);
+  const [hasShippingZones, setHasShippingZones] = useState(false);
+
   // Find default saved address for auto-fill
   const defaultAddr = savedAddresses.find((a) => a.isDefault) ?? savedAddresses[0];
 
@@ -92,6 +101,51 @@ export function CheckoutClient({
       saveAddress: false,
     },
   });
+
+  // Fetch shipping options when country changes
+  const fetchShippingOptions = useCallback(
+    async (country: string) => {
+      setIsLoadingShipping(true);
+      try {
+        const cartItems = items.map((i) => ({
+          variantId: i.variantId,
+          quantity: i.quantity,
+        }));
+        const options = await getShippingOptions(country, cartItems, subtotal);
+        if (options) {
+          setShippingOptions(options);
+          setHasShippingZones(true);
+          // Auto-select the first (cheapest) option
+          if (options.length > 0 && !selectedShippingRate) {
+            setSelectedShippingRate(options[0].id);
+          }
+        } else {
+          setShippingOptions([]);
+          setHasShippingZones(false);
+          setSelectedShippingRate(null);
+        }
+      } catch {
+        setShippingOptions([]);
+        setHasShippingZones(false);
+      } finally {
+        setIsLoadingShipping(false);
+      }
+    },
+    [items, subtotal, selectedShippingRate],
+  );
+
+  const watchedCountry = form.watch("country");
+  useEffect(() => {
+    if (watchedCountry) {
+      fetchShippingOptions(watchedCountry);
+    }
+  }, [watchedCountry, fetchShippingOptions]);
+
+  // Get selected shipping cost for display
+  const selectedShippingOption = shippingOptions.find(
+    (o) => o.id === selectedShippingRate,
+  );
+  const displayShippingCost = selectedShippingOption?.price ?? null;
 
   if (items.length === 0 && !clientSecret) {
     return (
@@ -126,6 +180,7 @@ export function CheckoutClient({
           customerNote: values.customerNote || "",
           saveAddress: values.saveAddress ?? false,
           ...(couponCode && { couponCode }),
+          ...(selectedShippingRate && { shippingRateId: selectedShippingRate }),
         }),
       });
 
@@ -320,6 +375,16 @@ export function CheckoutClient({
                   )}
                 />
 
+                {/* Shipping method selector (shown when zones are configured) */}
+                {hasShippingZones && (
+                  <ShippingMethodSelector
+                    options={shippingOptions}
+                    selected={selectedShippingRate}
+                    onSelect={setSelectedShippingRate}
+                    isLoading={isLoadingShipping}
+                  />
+                )}
+
                 {/* Save address checkbox for logged-in users */}
                 {isLoggedIn && (
                   <FormField
@@ -450,7 +515,11 @@ export function CheckoutClient({
               <span className="text-muted-foreground">
                 {appliedDiscount?.freeShipping
                   ? tCart("freeShipping")
-                  : tCart("estimatedShipping")}
+                  : displayShippingCost !== null
+                    ? displayShippingCost === 0
+                      ? tCart("freeShipping")
+                      : formatPrice(displayShippingCost)
+                    : tCart("estimatedShipping")}
               </span>
             </div>
 
@@ -458,7 +527,11 @@ export function CheckoutClient({
 
             <div className="flex justify-between font-semibold">
               <span>{tCart("total")}</span>
-              <span>{formatPrice(subtotal - (appliedDiscount?.amount ?? 0))}</span>
+              <span>
+                {formatPrice(
+                  subtotal - (appliedDiscount?.amount ?? 0) + (displayShippingCost ?? 0),
+                )}
+              </span>
             </div>
           </CardContent>
         </Card>

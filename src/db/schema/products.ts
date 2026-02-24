@@ -71,6 +71,7 @@ export const productVariants = pgTable(
     color: text("color"),
     material: text("material"),
     priceAdjustment: integer("price_adjustment").default(0).notNull(),
+    weight: integer("weight"), // grams, nullable (null = weightless)
     stock: integer("stock").default(0).notNull(),
     isAvailable: boolean("is_available").default(true).notNull(),
     productId: text("product_id").notNull(),

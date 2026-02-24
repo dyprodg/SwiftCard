@@ -7,6 +7,12 @@ import { eq, sql, and, or, isNull, lte, gte } from "drizzle-orm";
 import { stripe } from "@/lib/stripe/client";
 import { getCart, guestCartKey, rateLimit } from "@/lib/kv";
 import { checkoutSchema } from "@/lib/validations/checkout";
+import {
+  getShippingZoneForCountry,
+  getTaxRateForCountry,
+  getCartWeight,
+} from "@/server/queries/shipping";
+import { filterApplicableRates } from "@/lib/utils/shipping-calculator";
 import { generateOrderNumber } from "@/lib/utils/order-number";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
 import { sendOrderCreatedEmail } from "@/lib/resend";
@@ -60,8 +66,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { shippingAddress, customerEmail, customerNote, couponCode, saveAddress } =
-      validation.data;
+    const {
+      shippingAddress,
+      customerEmail,
+      customerNote,
+      couponCode,
+      saveAddress,
+      shippingRateId,
+    } = validation.data;
 
     // Get cart via cookie (works for both guests and logged-in users)
     // API routes are excluded from Clerk middleware, so we use the cart_session cookie
@@ -248,19 +260,49 @@ export async function POST(req: NextRequest) {
       // ===== TOTALS =====
       const discountedSubtotal = subtotal - discountAmount;
 
-      // Get shop settings for tax & shipping
+      // Get shop settings for fallback tax & shipping
       const [settings] = await tx
         .select()
         .from(shopSettings)
         .where(eq(shopSettings.id, "singleton"));
 
-      const taxRate = settings?.defaultTaxRate ?? 0.081;
-      const baseShippingCost =
-        settings?.freeShippingThreshold && subtotal >= settings.freeShippingThreshold
-          ? 0
-          : (settings?.defaultShippingCost ?? 0);
-      const shippingCost = freeShipping ? 0 : baseShippingCost;
       const currency = settings?.currency ?? "CHF";
+
+      // --- Zone-based tax ---
+      const zoneTaxRate = await getTaxRateForCountry(shippingAddress.country);
+      const taxRate = zoneTaxRate ?? settings?.defaultTaxRate ?? 0.081;
+
+      // --- Zone-based shipping ---
+      let shippingCost: number;
+      let shippingMethodName: string | null = null;
+
+      if (shippingRateId) {
+        // Validate the selected shipping rate against the zone
+        const zone = await getShippingZoneForCountry(shippingAddress.country);
+        const rate = zone?.rates.find((r) => r.id === shippingRateId);
+        if (!rate) {
+          throw new Error("Selected shipping method is not available for your country");
+        }
+
+        // Verify the rate is still applicable (weight/price range check)
+        const cartWeight = await getCartWeight(
+          validatedItems.map((i) => ({ variantId: i.variantId, quantity: i.quantity })),
+        );
+        const applicable = filterApplicableRates([rate], cartWeight, subtotal);
+        if (applicable.length === 0) {
+          throw new Error("Selected shipping method is no longer applicable");
+        }
+
+        shippingCost = freeShipping ? 0 : applicable[0].price;
+        shippingMethodName = rate.name;
+      } else {
+        // Fallback: old flat-rate behavior (no zones configured)
+        const baseShippingCost =
+          settings?.freeShippingThreshold && subtotal >= settings.freeShippingThreshold
+            ? 0
+            : (settings?.defaultShippingCost ?? 0);
+        shippingCost = freeShipping ? 0 : baseShippingCost;
+      }
 
       const tax = Math.round(discountedSubtotal * taxRate);
       const total = discountedSubtotal + tax + shippingCost;
@@ -293,6 +335,7 @@ export async function POST(req: NextRequest) {
           shippingCity: shippingAddress.city,
           shippingZip: shippingAddress.zip,
           shippingCountry: shippingAddress.country,
+          shippingMethod: shippingMethodName,
           customerNote: customerNote || null,
           discountId,
           discountAmount,

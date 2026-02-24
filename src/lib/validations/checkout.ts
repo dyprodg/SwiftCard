@@ -16,6 +16,7 @@ export const checkoutSchema = z.object({
   customerNote: z.string().max(500).optional().default(""),
   couponCode: z.string().trim().max(50).optional(),
   saveAddress: z.boolean().optional().default(false),
+  shippingRateId: z.string().optional(),
 });
 
 export type ShippingAddress = z.infer<typeof shippingAddressSchema>;
