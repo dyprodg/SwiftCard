@@ -76,7 +76,7 @@ export async function submitReview(input: {
       userName,
       rating: data.rating,
       title: data.title,
-      body: data.body,
+      body: data.body ?? null,
       verified,
       status: "PENDING",
     });
@@ -84,8 +84,9 @@ export async function submitReview(input: {
     updateTag("reviews");
     return { success: true };
   } catch (error) {
-    console.error("submitReview error:", error);
-    return { success: false, error: "Failed to submit review" };
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("submitReview error:", message, error);
+    return { success: false, error: `Failed to submit review: ${message}` };
   }
 }
 
