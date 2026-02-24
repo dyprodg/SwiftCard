@@ -182,7 +182,9 @@
     "processing": "Processing...",
     "paymentFailed": "Payment failed. Please try again.",
     "paymentBeingProcessed": "Payment is being processed. This page will update automatically.",
-    "continueShopping": "Continue Shopping"
+    "continueShopping": "Continue Shopping",
+    "tracking": "Tracking Information",
+    "trackPackage": "Track your package"
   },
   "maintenance": {
     "title": "We'll be right back",
@@ -332,6 +334,51 @@
         "REFUNDED": "Refunded"
       },
       "processRefund": "Process Refund",
+      "fulfillOrder": "Fulfill Order",
+      "packingSlip": "Print Packing Slip",
+      "fulfillmentStatuses": {
+        "UNFULFILLED": "Unfulfilled",
+        "PARTIALLY_FULFILLED": "Partially Fulfilled",
+        "FULFILLED": "Fulfilled",
+        "RETURNED": "Returned"
+      },
+      "fulfillment": {
+        "title": "Create Fulfillment",
+        "selectItems": "Select items to fulfill",
+        "carrier": "Carrier",
+        "selectCarrier": "Select carrier...",
+        "carrierName": "Carrier Name",
+        "carrierNamePlaceholder": "Enter carrier name...",
+        "trackingNumber": "Tracking Number",
+        "trackingNumberPlaceholder": "Enter tracking number...",
+        "trackingUrlPreview": "Tracking URL",
+        "note": "Note",
+        "notePlaceholder": "Optional note about this fulfillment...",
+        "createFulfillment": "Create Fulfillment",
+        "confirmMessage": "This will create a fulfillment and send a shipping notification email to the customer. Continue?",
+        "confirmFulfillment": "Confirm Fulfillment",
+        "back": "Back",
+        "processing": "Processing...",
+        "success": "Fulfillment created successfully.",
+        "close": "Close",
+        "history": {
+          "title": "Fulfillment History",
+          "trackPackage": "Track package",
+          "createdBy": "Created by",
+          "summary": "{fulfilled} of {total} items fulfilled"
+        }
+      },
+      "packingSlip": {
+        "title": "Packing Slip",
+        "print": "Print",
+        "order": "Order",
+        "date": "Date",
+        "shipTo": "Ship To",
+        "item": "Item",
+        "variant": "Variant",
+        "quantity": "Qty",
+        "customerNote": "Customer Note"
+      },
       "paymentStatuses": {
         "PENDING": "Pending",
         "PAID": "Paid",

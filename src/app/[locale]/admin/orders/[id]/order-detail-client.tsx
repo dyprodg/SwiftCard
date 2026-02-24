@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -19,18 +19,25 @@ import {
 import {
   OrderStatusBadge,
   PaymentStatusBadge,
+  FulfillmentStatusBadge,
 } from "@/components/admin/order-status-badge";
 import { RefundDialog } from "@/components/admin/refund-dialog";
 import { RefundHistory } from "@/components/admin/refund-history";
+import { FulfillmentDialog } from "@/components/admin/fulfillment-dialog";
+import { FulfillmentHistory } from "@/components/admin/fulfillment-history";
 import { formatPrice } from "@/lib/utils/format-price";
 import {
   ORDER_STATUS_TRANSITIONS,
   AUTOMATED_TRANSITIONS,
 } from "@/lib/constants/order-status";
 import { updateOrderStatus, addInternalNote } from "@/server/actions/orders";
-import type { OrderWithItemsAndRefunds } from "@/types";
+import type { OrderWithItemsAndRefundsAndFulfillments } from "@/types";
 
-export function OrderDetailClient({ order }: { order: OrderWithItemsAndRefunds }) {
+export function OrderDetailClient({
+  order,
+}: {
+  order: OrderWithItemsAndRefundsAndFulfillments;
+}) {
   const locale = useLocale();
   const t = useTranslations("admin.orders");
   const td = useTranslations("admin.orders.detail");
@@ -39,6 +46,7 @@ export function OrderDetailClient({ order }: { order: OrderWithItemsAndRefunds }
   const [addingNote, setAddingNote] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
+  const [fulfillmentDialogOpen, setFulfillmentDialogOpen] = useState(false);
 
   const allowedTransitions = (ORDER_STATUS_TRANSITIONS[order.status] ?? []).filter(
     (s) => !AUTOMATED_TRANSITIONS.includes(s),
@@ -48,6 +56,11 @@ export function OrderDetailClient({ order }: { order: OrderWithItemsAndRefunds }
   const canRefund =
     (order.paymentStatus === "PAID" || order.paymentStatus === "PARTIALLY_REFUNDED") &&
     order.totalRefunded < order.total;
+
+  const canFulfill =
+    order.fulfillmentStatus !== "FULFILLED" &&
+    order.status !== "CANCELLED" &&
+    order.status !== "REFUNDED";
 
   async function handleStatusChange(newStatus: string) {
     setUpdating(true);
@@ -82,6 +95,7 @@ export function OrderDetailClient({ order }: { order: OrderWithItemsAndRefunds }
             {new Date(order.createdAt).toLocaleString(dateLocale)}
           </p>
         </div>
+        <FulfillmentStatusBadge status={order.fulfillmentStatus} />
         <OrderStatusBadge status={order.status} />
         <PaymentStatusBadge status={order.paymentStatus} />
       </div>
@@ -184,6 +198,17 @@ export function OrderDetailClient({ order }: { order: OrderWithItemsAndRefunds }
               <p className="text-muted-foreground text-sm">{t("noTransitions")}</p>
             )}
 
+            {/* Fulfill Order Button */}
+            {canFulfill && (
+              <Button
+                variant="default"
+                className="mt-3 w-full"
+                onClick={() => setFulfillmentDialogOpen(true)}
+              >
+                {t("fulfillOrder")}
+              </Button>
+            )}
+
             {/* Refund Button */}
             {canRefund && (
               <Button
@@ -194,6 +219,17 @@ export function OrderDetailClient({ order }: { order: OrderWithItemsAndRefunds }
                 {t("processRefund")}
               </Button>
             )}
+
+            {/* Packing Slip */}
+            <Button variant="outline" className="mt-3 w-full" asChild>
+              <Link
+                href={`/${locale}/admin/orders/${order.id}/packing-slip`}
+                target="_blank"
+              >
+                <Printer className="mr-2 h-4 w-4" />
+                {t("packingSlip")}
+              </Link>
+            </Button>
 
             {/* Timestamps */}
             <div className="mt-4 space-y-2 text-xs">
@@ -280,8 +316,18 @@ export function OrderDetailClient({ order }: { order: OrderWithItemsAndRefunds }
         </div>
       </div>
 
+      {/* Fulfillment History */}
+      <FulfillmentHistory order={order} />
+
       {/* Refund History */}
       <RefundHistory order={order} />
+
+      {/* Fulfillment Dialog */}
+      <FulfillmentDialog
+        order={order}
+        open={fulfillmentDialogOpen}
+        onOpenChange={setFulfillmentDialogOpen}
+      />
 
       {/* Refund Dialog */}
       <RefundDialog

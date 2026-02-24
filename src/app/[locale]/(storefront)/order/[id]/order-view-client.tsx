@@ -10,7 +10,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { AlertTriangle, Loader2 } from "lucide-react";
+import { AlertTriangle, ExternalLink, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -27,6 +27,16 @@ type OrderItem = {
   quantity: number;
   unitPrice: number;
   total: number;
+};
+
+type FulfillmentData = {
+  id: string;
+  carrier: string | null;
+  carrierOther: string | null;
+  carrierLabel: string | null;
+  trackingNumber: string | null;
+  trackingUrl: string | null;
+  createdAt: string;
 };
 
 type OrderData = {
@@ -49,6 +59,7 @@ type OrderData = {
   shippingCountry: string;
   createdAt: string;
   items: OrderItem[];
+  fulfillments: FulfillmentData[];
 };
 
 type Translations = {
@@ -70,6 +81,8 @@ type Translations = {
   paymentFailed: string;
   paymentBeingProcessed: string;
   continueShopping: string;
+  tracking: string;
+  trackPackage: string;
 };
 
 const statusColors: Record<string, string> = {
@@ -303,6 +316,43 @@ export function OrderViewClient({
             </p>
             <p>{order.shippingCountry}</p>
           </div>
+
+          {/* Tracking Information */}
+          {order.fulfillments.length > 0 && (
+            <>
+              <Separator />
+              <div className="text-sm">
+                <p className="mb-2 font-medium">{t.tracking}</p>
+                <div className="space-y-3">
+                  {order.fulfillments.map((f) => (
+                    <div key={f.id} className="rounded-md border p-3">
+                      <div className="flex items-center justify-between">
+                        {f.carrierLabel && (
+                          <span className="text-sm font-medium">{f.carrierLabel}</span>
+                        )}
+                        {f.trackingNumber && (
+                          <span className="text-muted-foreground text-xs">
+                            #{f.trackingNumber}
+                          </span>
+                        )}
+                      </div>
+                      {f.trackingUrl && (
+                        <a
+                          href={f.trackingUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-1 inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
+                        >
+                          {t.trackPackage}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 

@@ -12,6 +12,7 @@ import { db } from "@/db";
 import { orders } from "@/db/schema/orders";
 import { eq } from "drizzle-orm";
 import { OrderViewClient } from "./order-view-client";
+import { CARRIER_LABELS, type Carrier } from "@/lib/constants/carriers";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -26,7 +27,10 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
 
   const order = await db.query.orders.findFirst({
     where: eq(orders.id, id),
-    with: { items: true },
+    with: {
+      items: true,
+      fulfillments: { with: { items: true } },
+    },
   });
 
   if (!order) notFound();
@@ -80,6 +84,19 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
             unitPrice: item.unitPrice,
             total: item.total,
           })),
+          fulfillments: order.fulfillments.map((f) => ({
+            id: f.id,
+            carrier: f.carrier,
+            carrierOther: f.carrierOther,
+            carrierLabel: f.carrier
+              ? f.carrier === "OTHER"
+                ? (f.carrierOther ?? "Other")
+                : CARRIER_LABELS[f.carrier as Carrier]
+              : null,
+            trackingNumber: f.trackingNumber,
+            trackingUrl: f.trackingUrl,
+            createdAt: f.createdAt.toISOString(),
+          })),
         }}
         token={order.guestAccessToken}
         locale={locale}
@@ -102,6 +119,8 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
           paymentFailed: t("paymentFailed"),
           paymentBeingProcessed: t("paymentBeingProcessed"),
           continueShopping: t("continueShopping"),
+          tracking: t("tracking"),
+          trackPackage: t("trackPackage"),
         }}
       />
     </div>

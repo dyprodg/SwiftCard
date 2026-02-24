@@ -50,3 +50,20 @@ export function PaymentStatusBadge({ status }: { status: string }) {
     </Badge>
   );
 }
+
+const fulfillmentStatusClasses: Record<string, string> = {
+  UNFULFILLED: "bg-gray-100 text-gray-800 border-gray-200",
+  PARTIALLY_FULFILLED: "bg-amber-100 text-amber-800 border-amber-200",
+  FULFILLED: "bg-green-100 text-green-800 border-green-200",
+  RETURNED: "bg-red-100 text-red-800 border-red-200",
+};
+
+export function FulfillmentStatusBadge({ status }: { status: string }) {
+  const t = useTranslations("admin.orders.fulfillmentStatuses");
+  const className = fulfillmentStatusClasses[status] ?? "";
+  return (
+    <Badge variant="outline" className={cn("border", className)}>
+      {t(status as "UNFULFILLED" | "PARTIALLY_FULFILLED" | "FULFILLED" | "RETURNED")}
+    </Badge>
+  );
+}
