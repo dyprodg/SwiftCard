@@ -52,7 +52,7 @@ export async function submitReview(input: {
 
     // Check if user has purchased this product (verified purchase)
     const purchasedOrder = await db.query.orders.findFirst({
-      where: and(eq(orders.userId, userId), eq(orders.paymentStatus, "PAID")),
+      where: and(eq(orders.customerId, userId), eq(orders.paymentStatus, "PAID")),
       with: {
         items: {
           where: eq(orderItems.productId, data.productId),
@@ -84,9 +84,8 @@ export async function submitReview(input: {
     updateTag("reviews");
     return { success: true };
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    console.error("submitReview error:", message, error);
-    return { success: false, error: `Failed to submit review: ${message}` };
+    console.error("submitReview error:", error);
+    return { success: false, error: "Failed to submit review" };
   }
 }
 
