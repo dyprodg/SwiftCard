@@ -1,6 +1,6 @@
 import { db } from "@/db";
-import { products, productImages, productVariants, categories } from "@/db/schema";
-import { eq, desc, and, ilike, inArray, sql } from "drizzle-orm";
+import { products } from "@/db/schema";
+import { eq, desc, and, ilike, sql } from "drizzle-orm";
 import { cacheTag, cacheLife } from "next/cache";
 
 type ProductFilters = {

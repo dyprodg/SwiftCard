@@ -106,7 +106,11 @@ async function FeaturedProducts({ locale }: { locale: string }) {
           </Link>
         </Button>
       </div>
-      <ProductGrid products={localizeProducts(featured, locale)} locale={locale} discounts={activeDiscounts} />
+      <ProductGrid
+        products={localizeProducts(featured, locale)}
+        locale={locale}
+        discounts={activeDiscounts}
+      />
     </section>
   );
 }

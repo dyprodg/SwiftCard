@@ -1877,21 +1877,12 @@
     "public.product_status": {
       "name": "product_status",
       "schema": "public",
-      "values": [
-        "DRAFT",
-        "ACTIVE",
-        "ARCHIVED"
-      ]
+      "values": ["DRAFT", "ACTIVE", "ARCHIVED"]
     },
     "public.fulfillment_status": {
       "name": "fulfillment_status",
       "schema": "public",
-      "values": [
-        "UNFULFILLED",
-        "PARTIALLY_FULFILLED",
-        "FULFILLED",
-        "RETURNED"
-      ]
+      "values": ["UNFULFILLED", "PARTIALLY_FULFILLED", "FULFILLED", "RETURNED"]
     },
     "public.order_status": {
       "name": "order_status",
@@ -1909,52 +1900,27 @@
     "public.payment_status": {
       "name": "payment_status",
       "schema": "public",
-      "values": [
-        "PENDING",
-        "PAID",
-        "FAILED",
-        "REFUNDED",
-        "PARTIALLY_REFUNDED"
-      ]
+      "values": ["PENDING", "PAID", "FAILED", "REFUNDED", "PARTIALLY_REFUNDED"]
     },
     "public.refund_reason": {
       "name": "refund_reason",
       "schema": "public",
-      "values": [
-        "DAMAGED",
-        "MISSING_ITEM",
-        "CUSTOMER_REQUEST",
-        "DUPLICATE",
-        "OTHER"
-      ]
+      "values": ["DAMAGED", "MISSING_ITEM", "CUSTOMER_REQUEST", "DUPLICATE", "OTHER"]
     },
     "public.discount_type": {
       "name": "discount_type",
       "schema": "public",
-      "values": [
-        "PERCENTAGE",
-        "FIXED",
-        "FREE_SHIPPING"
-      ]
+      "values": ["PERCENTAGE", "FIXED", "FREE_SHIPPING"]
     },
     "public.reservation_status": {
       "name": "reservation_status",
       "schema": "public",
-      "values": [
-        "RESERVED",
-        "CONVERTED",
-        "EXPIRED"
-      ]
+      "values": ["RESERVED", "CONVERTED", "EXPIRED"]
     },
     "public.carrier": {
       "name": "carrier",
       "schema": "public",
-      "values": [
-        "POST",
-        "DHL",
-        "UPS",
-        "OTHER"
-      ]
+      "values": ["POST", "DHL", "UPS", "OTHER"]
     }
   },
   "schemas": {},

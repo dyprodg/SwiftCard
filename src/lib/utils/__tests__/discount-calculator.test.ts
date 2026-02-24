@@ -1,8 +1,5 @@
 import { describe, it, expect } from "vitest";
-import {
-  calculateDiscount,
-  findBestAutomaticDiscount,
-} from "../discount-calculator";
+import { calculateDiscount, findBestAutomaticDiscount } from "../discount-calculator";
 
 const baseDiscount = {
   id: "d1",
@@ -161,9 +158,7 @@ describe("findBestAutomaticDiscount", () => {
   });
 
   it("returns null when no discounts apply", () => {
-    const discounts = [
-      { ...baseDiscount, id: "d1", minOrderAmount: 99999 },
-    ];
+    const discounts = [{ ...baseDiscount, id: "d1", minOrderAmount: 99999 }];
     const result = findBestAutomaticDiscount(discounts, cartItems, subtotal);
     expect(result).toBeNull();
   });

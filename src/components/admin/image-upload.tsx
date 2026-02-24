@@ -4,7 +4,6 @@ import { useCallback, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { X, Upload, Loader2 } from "lucide-react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 type UploadedImage = {

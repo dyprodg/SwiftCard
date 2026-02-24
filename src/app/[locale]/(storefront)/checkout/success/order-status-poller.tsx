@@ -19,7 +19,7 @@ export function OrderStatusPoller({
   fallbackMessage: string;
 }) {
   const router = useRouter();
-  const [attempts, setAttempts] = useState(0);
+  const [, setAttempts] = useState(0);
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {

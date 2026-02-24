@@ -55,16 +55,13 @@ export async function processRefund(input: RefundInput) {
 
   // Calculate refund amount
   let refundAmount: number;
-  let isFullRefund: boolean;
   let refundItems: { orderItemId: string; quantity: number; amount: number }[] = [];
 
   if (data.type === "full") {
     refundAmount = remainingRefundable;
-    isFullRefund = true;
   } else {
     // partial or percentage
     refundAmount = data.totalAmount;
-    isFullRefund = refundAmount >= remainingRefundable;
     refundItems = data.items;
 
     // Validate item quantities don't exceed what's available

@@ -40,18 +40,11 @@ export async function updateOrderStatus(orderId: string, newStatus: string) {
   await db.update(orders).set(updateData).where(eq(orders.id, orderId));
 
   // Send emails based on status change
-  // Skip shipping email if fulfillments exist — the fulfillment action already sent one with tracking info
   if (newStatus === "SHIPPED") {
-    const fullOrder = await db.query.orders.findFirst({
-      where: eq(orders.id, orderId),
-      with: { fulfillments: true },
-    });
-    if (!fullOrder?.fulfillments?.length) {
-      await sendShippingNotificationEmail(order.customerEmail, {
-        orderNumber: order.orderNumber,
-        shippingName: order.shippingName,
-      }).catch((err) => console.error("Failed to send shipping email:", err));
-    }
+    await sendShippingNotificationEmail(order.customerEmail, {
+      orderNumber: order.orderNumber,
+      shippingName: order.shippingName,
+    }).catch((err) => console.error("Failed to send shipping email:", err));
   }
 
   revalidatePath("/admin/orders");

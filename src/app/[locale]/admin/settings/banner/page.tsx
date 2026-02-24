@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -105,7 +105,10 @@ export default function BannerSettingsPage() {
                   <FormItem>
                     <FormLabel>{t("bannerForm.textDe")}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Sommerschlussverkauf - 20% auf alles!" {...field} />
+                      <Input
+                        placeholder="Sommerschlussverkauf - 20% auf alles!"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

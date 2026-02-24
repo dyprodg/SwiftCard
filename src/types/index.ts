@@ -19,7 +19,6 @@ import type {
   discountCategories,
 } from "@/db/schema/discounts";
 import type { stockReservations } from "@/db/schema/reservations";
-import type { fulfillments, fulfillmentItems } from "@/db/schema/fulfillments";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -35,14 +34,6 @@ export type NewOrder = InferInsertModel<typeof orders>;
 export type OrderItem = InferSelectModel<typeof orderItems>;
 export type OrderRefund = InferSelectModel<typeof orderRefunds>;
 export type OrderRefundItem = InferSelectModel<typeof orderRefundItems>;
-
-// Fulfillment types
-export type Fulfillment = InferSelectModel<typeof fulfillments>;
-export type FulfillmentItem = InferSelectModel<typeof fulfillmentItems>;
-
-export type FulfillmentWithItems = Fulfillment & {
-  items: FulfillmentItem[];
-};
 
 // Settings types
 export type ShopSettings = InferSelectModel<typeof shopSettings>;
@@ -67,12 +58,6 @@ export type OrderRefundWithItems = OrderRefund & {
 export type OrderWithItemsAndRefunds = Order & {
   items: OrderItem[];
   refunds: OrderRefundWithItems[];
-};
-
-export type OrderWithItemsAndRefundsAndFulfillments = Order & {
-  items: OrderItem[];
-  refunds: OrderRefundWithItems[];
-  fulfillments: FulfillmentWithItems[];
 };
 
 // Discount types

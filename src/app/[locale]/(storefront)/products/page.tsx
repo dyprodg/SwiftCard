@@ -65,7 +65,6 @@ export default async function ProductsPage({ searchParams }: Props) {
 async function ProductsContent({
   locale,
   page,
-  category,
 }: {
   locale: string;
   page: number;
@@ -117,7 +116,11 @@ async function ProductsContent({
 
         {/* Products */}
         <div className="flex-1">
-          <ProductGrid products={localizeProducts(items, locale)} locale={locale} discounts={activeDiscounts} />
+          <ProductGrid
+            products={localizeProducts(items, locale)}
+            locale={locale}
+            discounts={activeDiscounts}
+          />
 
           {/* Pagination */}
           {totalPages > 1 && (

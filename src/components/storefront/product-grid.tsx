@@ -1,5 +1,10 @@
 import { ProductCard, type ProductDiscount } from "./product-card";
-import type { Product, ProductImage, ProductVariant, DiscountWithRelations } from "@/types";
+import type {
+  Product,
+  ProductImage,
+  ProductVariant,
+  DiscountWithRelations,
+} from "@/types";
 
 type ProductGridProps = {
   products: Array<
@@ -20,7 +25,11 @@ function findBestDiscount(
   product: Product,
   discounts: DiscountWithRelations[],
 ): ProductDiscount {
-  let best: { type: "PERCENTAGE" | "FIXED" | "FREE_SHIPPING"; value: number; score: number } | null = null;
+  let best: {
+    type: "PERCENTAGE" | "FIXED" | "FREE_SHIPPING";
+    value: number;
+    score: number;
+  } | null = null;
 
   for (const d of discounts) {
     const isScoped = d.products.length > 0 || d.categories.length > 0;
@@ -28,7 +37,8 @@ function findBestDiscount(
     if (isScoped) {
       const matchesProduct = d.products.some((p) => p.productId === product.id);
       const matchesCategory =
-        product.categoryId && d.categories.some((c) => c.categoryId === product.categoryId);
+        product.categoryId &&
+        d.categories.some((c) => c.categoryId === product.categoryId);
       if (!matchesProduct && !matchesCategory) continue;
     }
 
@@ -46,7 +56,13 @@ function findBestDiscount(
         break;
     }
 
-    if (!best || score > best.score || (score === best.score && d.type === "FREE_SHIPPING" && best.type !== "FREE_SHIPPING")) {
+    if (
+      !best ||
+      score > best.score ||
+      (score === best.score &&
+        d.type === "FREE_SHIPPING" &&
+        best.type !== "FREE_SHIPPING")
+    ) {
       best = { type: d.type, value: d.value, score };
     }
   }

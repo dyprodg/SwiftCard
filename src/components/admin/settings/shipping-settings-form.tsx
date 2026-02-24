@@ -42,6 +42,7 @@ export function ShippingSettingsForm({ defaultValues }: Props) {
     defaultValues,
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const hasFreeThreshold = form.watch("freeShippingThreshold") !== null;
 
   function onSubmit(data: ShippingSettingsInput) {

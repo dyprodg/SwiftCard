@@ -89,9 +89,7 @@ export default async function DiscountsPage({ searchParams, params }: Props) {
             size="sm"
             asChild
           >
-            <Link href={`/${locale}/admin/discounts?status=${status}`}>
-              {t(status)}
-            </Link>
+            <Link href={`/${locale}/admin/discounts?status=${status}`}>{t(status)}</Link>
           </Button>
         ))}
       </div>
@@ -138,7 +136,9 @@ export default async function DiscountsPage({ searchParams, params }: Props) {
                     )}
                   </TableCell>
                   <TableCell>{t(`types.${discount.type}`)}</TableCell>
-                  <TableCell>{formatDiscountValue(discount.type, discount.value)}</TableCell>
+                  <TableCell>
+                    {formatDiscountValue(discount.type, discount.value)}
+                  </TableCell>
                   <TableCell>
                     {discount.usedCount}
                     {discount.maxUses ? ` / ${discount.maxUses}` : ""}

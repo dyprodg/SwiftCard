@@ -182,9 +182,7 @@
     "processing": "Wird verarbeitet...",
     "paymentFailed": "Zahlung fehlgeschlagen. Bitte versuche es erneut.",
     "paymentBeingProcessed": "Zahlung wird verarbeitet. Diese Seite wird automatisch aktualisiert.",
-    "continueShopping": "Weiter einkaufen",
-    "tracking": "Sendungsverfolgung",
-    "trackPackage": "Sendung verfolgen"
+    "continueShopping": "Weiter einkaufen"
   },
   "maintenance": {
     "title": "Wir sind gleich zurück",
@@ -334,51 +332,6 @@
         "REFUNDED": "Erstattet"
       },
       "processRefund": "Erstattung verarbeiten",
-      "fulfillOrder": "Bestellung ausführen",
-      "packingSlip": "Packzettel drucken",
-      "fulfillmentStatuses": {
-        "UNFULFILLED": "Nicht ausgeführt",
-        "PARTIALLY_FULFILLED": "Teilweise ausgeführt",
-        "FULFILLED": "Ausgeführt",
-        "RETURNED": "Zurückgesendet"
-      },
-      "fulfillment": {
-        "title": "Ausführung erstellen",
-        "selectItems": "Artikel zur Ausführung auswählen",
-        "carrier": "Versanddienstleister",
-        "selectCarrier": "Versanddienstleister wählen...",
-        "carrierName": "Name des Versanddienstleisters",
-        "carrierNamePlaceholder": "Name eingeben...",
-        "trackingNumber": "Sendungsnummer",
-        "trackingNumberPlaceholder": "Sendungsnummer eingeben...",
-        "trackingUrlPreview": "Tracking-URL",
-        "note": "Notiz",
-        "notePlaceholder": "Optionale Notiz zur Ausführung...",
-        "createFulfillment": "Ausführung erstellen",
-        "confirmMessage": "Dies erstellt eine Ausführung und sendet eine Versandbenachrichtigung an den Kunden. Fortfahren?",
-        "confirmFulfillment": "Ausführung bestätigen",
-        "back": "Zurück",
-        "processing": "Wird verarbeitet...",
-        "success": "Ausführung erfolgreich erstellt.",
-        "close": "Schliessen",
-        "history": {
-          "title": "Ausführungsverlauf",
-          "trackPackage": "Sendung verfolgen",
-          "createdBy": "Erstellt von",
-          "summary": "{fulfilled} von {total} Artikeln ausgeführt"
-        }
-      },
-      "packingSlip": {
-        "title": "Packzettel",
-        "print": "Drucken",
-        "order": "Bestellung",
-        "date": "Datum",
-        "shipTo": "Lieferung an",
-        "item": "Artikel",
-        "variant": "Variante",
-        "quantity": "Menge",
-        "customerNote": "Kundennotiz"
-      },
       "paymentStatuses": {
         "PENDING": "Ausstehend",
         "PAID": "Bezahlt",

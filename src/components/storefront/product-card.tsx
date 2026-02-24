@@ -46,8 +46,7 @@ export async function ProductCard({ product, locale, discount }: ProductCardProp
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
 
-  const hasMonetaryDiscount =
-    discount && discount.type !== "FREE_SHIPPING";
+  const hasMonetaryDiscount = discount && discount.type !== "FREE_SHIPPING";
   const discountedMin = applyDiscount(minPrice, discount ?? null);
   const discountedMax = applyDiscount(maxPrice, discount ?? null);
 

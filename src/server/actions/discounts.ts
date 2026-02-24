@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/db";
-import { discounts, discountProducts, discountCategories, orders } from "@/db/schema";
-import { eq, and, sql } from "drizzle-orm";
+import { discounts, discountProducts, discountCategories } from "@/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { revalidatePath, updateTag } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 import {
@@ -173,9 +173,7 @@ export async function validateCoupon(
   const sessionId = cookieStore.get("cart_session")?.value;
 
   if (discount.maxUsesPerCustomer && sessionId) {
-    const cartId = guestCartKey(sessionId);
-    // Count orders with this discount from this session's email
-    // For simplicity, we just validate the code is valid; per-customer check happens at checkout
+    // Per-customer check happens at checkout
   }
 
   return {

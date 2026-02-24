@@ -79,6 +79,7 @@ export function DiscountForm({ discount, products, categories }: Props) {
     },
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library
   const watchType = form.watch("type");
   const watchAutomatic = form.watch("automatic");
 
@@ -109,9 +110,7 @@ export function DiscountForm({ discount, products, categories }: Props) {
         }
         router.push(`/${locale}/admin/discounts`);
       } catch (error) {
-        toast.error(
-          error instanceof Error ? error.message : t("discountError"),
-        );
+        toast.error(error instanceof Error ? error.message : t("discountError"));
       }
     });
   }
@@ -206,7 +205,9 @@ export function DiscountForm({ discount, products, categories }: Props) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      {watchType === "PERCENTAGE" ? t("percentageValue") : t("fixedValue")}
+                      {watchType === "PERCENTAGE"
+                        ? t("percentageValue")
+                        : t("fixedValue")}
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -218,9 +219,7 @@ export function DiscountForm({ discount, products, categories }: Props) {
                       />
                     </FormControl>
                     <FormDescription>
-                      {watchType === "PERCENTAGE"
-                        ? t("percentageHint")
-                        : t("fixedHint")}
+                      {watchType === "PERCENTAGE" ? t("percentageHint") : t("fixedHint")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -290,7 +289,9 @@ export function DiscountForm({ discount, products, categories }: Props) {
                       placeholder="0"
                       value={field.value ?? ""}
                       onChange={(e) =>
-                        field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                        field.onChange(
+                          e.target.value ? Number(e.target.value) : undefined,
+                        )
                       }
                     />
                   </FormControl>
@@ -314,7 +315,9 @@ export function DiscountForm({ discount, products, categories }: Props) {
                         placeholder={t("unlimited")}
                         value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                          field.onChange(
+                            e.target.value ? Number(e.target.value) : undefined,
+                          )
                         }
                       />
                     </FormControl>
@@ -336,7 +339,9 @@ export function DiscountForm({ discount, products, categories }: Props) {
                         placeholder={t("unlimited")}
                         value={field.value ?? ""}
                         onChange={(e) =>
-                          field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                          field.onChange(
+                            e.target.value ? Number(e.target.value) : undefined,
+                          )
                         }
                       />
                     </FormControl>
@@ -430,7 +435,9 @@ export function DiscountForm({ discount, products, categories }: Props) {
                       <FormLabel>{t("scopeProducts")}</FormLabel>
                       <div className="max-h-48 space-y-2 overflow-y-auto rounded-md border p-3">
                         {products.length === 0 ? (
-                          <p className="text-muted-foreground text-sm">{t("noProductsAvailable")}</p>
+                          <p className="text-muted-foreground text-sm">
+                            {t("noProductsAvailable")}
+                          </p>
                         ) : (
                           products.map((product) => (
                             <label
@@ -469,7 +476,9 @@ export function DiscountForm({ discount, products, categories }: Props) {
                       <FormLabel>{t("scopeCategories")}</FormLabel>
                       <div className="max-h-48 space-y-2 overflow-y-auto rounded-md border p-3">
                         {categories.length === 0 ? (
-                          <p className="text-muted-foreground text-sm">{t("noCategoriesAvailable")}</p>
+                          <p className="text-muted-foreground text-sm">
+                            {t("noCategoriesAvailable")}
+                          </p>
                         ) : (
                           categories.map((category) => (
                             <label

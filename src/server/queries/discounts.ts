@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { discounts, discountProducts, discountCategories } from "@/db/schema";
+import { discounts } from "@/db/schema";
 import { eq, and, desc, sql, lte, gte, or, isNull } from "drizzle-orm";
 import { cacheTag, cacheLife } from "next/cache";
 
