@@ -14,6 +14,7 @@ import { orderEvents } from "./order-events";
 import { wishlists, productReviews, stockNotifications } from "./customer-features";
 import { customerAddresses } from "./customer-profiles";
 import { shippingZones, shippingRates, taxZones } from "./shipping";
+import { returns, returnItems } from "./returns";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -69,6 +70,7 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   fulfillments: many(fulfillments),
   reservations: many(stockReservations),
   events: many(orderEvents),
+  returns: many(returns),
   discount: one(discounts, {
     fields: [orders.discountId],
     references: [discounts.id],
@@ -223,3 +225,27 @@ export const shippingRatesRelations = relations(shippingRates, ({ one }) => ({
 
 // Tax zone relations (no FKs)
 export const taxZonesRelations = relations(taxZones, () => ({}));
+
+// Return relations
+export const returnsRelations = relations(returns, ({ one, many }) => ({
+  order: one(orders, {
+    fields: [returns.orderId],
+    references: [orders.id],
+  }),
+  items: many(returnItems),
+  refund: one(orderRefunds, {
+    fields: [returns.refundId],
+    references: [orderRefunds.id],
+  }),
+}));
+
+export const returnItemsRelations = relations(returnItems, ({ one }) => ({
+  return: one(returns, {
+    fields: [returnItems.returnId],
+    references: [returns.id],
+  }),
+  orderItem: one(orderItems, {
+    fields: [returnItems.orderItemId],
+    references: [orderItems.id],
+  }),
+}));

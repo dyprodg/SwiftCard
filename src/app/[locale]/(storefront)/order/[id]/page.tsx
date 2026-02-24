@@ -13,6 +13,11 @@ import { orders } from "@/db/schema/orders";
 import { eq } from "drizzle-orm";
 import { OrderViewClient } from "./order-view-client";
 import { CARRIER_LABELS, type Carrier } from "@/lib/constants/carriers";
+import {
+  canRequestReturn,
+  getReturnedQuantities,
+  getReturnsByOrder,
+} from "@/server/queries/returns";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -30,18 +35,19 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
     with: {
       items: true,
       fulfillments: { with: { items: true } },
+      returns: { with: { items: true } },
     },
   });
 
   if (!order) notFound();
 
   // Authorize: token match OR logged-in user email match
+  const { userId } = await auth();
   let authorized = false;
 
   if (token && order.guestAccessToken === token) {
     authorized = true;
   } else {
-    const { userId } = await auth();
     if (userId) {
       const user = await currentUser();
       const email = user?.emailAddresses[0]?.emailAddress;
@@ -52,6 +58,15 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
   }
 
   if (!authorized) notFound();
+
+  // Check return eligibility for logged-in users
+  let returnEligible = false;
+  let returnedQuantities: Record<string, number> = {};
+  if (userId && order.customerId === userId) {
+    const eligibility = await canRequestReturn(order.id, authUserId);
+    returnEligible = eligibility.eligible;
+    returnedQuantities = await getReturnedQuantities(order.id);
+  }
 
   return (
     <div className="container mx-auto max-w-2xl px-4 py-8">
@@ -121,7 +136,21 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
           continueShopping: t("continueShopping"),
           tracking: t("tracking"),
           trackPackage: t("trackPackage"),
+          requestReturn: t("requestReturn"),
+          returnStatus: t("returnStatus"),
         }}
+        returnEligible={returnEligible}
+        returnedQuantities={returnedQuantities}
+        existingReturns={order.returns.map((r) => ({
+          id: r.id,
+          status: r.status,
+          reason: r.reason,
+          createdAt: r.createdAt.toISOString(),
+          items: r.items.map((ri) => ({
+            orderItemId: ri.orderItemId,
+            quantity: ri.quantity,
+          })),
+        }))}
       />
     </div>
   );

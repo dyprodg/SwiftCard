@@ -28,6 +28,7 @@ import type {
 } from "@/db/schema/customer-features";
 import type { customerAddresses, abandonedCarts } from "@/db/schema/customer-profiles";
 import type { shippingZones, shippingRates, taxZones } from "@/db/schema/shipping";
+import type { returns, returnItems } from "@/db/schema/returns";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -91,6 +92,15 @@ export type OrderWithAll = Order & {
   refunds: OrderRefundWithItems[];
   fulfillments: FulfillmentWithItems[];
   events: OrderEvent[];
+  returns: ReturnWithItems[];
+};
+
+// Return types
+export type Return = InferSelectModel<typeof returns>;
+export type ReturnItem = InferSelectModel<typeof returnItems>;
+
+export type ReturnWithItems = Return & {
+  items: ReturnItem[];
 };
 
 // Discount types

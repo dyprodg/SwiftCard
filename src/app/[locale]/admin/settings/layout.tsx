@@ -12,6 +12,7 @@ const tabKeys = [
   "legal",
   "banner",
   "reservations",
+  "returns",
 ] as const;
 const tabHrefs: Record<string, string> = {
   general: "/admin/settings/general",
@@ -20,6 +21,7 @@ const tabHrefs: Record<string, string> = {
   legal: "/admin/settings/legal",
   banner: "/admin/settings/banner",
   reservations: "/admin/settings/reservations",
+  returns: "/admin/settings/returns",
 };
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {

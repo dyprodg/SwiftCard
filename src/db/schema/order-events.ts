@@ -17,6 +17,11 @@ export const orderEventTypeEnum = pgEnum("order_event_type", [
   "DRAFT_UPDATED",
   "PAYMENT_LINK_SENT",
   "PAYMENT_LINK_EXPIRED",
+  "RETURN_REQUESTED",
+  "RETURN_APPROVED",
+  "RETURN_RECEIVED",
+  "RETURN_REFUNDED",
+  "RETURN_REJECTED",
 ]);
 
 export const orderEvents = pgTable(

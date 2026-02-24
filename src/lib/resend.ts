@@ -198,6 +198,63 @@ export async function sendRefundNotificationEmail(
   });
 }
 
+export async function sendReturnApprovedEmail(
+  to: string,
+  data: {
+    orderNumber: string;
+    items: {
+      productName: string;
+      variantName: string | null;
+      quantity: number;
+    }[];
+    orderViewUrl: string;
+  },
+) {
+  const { ReturnApprovedEmail } = await import("@/emails/return-approved");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `Return Approved - ${data.orderNumber}`,
+    react: ReturnApprovedEmail(data),
+  });
+}
+
+export async function sendReturnRejectedEmail(
+  to: string,
+  data: {
+    orderNumber: string;
+    rejectionReason: string;
+    orderViewUrl: string;
+  },
+) {
+  const { ReturnRejectedEmail } = await import("@/emails/return-rejected");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `Return Update - ${data.orderNumber}`,
+    react: ReturnRejectedEmail(data),
+  });
+}
+
+export async function sendReturnReceivedEmail(
+  to: string,
+  data: {
+    orderNumber: string;
+    orderViewUrl: string;
+  },
+) {
+  const { ReturnReceivedEmail } = await import("@/emails/return-received");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `Return Received - ${data.orderNumber}`,
+    react: ReturnReceivedEmail(data),
+  });
+}
+
 export async function sendPaymentLinkEmail(
   to: string,
   data: {

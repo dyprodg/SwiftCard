@@ -16,6 +16,10 @@ import {
   FileEdit,
   Send,
   Clock,
+  RotateCcw,
+  CheckCircle2,
+  PackageCheck,
+  Ban,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { OrderEvent } from "@/types";
@@ -36,6 +40,11 @@ const EVENT_ICONS: Record<string, typeof Activity> = {
   DRAFT_UPDATED: FileEdit,
   PAYMENT_LINK_SENT: Send,
   PAYMENT_LINK_EXPIRED: Clock,
+  RETURN_REQUESTED: RotateCcw,
+  RETURN_APPROVED: CheckCircle2,
+  RETURN_RECEIVED: PackageCheck,
+  RETURN_REFUNDED: CreditCard,
+  RETURN_REJECTED: Ban,
 };
 
 function ActorDisplay({ createdBy }: { createdBy: string | null }) {
@@ -163,6 +172,23 @@ function EventDescription({
       return <>{t("paymentLinkSent", { email: String(data.email ?? "") })}</>;
     case "PAYMENT_LINK_EXPIRED":
       return <>{t("paymentLinkExpired")}</>;
+    case "RETURN_REQUESTED":
+      return <>{t("returnRequested")}</>;
+    case "RETURN_APPROVED":
+      return <>{t("returnApproved")}</>;
+    case "RETURN_RECEIVED":
+      return <>{t("returnReceived")}</>;
+    case "RETURN_REFUNDED": {
+      const refundAmt = data.amount;
+      return (
+        <>
+          {t("returnRefunded")}
+          {typeof refundAmt === "number" && ` (${(refundAmt / 100).toFixed(2)} CHF)`}
+        </>
+      );
+    }
+    case "RETURN_REJECTED":
+      return <>{t("returnRejected")}</>;
     default:
       return <>{type}</>;
   }

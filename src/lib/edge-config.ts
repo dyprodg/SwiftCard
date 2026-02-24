@@ -93,6 +93,31 @@ export async function getReservationSettings(): Promise<ReservationSettings> {
   }
 }
 
+export type ReturnSettings = {
+  returnWindowDays: number;
+  enabled: boolean;
+};
+
+const RETURN_DEFAULTS: ReturnSettings = {
+  returnWindowDays: 30,
+  enabled: true,
+};
+
+export async function getReturnSettings(): Promise<ReturnSettings> {
+  "use cache";
+  cacheTag("return-settings");
+  cacheLife("hours");
+
+  try {
+    const client = getClient();
+    if (!client) return RETURN_DEFAULTS;
+    const settings = await client.get<ReturnSettings>("returnSettings");
+    return settings ?? RETURN_DEFAULTS;
+  } catch {
+    return RETURN_DEFAULTS;
+  }
+}
+
 export async function isMaintenanceMode(): Promise<boolean> {
   try {
     const client = getClient();

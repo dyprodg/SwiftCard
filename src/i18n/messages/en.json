@@ -236,7 +236,35 @@
     "paymentBeingProcessed": "Payment is being processed. This page will update automatically.",
     "continueShopping": "Continue Shopping",
     "tracking": "Tracking Information",
-    "trackPackage": "Track your package"
+    "trackPackage": "Track your package",
+    "requestReturn": "Request Return",
+    "returnStatus": "Return Status"
+  },
+  "returns": {
+    "title": "Return Request",
+    "requestReturn": "Request Return",
+    "requestReturnDescription": "Select items you would like to return and provide a reason.",
+    "selectItemsLabel": "Items to Return",
+    "selectItems": "Please select at least one item to return.",
+    "reasonLabel": "Reason for Return",
+    "selectReason": "Please select a reason",
+    "addNote": "Additional Notes (optional)",
+    "notePlaceholder": "Any additional details about your return...",
+    "submit": "Submit Return Request",
+    "submitting": "Submitting...",
+    "success": "Your return request has been submitted. We will review it and get back to you shortly.",
+    "close": "Close",
+    "cancel": "Cancel",
+    "quantity": "Qty",
+    "reasons": {
+      "DEFECTIVE": "Defective / Damaged",
+      "WRONG_ITEM": "Wrong Item Received",
+      "NOT_AS_DESCRIBED": "Not as Described",
+      "CHANGED_MIND": "Changed Mind",
+      "TOO_LARGE": "Too Large",
+      "TOO_SMALL": "Too Small",
+      "OTHER": "Other"
+    }
   },
   "maintenance": {
     "title": "We'll be right back",
@@ -258,7 +286,8 @@
       "abandonedCarts": "Abandoned Carts",
       "viewStorefront": "View Storefront",
       "adminTitle": "SwiftCard Admin",
-      "draftOrders": "Draft Orders"
+      "draftOrders": "Draft Orders",
+      "returns": "Returns"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -418,7 +447,12 @@
         "draftCreated": "Draft order created",
         "draftUpdated": "Draft order updated",
         "paymentLinkSent": "Payment link sent to {email}",
-        "paymentLinkExpired": "Payment link expired"
+        "paymentLinkExpired": "Payment link expired",
+        "returnRequested": "Return requested by customer",
+        "returnApproved": "Return approved",
+        "returnReceived": "Returned items received",
+        "returnRefunded": "Return refund processed",
+        "returnRejected": "Return request rejected"
       },
       "statuses": {
         "DRAFT": "Draft",
@@ -587,6 +621,64 @@
         "saving": "Saving...",
         "createAndSendLink": "Create & Send Payment Link",
         "saveAndSendLink": "Save & Send Payment Link"
+      }
+    },
+    "returns": {
+      "title": "Returns",
+      "description": "Manage customer return requests",
+      "noReturns": "No return requests yet.",
+      "filterStatus": "Filter by status",
+      "allStatuses": "All Statuses",
+      "stats": {
+        "requested": "Requested",
+        "approved": "Approved",
+        "received": "Received",
+        "refunded": "Refunded",
+        "rejected": "Rejected"
+      },
+      "table": {
+        "order": "Order",
+        "customer": "Customer",
+        "items": "Items",
+        "reason": "Reason",
+        "status": "Status",
+        "date": "Date",
+        "actions": "Actions",
+        "view": "View"
+      },
+      "detail": {
+        "title": "Return",
+        "orderLink": "Order",
+        "items": "Return Items",
+        "returnQty": "Return qty",
+        "itemReason": "Reason",
+        "estimatedRefund": "Estimated Refund",
+        "info": "Details",
+        "customer": "Customer",
+        "reason": "Reason",
+        "customerNote": "Customer Note",
+        "adminNote": "Admin Note",
+        "actions": "Actions",
+        "approve": "Approve Return",
+        "reject": "Reject Return",
+        "markReceived": "Mark as Received",
+        "processRefund": "Process Refund",
+        "refundProcessed": "Refund has been processed for this return.",
+        "returnRejected": "This return request was rejected.",
+        "rejectTitle": "Reject Return",
+        "rejectDescription": "Please provide a reason for rejecting this return. The customer will be notified.",
+        "rejectionReasonPlaceholder": "Enter rejection reason...",
+        "confirmReject": "Reject",
+        "refundTitle": "Process Refund",
+        "refundDescription": "This will issue a refund of {amount} to the customer via Stripe.",
+        "restoreStock": "Restore stock for returned items",
+        "confirmRefund": "Process Refund",
+        "cancel": "Cancel",
+        "createdAt": "Submitted:",
+        "approvedAt": "Approved:",
+        "receivedAt": "Received:",
+        "refundedAt": "Refunded:",
+        "rejectedAt": "Rejected:"
       }
     },
     "discounts": {
@@ -835,6 +927,14 @@
         "title": "Stock Reservation Settings",
         "timeoutLabel": "Reservation Timeout (minutes)",
         "timeoutDescription": "How long stock is held for a checkout before being released (5-60 minutes)"
+      },
+      "returns": "Returns",
+      "returnsForm": {
+        "title": "Return Policy Settings",
+        "enabledLabel": "Enable Returns",
+        "enabledDescription": "Allow customers to request returns on eligible orders",
+        "windowLabel": "Return Window (days)",
+        "windowDescription": "Number of days after delivery within which customers can request a return (1-365)"
       },
       "banner": "Banner",
       "bannerForm": {

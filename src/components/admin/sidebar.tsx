@@ -18,6 +18,7 @@ import {
   Truck,
   Percent,
   FileEdit,
+  RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +27,7 @@ const navItems = [
   { key: "products" as const, href: "/admin/products", icon: Package },
   { key: "orders" as const, href: "/admin/orders", icon: ShoppingCart },
   { key: "draftOrders" as const, href: "/admin/draft-orders", icon: FileEdit },
+  { key: "returns" as const, href: "/admin/returns", icon: RotateCcw },
   { key: "discounts" as const, href: "/admin/discounts", icon: Tag },
   { key: "customers" as const, href: "/admin/customers", icon: Users },
   { key: "reviews" as const, href: "/admin/reviews", icon: MessageSquare },

@@ -10,13 +10,14 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { AlertTriangle, ExternalLink, Loader2 } from "lucide-react";
+import { AlertTriangle, ExternalLink, Loader2, RotateCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { formatPrice } from "@/lib/utils/format-price";
+import { ReturnRequestDialog } from "@/components/storefront/return-request-dialog";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -62,6 +63,14 @@ type OrderData = {
   fulfillments: FulfillmentData[];
 };
 
+type ExistingReturn = {
+  id: string;
+  status: string;
+  reason: string;
+  createdAt: string;
+  items: { orderItemId: string; quantity: number }[];
+};
+
 type Translations = {
   orderNumber: string;
   date: string;
@@ -83,6 +92,8 @@ type Translations = {
   continueShopping: string;
   tracking: string;
   trackPackage: string;
+  requestReturn: string;
+  returnStatus: string;
 };
 
 const statusColors: Record<string, string> = {
@@ -93,6 +104,14 @@ const statusColors: Record<string, string> = {
   DELIVERED: "bg-green-100 text-green-800",
   CANCELLED: "bg-red-100 text-red-800",
   REFUNDED: "bg-gray-100 text-gray-800",
+};
+
+const returnStatusColors: Record<string, string> = {
+  REQUESTED: "bg-yellow-100 text-yellow-800",
+  APPROVED: "bg-blue-100 text-blue-800",
+  RECEIVED: "bg-purple-100 text-purple-800",
+  REFUNDED: "bg-green-100 text-green-800",
+  REJECTED: "bg-red-100 text-red-800",
 };
 
 const paymentStatusColors: Record<string, string> = {
@@ -108,11 +127,17 @@ export function OrderViewClient({
   token,
   locale,
   translations: t,
+  returnEligible = false,
+  returnedQuantities = {},
+  existingReturns = [],
 }: {
   order: OrderData;
   token: string;
   locale: string;
   translations: Translations;
+  returnEligible?: boolean;
+  returnedQuantities?: Record<string, number>;
+  existingReturns?: ExistingReturn[];
 }) {
   const router = useRouter();
   const [clientSecret, setClientSecret] = useState<string | null>(null);
@@ -355,6 +380,51 @@ export function OrderViewClient({
           )}
         </CardContent>
       </Card>
+
+      {/* Existing Returns */}
+      {existingReturns.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <RotateCcw className="h-4 w-4" />
+              {t.returnStatus}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-3">
+              {existingReturns.map((r) => (
+                <div
+                  key={r.id}
+                  className="flex items-center justify-between rounded-md border p-3"
+                >
+                  <div>
+                    <p className="text-sm font-medium">{r.reason}</p>
+                    <p className="text-muted-foreground text-xs">
+                      {new Date(r.createdAt).toLocaleDateString(
+                        locale === "de" ? "de-CH" : "en-CH",
+                      )}
+                    </p>
+                  </div>
+                  <Badge variant="outline" className={returnStatusColors[r.status] ?? ""}>
+                    {r.status}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Return Request Button */}
+      {returnEligible && (
+        <div className="flex justify-center">
+          <ReturnRequestDialog
+            orderId={order.id}
+            items={order.items}
+            returnedQuantities={returnedQuantities}
+          />
+        </div>
+      )}
 
       <div className="flex justify-center">
         <Button asChild variant="outline">

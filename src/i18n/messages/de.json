@@ -236,7 +236,35 @@
     "paymentBeingProcessed": "Zahlung wird verarbeitet. Diese Seite wird automatisch aktualisiert.",
     "continueShopping": "Weiter einkaufen",
     "tracking": "Sendungsverfolgung",
-    "trackPackage": "Sendung verfolgen"
+    "trackPackage": "Sendung verfolgen",
+    "requestReturn": "Rücksendung beantragen",
+    "returnStatus": "Rücksendungsstatus"
+  },
+  "returns": {
+    "title": "Rücksendung beantragen",
+    "requestReturn": "Rücksendung beantragen",
+    "requestReturnDescription": "Wählen Sie die Artikel aus, die Sie zurücksenden möchten, und geben Sie einen Grund an.",
+    "selectItemsLabel": "Zu retournierende Artikel",
+    "selectItems": "Bitte wählen Sie mindestens einen Artikel zur Rücksendung aus.",
+    "reasonLabel": "Grund für die Rücksendung",
+    "selectReason": "Bitte wählen Sie einen Grund",
+    "addNote": "Zusätzliche Anmerkungen (optional)",
+    "notePlaceholder": "Weitere Details zu Ihrer Rücksendung...",
+    "submit": "Rücksendung einreichen",
+    "submitting": "Wird eingereicht...",
+    "success": "Ihre Rücksendeanfrage wurde eingereicht. Wir werden sie prüfen und uns in Kürze bei Ihnen melden.",
+    "close": "Schliessen",
+    "cancel": "Abbrechen",
+    "quantity": "Anz.",
+    "reasons": {
+      "DEFECTIVE": "Defekt / Beschädigt",
+      "WRONG_ITEM": "Falscher Artikel erhalten",
+      "NOT_AS_DESCRIBED": "Nicht wie beschrieben",
+      "CHANGED_MIND": "Meinung geändert",
+      "TOO_LARGE": "Zu gross",
+      "TOO_SMALL": "Zu klein",
+      "OTHER": "Sonstiges"
+    }
   },
   "maintenance": {
     "title": "Wir sind gleich zurück",
@@ -258,7 +286,8 @@
       "abandonedCarts": "Verlassene Warenkörbe",
       "viewStorefront": "Zum Shop",
       "adminTitle": "SwiftCard Admin",
-      "draftOrders": "Entwurfsbestellungen"
+      "draftOrders": "Entwurfsbestellungen",
+      "returns": "Retouren"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -418,7 +447,12 @@
         "draftCreated": "Entwurfsbestellung erstellt",
         "draftUpdated": "Entwurfsbestellung aktualisiert",
         "paymentLinkSent": "Zahlungslink gesendet an {email}",
-        "paymentLinkExpired": "Zahlungslink abgelaufen"
+        "paymentLinkExpired": "Zahlungslink abgelaufen",
+        "returnRequested": "Rücksendung vom Kunden beantragt",
+        "returnApproved": "Rücksendung genehmigt",
+        "returnReceived": "Retournierte Artikel erhalten",
+        "returnRefunded": "Rücksendungserstattung verarbeitet",
+        "returnRejected": "Rücksendung abgelehnt"
       },
       "statuses": {
         "DRAFT": "Entwurf",
@@ -587,6 +621,64 @@
         "saving": "Wird gespeichert...",
         "createAndSendLink": "Erstellen & Zahlungslink senden",
         "saveAndSendLink": "Speichern & Zahlungslink senden"
+      }
+    },
+    "returns": {
+      "title": "Retouren",
+      "description": "Rücksendeanfragen von Kunden verwalten",
+      "noReturns": "Noch keine Rücksendeanfragen.",
+      "filterStatus": "Nach Status filtern",
+      "allStatuses": "Alle Status",
+      "stats": {
+        "requested": "Beantragt",
+        "approved": "Genehmigt",
+        "received": "Erhalten",
+        "refunded": "Erstattet",
+        "rejected": "Abgelehnt"
+      },
+      "table": {
+        "order": "Bestellung",
+        "customer": "Kunde",
+        "items": "Artikel",
+        "reason": "Grund",
+        "status": "Status",
+        "date": "Datum",
+        "actions": "Aktionen",
+        "view": "Anzeigen"
+      },
+      "detail": {
+        "title": "Retoure",
+        "orderLink": "Bestellung",
+        "items": "Retournierte Artikel",
+        "returnQty": "Retoure Anz.",
+        "itemReason": "Grund",
+        "estimatedRefund": "Geschätzte Erstattung",
+        "info": "Details",
+        "customer": "Kunde",
+        "reason": "Grund",
+        "customerNote": "Kundennotiz",
+        "adminNote": "Admin-Notiz",
+        "actions": "Aktionen",
+        "approve": "Retoure genehmigen",
+        "reject": "Retoure ablehnen",
+        "markReceived": "Als erhalten markieren",
+        "processRefund": "Erstattung verarbeiten",
+        "refundProcessed": "Die Erstattung für diese Retoure wurde verarbeitet.",
+        "returnRejected": "Diese Rücksendeanfrage wurde abgelehnt.",
+        "rejectTitle": "Retoure ablehnen",
+        "rejectDescription": "Bitte geben Sie einen Grund für die Ablehnung an. Der Kunde wird benachrichtigt.",
+        "rejectionReasonPlaceholder": "Ablehnungsgrund eingeben...",
+        "confirmReject": "Ablehnen",
+        "refundTitle": "Erstattung verarbeiten",
+        "refundDescription": "Dies wird eine Erstattung von {amount} an den Kunden über Stripe auslösen.",
+        "restoreStock": "Bestand für retournierte Artikel wiederherstellen",
+        "confirmRefund": "Erstattung verarbeiten",
+        "cancel": "Abbrechen",
+        "createdAt": "Eingereicht:",
+        "approvedAt": "Genehmigt:",
+        "receivedAt": "Erhalten:",
+        "refundedAt": "Erstattet:",
+        "rejectedAt": "Abgelehnt:"
       }
     },
     "discounts": {
@@ -835,6 +927,14 @@
         "title": "Lagerreservierungs-Einstellungen",
         "timeoutLabel": "Reservierungs-Timeout (Minuten)",
         "timeoutDescription": "Wie lange der Bestand für einen Bestellvorgang reserviert wird, bevor er freigegeben wird (5-60 Minuten)"
+      },
+      "returns": "Retouren",
+      "returnsForm": {
+        "title": "Retourenrichtlinien",
+        "enabledLabel": "Retouren aktivieren",
+        "enabledDescription": "Kunden erlauben, Rücksendungen für berechtigte Bestellungen zu beantragen",
+        "windowLabel": "Retourenfrist (Tage)",
+        "windowDescription": "Anzahl der Tage nach Lieferung, innerhalb derer Kunden eine Rücksendung beantragen können (1-365)"
       },
       "banner": "Banner",
       "bannerForm": {
