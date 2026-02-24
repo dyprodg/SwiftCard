@@ -60,6 +60,7 @@ type OrderData = {
   shippingCity: string;
   shippingZip: string;
   shippingCountry: string;
+  totalRefunded: number;
   createdAt: string;
   items: OrderItem[];
   fulfillments: FulfillmentData[];
@@ -95,6 +96,7 @@ type Translations = {
   continueShopping: string;
   tracking: string;
   trackPackage: string;
+  refunded: string;
   requestReturn: string;
   returnStatus: string;
 };
@@ -338,6 +340,12 @@ export function OrderViewClient({
             <span>{t.total}</span>
             <span>{formatPrice(order.total, order.currency)}</span>
           </div>
+          {order.totalRefunded > 0 && (
+            <div className="flex justify-between text-orange-600">
+              <span>{t.refunded}</span>
+              <span>-{formatPrice(order.totalRefunded, order.currency)}</span>
+            </div>
+          )}
 
           <Separator />
 

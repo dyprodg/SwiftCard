@@ -98,6 +98,7 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
           shippingCity: order.shippingCity,
           shippingZip: order.shippingZip,
           shippingCountry: order.shippingCountry,
+          totalRefunded: order.totalRefunded,
           createdAt: order.createdAt.toISOString(),
           items: order.items.map((item) => ({
             id: item.id,
@@ -145,6 +146,7 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
           continueShopping: t("continueShopping"),
           tracking: t("tracking"),
           trackPackage: t("trackPackage"),
+          refunded: t("refunded"),
           requestReturn: t("requestReturn"),
           returnStatus: t("returnStatus"),
         }}
