@@ -87,7 +87,7 @@ export function CartSheet({ locale }: { locale: string }) {
         ) : (
           <>
             {/* Cart items */}
-            <div className="flex-1 overflow-y-auto py-4">
+            <div className="flex-1 overflow-y-auto p-4">
               <div className="space-y-4">
                 {items.map((item) => {
                   const { discountedPrice, hasDiscount } = getItemDiscount(
@@ -193,10 +193,12 @@ export function CartSheet({ locale }: { locale: string }) {
               </div>
             </div>
 
-            <Separator />
+            <div className="px-4">
+              <Separator />
+            </div>
 
             {/* Footer */}
-            <div className="space-y-3 pt-4">
+            <div className="space-y-3 p-4">
               <div className="flex justify-between text-sm">
                 <span>{t("subtotal")}</span>
                 <span className="font-semibold">{formatPrice(subtotal)}</span>
