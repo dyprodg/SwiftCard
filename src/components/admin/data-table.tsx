@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export type Column<T> = {
-  header: string;
+  header: string | (() => React.ReactNode);
   accessorKey?: keyof T;
   cell?: (row: T) => React.ReactNode;
   className?: string;
@@ -45,9 +45,12 @@ export function DataTable<T extends { id: string }>({
         <Table>
           <TableHeader>
             <TableRow>
-              {columns.map((col) => (
-                <TableHead key={col.header} className={col.className}>
-                  {col.header}
+              {columns.map((col, i) => (
+                <TableHead
+                  key={typeof col.header === "string" ? col.header : `col-${i}`}
+                  className={col.className}
+                >
+                  {typeof col.header === "function" ? col.header() : col.header}
                 </TableHead>
               ))}
             </TableRow>
@@ -62,8 +65,11 @@ export function DataTable<T extends { id: string }>({
             ) : (
               data.map((row) => (
                 <TableRow key={row.id}>
-                  {columns.map((col) => (
-                    <TableCell key={col.header} className={col.className}>
+                  {columns.map((col, i) => (
+                    <TableCell
+                      key={typeof col.header === "string" ? col.header : `col-${i}`}
+                      className={col.className}
+                    >
                       {col.cell
                         ? col.cell(row)
                         : col.accessorKey

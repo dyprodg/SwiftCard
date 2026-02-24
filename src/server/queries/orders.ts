@@ -2,23 +2,41 @@
 
 import { db } from "@/db";
 import { orders } from "@/db/schema/orders";
-import { eq, desc, sql, and, ilike, or } from "drizzle-orm";
+import { orderEvents } from "@/db/schema/order-events";
+import { eq, desc, sql, and, ilike, or, gte, lte } from "drizzle-orm";
 import type {
   OrderWithItems,
   OrderWithItemsAndRefunds,
   OrderWithItemsAndRefundsAndFulfillments,
+  OrderEvent,
 } from "@/types";
 
-type OrderFilters = {
+export type OrderFilters = {
   page?: number;
   pageSize?: number;
   status?: string;
   paymentStatus?: string;
+  fulfillmentStatus?: string;
   search?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  amountMin?: number;
+  amountMax?: number;
 };
 
 export async function getOrders(filters: OrderFilters = {}) {
-  const { page = 1, pageSize = 20, status, paymentStatus, search } = filters;
+  const {
+    page = 1,
+    pageSize = 20,
+    status,
+    paymentStatus,
+    fulfillmentStatus,
+    search,
+    dateFrom,
+    dateTo,
+    amountMin,
+    amountMax,
+  } = filters;
   const offset = (page - 1) * pageSize;
 
   const conditions = [];
@@ -36,6 +54,14 @@ export async function getOrders(filters: OrderFilters = {}) {
       ),
     );
   }
+  if (fulfillmentStatus) {
+    conditions.push(
+      eq(
+        orders.fulfillmentStatus,
+        fulfillmentStatus as (typeof orders.fulfillmentStatus.enumValues)[number],
+      ),
+    );
+  }
   if (search) {
     conditions.push(
       or(
@@ -44,6 +70,21 @@ export async function getOrders(filters: OrderFilters = {}) {
         ilike(orders.shippingName, `%${search}%`),
       ),
     );
+  }
+  if (dateFrom) {
+    conditions.push(gte(orders.createdAt, new Date(dateFrom)));
+  }
+  if (dateTo) {
+    // Include the entire end date by adding a day
+    const endDate = new Date(dateTo);
+    endDate.setDate(endDate.getDate() + 1);
+    conditions.push(lte(orders.createdAt, endDate));
+  }
+  if (amountMin !== undefined && amountMin > 0) {
+    conditions.push(gte(orders.total, amountMin));
+  }
+  if (amountMax !== undefined && amountMax > 0) {
+    conditions.push(lte(orders.total, amountMax));
   }
 
   const where = conditions.length > 0 ? and(...conditions) : undefined;
@@ -106,6 +147,14 @@ export async function getOrderByIdFull(
   });
 
   return order ?? null;
+}
+
+export async function getOrderEvents(orderId: string): Promise<OrderEvent[]> {
+  return db
+    .select()
+    .from(orderEvents)
+    .where(eq(orderEvents.orderId, orderId))
+    .orderBy(desc(orderEvents.createdAt));
 }
 
 export async function getOrdersByCustomer(

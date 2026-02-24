@@ -10,6 +10,7 @@ import { orders, orderItems, orderRefunds, orderRefundItems } from "./orders";
 import { discounts, discountProducts, discountCategories } from "./discounts";
 import { stockReservations } from "./reservations";
 import { fulfillments, fulfillmentItems } from "./fulfillments";
+import { orderEvents } from "./order-events";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -60,6 +61,7 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   refunds: many(orderRefunds),
   fulfillments: many(fulfillments),
   reservations: many(stockReservations),
+  events: many(orderEvents),
   discount: one(discounts, {
     fields: [orders.discountId],
     references: [discounts.id],
@@ -158,5 +160,13 @@ export const fulfillmentItemsRelations = relations(fulfillmentItems, ({ one }) =
   orderItem: one(orderItems, {
     fields: [fulfillmentItems.orderItemId],
     references: [orderItems.id],
+  }),
+}));
+
+// Order event relations
+export const orderEventsRelations = relations(orderEvents, ({ one }) => ({
+  order: one(orders, {
+    fields: [orderEvents.orderId],
+    references: [orders.id],
   }),
 }));

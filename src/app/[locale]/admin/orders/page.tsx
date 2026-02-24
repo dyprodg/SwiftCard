@@ -8,6 +8,11 @@ type Props = {
     status?: string;
     paymentStatus?: string;
     search?: string;
+    fulfillmentStatus?: string;
+    dateFrom?: string;
+    dateTo?: string;
+    amountMin?: string;
+    amountMax?: string;
   }>;
 };
 
@@ -22,6 +27,11 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
     status: params.status,
     paymentStatus: params.paymentStatus,
     search: params.search,
+    fulfillmentStatus: params.fulfillmentStatus,
+    dateFrom: params.dateFrom,
+    dateTo: params.dateTo,
+    amountMin: params.amountMin ? Number(params.amountMin) : undefined,
+    amountMax: params.amountMax ? Number(params.amountMax) : undefined,
   });
 
   return (
@@ -39,6 +49,11 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
         currentStatus={params.status}
         currentPaymentStatus={params.paymentStatus}
         currentSearch={params.search}
+        currentFulfillmentStatus={params.fulfillmentStatus}
+        currentDateFrom={params.dateFrom}
+        currentDateTo={params.dateTo}
+        currentAmountMin={params.amountMin}
+        currentAmountMax={params.amountMax}
       />
     </div>
   );

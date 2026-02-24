@@ -20,6 +20,7 @@ import type {
 } from "@/db/schema/discounts";
 import type { stockReservations } from "@/db/schema/reservations";
 import type { fulfillments, fulfillmentItems } from "@/db/schema/fulfillments";
+import type { orderEvents } from "@/db/schema/order-events";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -73,6 +74,16 @@ export type OrderWithItemsAndRefundsAndFulfillments = Order & {
   items: OrderItem[];
   refunds: OrderRefundWithItems[];
   fulfillments: FulfillmentWithItems[];
+};
+
+// Order event types
+export type OrderEvent = InferSelectModel<typeof orderEvents>;
+
+export type OrderWithAll = Order & {
+  items: OrderItem[];
+  refunds: OrderRefundWithItems[];
+  fulfillments: FulfillmentWithItems[];
+  events: OrderEvent[];
 };
 
 // Discount types

@@ -16,6 +16,7 @@ import {
 } from "@/lib/utils/discount-calculator";
 import { createReservationsInTx } from "@/lib/reservations";
 import { getReservationSettings } from "@/lib/edge-config";
+import { logOrderEvent } from "@/lib/utils/order-events";
 
 export async function POST(req: NextRequest) {
   try {
@@ -353,6 +354,14 @@ export async function POST(req: NextRequest) {
       result.order.guestAccessToken,
       "en",
     );
+    // Log ORDER_CREATED event (fire-and-forget)
+    logOrderEvent({
+      orderId: result.order.id,
+      type: "ORDER_CREATED",
+      data: { orderNumber: result.order.orderNumber },
+      createdBy: "system",
+    }).catch(() => {});
+
     sendOrderCreatedEmail(result.order.customerEmail, {
       orderNumber: result.order.orderNumber,
       items: result.validatedItems.map((item) => ({

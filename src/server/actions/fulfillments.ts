@@ -10,6 +10,7 @@ import { fulfillmentSchema, type FulfillmentInput } from "@/lib/validations/fulf
 import { buildTrackingUrl } from "@/lib/constants/carriers";
 import { computeFulfillmentStatus } from "@/lib/utils/fulfillment-status";
 import { sendShippingNotificationEmail } from "@/lib/resend";
+import { logOrderEventTx } from "@/lib/utils/order-events";
 import type { FulfillmentWithItems } from "@/types";
 
 async function requireAdmin() {
@@ -127,6 +128,38 @@ export async function createFulfillment(input: FulfillmentInput) {
       }
 
       await tx.update(orders).set(updateData).where(eq(orders.id, data.orderId));
+
+      // Log fulfillment events
+      await logOrderEventTx(tx, {
+        orderId: data.orderId,
+        type: "FULFILLMENT_CREATED",
+        data: {
+          fulfillmentId: fulfillment.id,
+          carrier: data.carrier ?? null,
+          trackingNumber: data.trackingNumber?.trim() || null,
+          items: data.items,
+        },
+        createdBy: adminUserId,
+      });
+
+      await logOrderEventTx(tx, {
+        orderId: data.orderId,
+        type: "FULFILLMENT_STATUS_CHANGED",
+        data: {
+          from: order.fulfillmentStatus,
+          to: newFulfillmentStatus,
+        },
+        createdBy: adminUserId,
+      });
+
+      if (updateData.status) {
+        await logOrderEventTx(tx, {
+          orderId: data.orderId,
+          type: "STATUS_CHANGED",
+          data: { from: order.status, to: updateData.status },
+          createdBy: adminUserId,
+        });
+      }
     });
   } catch (err) {
     console.error("Fulfillment DB transaction failed:", err);

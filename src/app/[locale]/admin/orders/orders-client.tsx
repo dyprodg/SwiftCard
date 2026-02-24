@@ -1,10 +1,13 @@
 "use client";
 
+import { useState, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Search } from "lucide-react";
+import { Search, Download, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -18,6 +21,7 @@ import {
   PaymentStatusBadge,
 } from "@/components/admin/order-status-badge";
 import { formatPrice } from "@/lib/utils/format-price";
+import { bulkUpdateOrderStatus } from "@/server/actions/orders";
 import type { Order } from "@/types";
 
 type Props = {
@@ -28,6 +32,11 @@ type Props = {
   currentStatus?: string;
   currentPaymentStatus?: string;
   currentSearch?: string;
+  currentFulfillmentStatus?: string;
+  currentDateFrom?: string;
+  currentDateTo?: string;
+  currentAmountMin?: string;
+  currentAmountMax?: string;
 };
 
 export function OrdersClient({
@@ -38,12 +47,20 @@ export function OrdersClient({
   currentStatus,
   currentPaymentStatus,
   currentSearch,
+  currentFulfillmentStatus,
+  currentDateFrom,
+  currentDateTo,
+  currentAmountMin,
+  currentAmountMax,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const locale = useLocale();
   const t = useTranslations("admin.orders");
+
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkUpdating, setBulkUpdating] = useState(false);
 
   function updateParams(key: string, value: string | undefined) {
     const params = new URLSearchParams(searchParams.toString());
@@ -56,7 +73,62 @@ export function OrdersClient({
     router.push(`${pathname}?${params.toString()}`);
   }
 
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const toggleSelectAll = useCallback(() => {
+    setSelectedIds((prev) => {
+      if (prev.size === orders.length) {
+        return new Set();
+      }
+      return new Set(orders.map((o) => o.id));
+    });
+  }, [orders]);
+
+  async function handleBulkStatus(newStatus: string) {
+    if (selectedIds.size === 0) return;
+    setBulkUpdating(true);
+    await bulkUpdateOrderStatus({
+      orderIds: Array.from(selectedIds),
+      newStatus,
+    });
+    setSelectedIds(new Set());
+    setBulkUpdating(false);
+  }
+
+  function handleExportCSV() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("page");
+    window.open(`/api/admin/orders/export?${params.toString()}`, "_blank");
+  }
+
   const columns: Column<Order>[] = [
+    {
+      header: () => (
+        <Checkbox
+          checked={orders.length > 0 && selectedIds.size === orders.length}
+          onCheckedChange={toggleSelectAll}
+          aria-label="Select all"
+        />
+      ),
+      cell: (row) => (
+        <Checkbox
+          checked={selectedIds.has(row.id)}
+          onCheckedChange={() => toggleSelect(row.id)}
+          aria-label={`Select ${row.orderNumber}`}
+        />
+      ),
+      className: "w-[40px]",
+    },
     {
       header: t("order"),
       cell: (row) => (
@@ -161,7 +233,101 @@ export function OrdersClient({
             <SelectItem value="REFUNDED">{t("paymentStatuses.REFUNDED")}</SelectItem>
           </SelectContent>
         </Select>
+
+        <Select
+          value={currentFulfillmentStatus ?? "all"}
+          onValueChange={(v: string) =>
+            updateParams("fulfillmentStatus", v === "all" ? undefined : v)
+          }
+        >
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder={t("fulfillment")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t("allFulfillments")}</SelectItem>
+            <SelectItem value="UNFULFILLED">Unfulfilled</SelectItem>
+            <SelectItem value="PARTIAL">Partial</SelectItem>
+            <SelectItem value="FULFILLED">Fulfilled</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+
+      {/* Date + Amount filters */}
+      <div className="flex flex-wrap items-center gap-3">
+        <Input
+          type="date"
+          placeholder={t("dateFrom")}
+          defaultValue={currentDateFrom}
+          className="w-[160px]"
+          onChange={(e) => updateParams("dateFrom", e.target.value || undefined)}
+        />
+        <Input
+          type="date"
+          placeholder={t("dateTo")}
+          defaultValue={currentDateTo}
+          className="w-[160px]"
+          onChange={(e) => updateParams("dateTo", e.target.value || undefined)}
+        />
+        <Input
+          type="number"
+          placeholder={t("amountMin")}
+          defaultValue={currentAmountMin}
+          className="w-[120px]"
+          min={0}
+          step={0.01}
+          onChange={(e) => {
+            const val = e.target.value;
+            updateParams(
+              "amountMin",
+              val ? String(Math.round(Number(val) * 100)) : undefined,
+            );
+          }}
+        />
+        <Input
+          type="number"
+          placeholder={t("amountMax")}
+          defaultValue={currentAmountMax}
+          className="w-[120px]"
+          min={0}
+          step={0.01}
+          onChange={(e) => {
+            const val = e.target.value;
+            updateParams(
+              "amountMax",
+              val ? String(Math.round(Number(val) * 100)) : undefined,
+            );
+          }}
+        />
+        <Button variant="outline" size="sm" onClick={handleExportCSV}>
+          <Download className="mr-2 h-4 w-4" />
+          {t("exportCSV")}
+        </Button>
+      </div>
+
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="bg-muted flex items-center gap-3 rounded-md p-3">
+          <span className="text-sm font-medium">
+            {t("selectedCount", { count: selectedIds.size })}
+          </span>
+          <Select onValueChange={handleBulkStatus} disabled={bulkUpdating}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder={t("bulkChangeStatus")} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="CONFIRMED">{t("statuses.CONFIRMED")}</SelectItem>
+              <SelectItem value="PROCESSING">{t("statuses.PROCESSING")}</SelectItem>
+              <SelectItem value="SHIPPED">{t("statuses.SHIPPED")}</SelectItem>
+              <SelectItem value="DELIVERED">{t("statuses.DELIVERED")}</SelectItem>
+              <SelectItem value="CANCELLED">{t("statuses.CANCELLED")}</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())}>
+            <X className="mr-1 h-4 w-4" />
+            {t("clearSelection")}
+          </Button>
+        </div>
+      )}
 
       {/* Table */}
       <DataTable

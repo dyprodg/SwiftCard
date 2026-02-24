@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getOrderByIdFull } from "@/server/queries/orders";
+import { getOrderByIdFull, getOrderEvents } from "@/server/queries/orders";
 import { OrderDetailClient } from "./order-detail-client";
 
 type Props = {
@@ -8,11 +8,11 @@ type Props = {
 
 export default async function AdminOrderDetailPage({ params }: Props) {
   const { id } = await params;
-  const order = await getOrderByIdFull(id);
+  const [order, events] = await Promise.all([getOrderByIdFull(id), getOrderEvents(id)]);
 
   if (!order) {
     notFound();
   }
 
-  return <OrderDetailClient order={order} />;
+  return <OrderDetailClient order={order} events={events} />;
 }

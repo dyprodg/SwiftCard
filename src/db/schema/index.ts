@@ -5,4 +5,5 @@ export * from "./analytics";
 export * from "./discounts";
 export * from "./reservations";
 export * from "./fulfillments";
+export * from "./order-events";
 export * from "./relations";

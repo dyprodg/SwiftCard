@@ -9,6 +9,7 @@ import { handlePaymentSuccess } from "@/server/actions/orders";
 import { sendPaymentFailedEmail } from "@/lib/resend";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
 import { convertReservations, expireReservations } from "@/lib/reservations";
+import { logOrderEvent, logOrderEventTx } from "@/lib/utils/order-events";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -58,6 +59,20 @@ export async function POST(req: NextRequest) {
             break;
           }
 
+          // Log payment + status events
+          await logOrderEvent({
+            orderId,
+            type: "PAYMENT_STATUS_CHANGED",
+            data: { from: "PENDING", to: "PAID" },
+            createdBy: "stripe-webhook",
+          });
+          await logOrderEvent({
+            orderId,
+            type: "STATUS_CHANGED",
+            data: { from: "PENDING", to: "CONFIRMED" },
+            createdBy: "stripe-webhook",
+          });
+
           // Convert reservations to permanent (stock stays decremented)
           await convertReservations(orderId);
 
@@ -100,6 +115,14 @@ export async function POST(req: NextRequest) {
             );
             break;
           }
+
+          // Log payment failure event
+          await logOrderEvent({
+            orderId,
+            type: "PAYMENT_STATUS_CHANGED",
+            data: { from: "PENDING", to: "FAILED" },
+            createdBy: "stripe-webhook",
+          });
 
           // Expire reservations (restores stock)
           await expireReservations(orderId);
@@ -161,6 +184,19 @@ export async function POST(req: NextRequest) {
 
             const newTotalRefunded = currentOrder.totalRefunded + refundAmount;
             const fullyRefunded = newTotalRefunded >= currentOrder.total;
+
+            // Log refund event
+            await logOrderEventTx(tx, {
+              orderId: order.id,
+              type: "REFUND_CREATED",
+              data: {
+                stripeRefundId: stripeRefund.id,
+                amount: refundAmount,
+                currency: order.currency,
+                source: "stripe-dashboard",
+              },
+              createdBy: "stripe-webhook",
+            });
 
             // Create reconciliation refund record
             await tx.insert(orderRefunds).values({

@@ -3,10 +3,11 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, Pencil, Printer } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -25,18 +26,26 @@ import { RefundDialog } from "@/components/admin/refund-dialog";
 import { RefundHistory } from "@/components/admin/refund-history";
 import { FulfillmentDialog } from "@/components/admin/fulfillment-dialog";
 import { FulfillmentHistory } from "@/components/admin/fulfillment-history";
+import { ActivityLog } from "@/components/admin/activity-log";
 import { formatPrice } from "@/lib/utils/format-price";
 import {
   ORDER_STATUS_TRANSITIONS,
   AUTOMATED_TRANSITIONS,
 } from "@/lib/constants/order-status";
-import { updateOrderStatus, addInternalNote } from "@/server/actions/orders";
-import type { OrderWithItemsAndRefundsAndFulfillments } from "@/types";
+import {
+  updateOrderStatus,
+  addInternalNote,
+  editShippingAddress,
+  editCustomerNote,
+} from "@/server/actions/orders";
+import type { OrderWithItemsAndRefundsAndFulfillments, OrderEvent } from "@/types";
 
 export function OrderDetailClient({
   order,
+  events,
 }: {
   order: OrderWithItemsAndRefundsAndFulfillments;
+  events: OrderEvent[];
 }) {
   const locale = useLocale();
   const t = useTranslations("admin.orders");
@@ -47,6 +56,23 @@ export function OrderDetailClient({
   const [error, setError] = useState<string | null>(null);
   const [refundDialogOpen, setRefundDialogOpen] = useState(false);
   const [fulfillmentDialogOpen, setFulfillmentDialogOpen] = useState(false);
+
+  // Editable shipping address state
+  const [editingAddress, setEditingAddress] = useState(false);
+  const [addressForm, setAddressForm] = useState({
+    shippingName: order.shippingName,
+    shippingAddress1: order.shippingAddress1,
+    shippingAddress2: order.shippingAddress2 ?? "",
+    shippingCity: order.shippingCity,
+    shippingZip: order.shippingZip,
+    shippingCountry: order.shippingCountry,
+  });
+  const [savingAddress, setSavingAddress] = useState(false);
+
+  // Editable customer note state
+  const [editingNote, setEditingNote] = useState(false);
+  const [customerNoteForm, setCustomerNoteForm] = useState(order.customerNote ?? "");
+  const [savingNote, setSavingNote] = useState(false);
 
   const allowedTransitions = (ORDER_STATUS_TRANSITIONS[order.status] ?? []).filter(
     (s) => !AUTOMATED_TRANSITIONS.includes(s),
@@ -61,6 +87,8 @@ export function OrderDetailClient({
     order.fulfillmentStatus !== "FULFILLED" &&
     order.status !== "CANCELLED" &&
     order.status !== "REFUNDED";
+
+  const canEdit = order.fulfillmentStatus === "UNFULFILLED";
 
   async function handleStatusChange(newStatus: string) {
     setUpdating(true);
@@ -78,6 +106,41 @@ export function OrderDetailClient({
     await addInternalNote(order.id, noteText.trim());
     setNoteText("");
     setAddingNote(false);
+  }
+
+  async function handleSaveAddress() {
+    setSavingAddress(true);
+    setError(null);
+    const result = await editShippingAddress({
+      orderId: order.id,
+      shippingName: addressForm.shippingName,
+      shippingAddress1: addressForm.shippingAddress1,
+      shippingAddress2: addressForm.shippingAddress2 || null,
+      shippingCity: addressForm.shippingCity,
+      shippingZip: addressForm.shippingZip,
+      shippingCountry: addressForm.shippingCountry,
+    });
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setEditingAddress(false);
+    }
+    setSavingAddress(false);
+  }
+
+  async function handleSaveCustomerNote() {
+    setSavingNote(true);
+    setError(null);
+    const result = await editCustomerNote({
+      orderId: order.id,
+      customerNote: customerNoteForm || null,
+    });
+    if (result.error) {
+      setError(result.error);
+    } else {
+      setEditingNote(false);
+    }
+    setSavingNote(false);
   }
 
   return (
@@ -271,16 +334,100 @@ export function OrderDetailClient({
 
           {/* Shipping Address */}
           <Card className="p-6">
-            <h2 className="mb-4 text-lg font-semibold">{t("shippingAddress")}</h2>
-            <div className="text-sm leading-relaxed">
-              <p>{order.shippingName}</p>
-              <p>{order.shippingAddress1}</p>
-              {order.shippingAddress2 && <p>{order.shippingAddress2}</p>}
-              <p>
-                {order.shippingZip} {order.shippingCity}
-              </p>
-              <p>{order.shippingCountry}</p>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold">{t("shippingAddress")}</h2>
+              {canEdit && !editingAddress && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setEditingAddress(true)}
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              )}
             </div>
+            {editingAddress ? (
+              <div className="space-y-2">
+                <Input
+                  placeholder={td("name")}
+                  value={addressForm.shippingName}
+                  onChange={(e) =>
+                    setAddressForm((f) => ({ ...f, shippingName: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder={td("address1")}
+                  value={addressForm.shippingAddress1}
+                  onChange={(e) =>
+                    setAddressForm((f) => ({ ...f, shippingAddress1: e.target.value }))
+                  }
+                />
+                <Input
+                  placeholder={td("address2")}
+                  value={addressForm.shippingAddress2}
+                  onChange={(e) =>
+                    setAddressForm((f) => ({ ...f, shippingAddress2: e.target.value }))
+                  }
+                />
+                <div className="flex gap-2">
+                  <Input
+                    placeholder={td("zip")}
+                    value={addressForm.shippingZip}
+                    className="w-1/3"
+                    onChange={(e) =>
+                      setAddressForm((f) => ({ ...f, shippingZip: e.target.value }))
+                    }
+                  />
+                  <Input
+                    placeholder={td("city")}
+                    value={addressForm.shippingCity}
+                    className="flex-1"
+                    onChange={(e) =>
+                      setAddressForm((f) => ({ ...f, shippingCity: e.target.value }))
+                    }
+                  />
+                </div>
+                <Input
+                  placeholder={td("country")}
+                  value={addressForm.shippingCountry}
+                  onChange={(e) =>
+                    setAddressForm((f) => ({ ...f, shippingCountry: e.target.value }))
+                  }
+                />
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSaveAddress} disabled={savingAddress}>
+                    {td("save")}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setEditingAddress(false);
+                      setAddressForm({
+                        shippingName: order.shippingName,
+                        shippingAddress1: order.shippingAddress1,
+                        shippingAddress2: order.shippingAddress2 ?? "",
+                        shippingCity: order.shippingCity,
+                        shippingZip: order.shippingZip,
+                        shippingCountry: order.shippingCountry,
+                      });
+                    }}
+                  >
+                    {td("cancel")}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-sm leading-relaxed">
+                <p>{order.shippingName}</p>
+                <p>{order.shippingAddress1}</p>
+                {order.shippingAddress2 && <p>{order.shippingAddress2}</p>}
+                <p>
+                  {order.shippingZip} {order.shippingCity}
+                </p>
+                <p>{order.shippingCountry}</p>
+              </div>
+            )}
           </Card>
 
           {/* Internal Notes */}
@@ -291,10 +438,54 @@ export function OrderDetailClient({
                 {order.internalNote}
               </pre>
             )}
-            {order.customerNote && (
+            {/* Customer Note (editable) */}
+            {(order.customerNote || canEdit) && (
               <div className="mb-4">
-                <p className="text-xs font-medium">{t("customerNote")}:</p>
-                <p className="text-muted-foreground text-xs">{order.customerNote}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-medium">{t("customerNote")}:</p>
+                  {canEdit && !editingNote && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6"
+                      onClick={() => setEditingNote(true)}
+                    >
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                {editingNote ? (
+                  <div className="mt-1 space-y-2">
+                    <Textarea
+                      value={customerNoteForm}
+                      onChange={(e) => setCustomerNoteForm(e.target.value)}
+                      rows={2}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        onClick={handleSaveCustomerNote}
+                        disabled={savingNote}
+                      >
+                        {td("save")}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setEditingNote(false);
+                          setCustomerNoteForm(order.customerNote ?? "");
+                        }}
+                      >
+                        {td("cancel")}
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground text-xs">
+                    {order.customerNote || "-"}
+                  </p>
+                )}
               </div>
             )}
             <div className="space-y-2">
@@ -321,6 +512,9 @@ export function OrderDetailClient({
 
       {/* Refund History */}
       <RefundHistory order={order} />
+
+      {/* Activity Log */}
+      <ActivityLog events={events} />
 
       {/* Fulfillment Dialog */}
       <FulfillmentDialog

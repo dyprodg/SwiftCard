@@ -10,6 +10,7 @@ import { stripe } from "@/lib/stripe/client";
 import { refundSchema, type RefundInput } from "@/lib/validations/refund";
 import { sendRefundNotificationEmail } from "@/lib/resend";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
+import { logOrderEventTx } from "@/lib/utils/order-events";
 
 async function requireAdmin() {
   const { userId, sessionClaims } = await auth();
@@ -202,6 +203,21 @@ export async function processRefund(input: RefundInput) {
           }
         }
       }
+
+      // Log refund event
+      await logOrderEventTx(tx, {
+        orderId: data.orderId,
+        type: "REFUND_CREATED",
+        data: {
+          refundId: refund.id,
+          stripeRefundId: stripeRefund.id,
+          amount: refundAmount,
+          type: data.type,
+          reason: data.reason,
+          fullyRefunded,
+        },
+        createdBy: adminUserId,
+      });
     });
   } catch (err) {
     console.error("Refund DB transaction failed:", err);
