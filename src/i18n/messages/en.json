@@ -730,6 +730,9 @@
     "submitError": "Failed to submit review",
     "selectRating": "Please select a rating",
     "alreadyReviewed": "You have already reviewed this product.",
+    "yourReview": "Your Review",
+    "pendingModeration": "Pending moderation",
+    "rejected": "Rejected",
     "signInToReview": "Sign in to leave a review.",
     "verifiedPurchase": "Verified Purchase",
     "noReviews": "No reviews yet. Be the first to review this product!"

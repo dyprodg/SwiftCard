@@ -24,6 +24,8 @@ export async function ReviewList({ productId }: ReviewListProps) {
     userId ? getUserReview(userId, productId) : null,
   ]);
 
+  const showPendingReview = existingReview && existingReview.status !== "APPROVED";
+
   return (
     <section className="space-y-6">
       <div className="flex items-center justify-between">
@@ -46,8 +48,28 @@ export async function ReviewList({ productId }: ReviewListProps) {
         </div>
       )}
 
-      {userId && existingReview && (
-        <p className="text-muted-foreground text-sm">{t("alreadyReviewed")}</p>
+      {/* Show user's own pending/rejected review */}
+      {showPendingReview && (
+        <div className="rounded-lg border border-dashed p-4">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-sm font-medium">{t("yourReview")}</span>
+            <Badge variant="outline" className="text-xs">
+              {existingReview.status === "PENDING"
+                ? t("pendingModeration")
+                : t("rejected")}
+            </Badge>
+          </div>
+          <div className="mb-2 flex items-center gap-2">
+            <StarRating rating={existingReview.rating} size="sm" />
+          </div>
+          <h4 className="font-medium">{existingReview.title}</h4>
+          {existingReview.body && (
+            <p className="text-muted-foreground mt-1 text-sm">{existingReview.body}</p>
+          )}
+          <p className="text-muted-foreground mt-2 text-xs">
+            {new Date(existingReview.createdAt).toLocaleDateString()}
+          </p>
+        </div>
       )}
 
       {!userId && <p className="text-muted-foreground text-sm">{t("signInToReview")}</p>}
@@ -77,7 +99,9 @@ export async function ReviewList({ productId }: ReviewListProps) {
           ))}
         </div>
       ) : (
-        <p className="text-muted-foreground text-sm">{t("noReviews")}</p>
+        !showPendingReview && (
+          <p className="text-muted-foreground text-sm">{t("noReviews")}</p>
+        )
       )}
     </section>
   );

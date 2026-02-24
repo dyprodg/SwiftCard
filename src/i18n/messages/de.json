@@ -730,6 +730,9 @@
     "submitError": "Fehler beim Senden der Bewertung",
     "selectRating": "Bitte wähle eine Bewertung",
     "alreadyReviewed": "Du hast dieses Produkt bereits bewertet.",
+    "yourReview": "Deine Bewertung",
+    "pendingModeration": "Wird überprüft",
+    "rejected": "Abgelehnt",
     "signInToReview": "Melde dich an, um eine Bewertung abzugeben.",
     "verifiedPurchase": "Verifizierter Kauf",
     "noReviews": "Noch keine Bewertungen. Sei der Erste, der dieses Produkt bewertet!"
