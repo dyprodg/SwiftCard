@@ -27,11 +27,15 @@ export function WishlistButton({
     e.stopPropagation();
 
     startTransition(async () => {
-      const result = await toggleWishlistItem({ productId });
-      if (result.success) {
-        toast.success(result.added ? t("added") : t("removed"));
-      } else {
-        toast.error(result.error ?? t("error"));
+      try {
+        const result = await toggleWishlistItem({ productId });
+        if (result.success) {
+          toast.success(result.added ? t("added") : t("removed"));
+        } else {
+          toast.error(result.error ?? t("error"));
+        }
+      } catch {
+        toast.error(t("error"));
       }
     });
   }

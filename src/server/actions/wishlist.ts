@@ -12,37 +12,47 @@ export async function toggleWishlistItem(input: { productId: string }): Promise<
   added?: boolean;
   error?: string;
 }> {
-  const { userId } = await auth();
-  if (!userId) return { success: false, error: "Sign in to use wishlist" };
+  try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: "Sign in to use wishlist" };
 
-  const { productId } = toggleWishlistSchema.parse(input);
+    const { productId } = toggleWishlistSchema.parse(input);
 
-  const existing = await db.query.wishlists.findFirst({
-    where: and(eq(wishlists.userId, userId), eq(wishlists.productId, productId)),
-  });
+    const existing = await db.query.wishlists.findFirst({
+      where: and(eq(wishlists.userId, userId), eq(wishlists.productId, productId)),
+    });
 
-  if (existing) {
-    await db.delete(wishlists).where(eq(wishlists.id, existing.id));
+    if (existing) {
+      await db.delete(wishlists).where(eq(wishlists.id, existing.id));
+      updateTag(`wishlist:${userId}`);
+      return { success: true, added: false };
+    }
+
+    await db.insert(wishlists).values({ userId, productId });
     updateTag(`wishlist:${userId}`);
-    return { success: true, added: false };
+    return { success: true, added: true };
+  } catch (error) {
+    console.error("toggleWishlistItem error:", error);
+    return { success: false, error: "Failed to update wishlist" };
   }
-
-  await db.insert(wishlists).values({ userId, productId });
-  updateTag(`wishlist:${userId}`);
-  return { success: true, added: true };
 }
 
 export async function removeWishlistItem(productId: string): Promise<{
   success: boolean;
   error?: string;
 }> {
-  const { userId } = await auth();
-  if (!userId) return { success: false, error: "Sign in required" };
+  try {
+    const { userId } = await auth();
+    if (!userId) return { success: false, error: "Sign in required" };
 
-  await db
-    .delete(wishlists)
-    .where(and(eq(wishlists.userId, userId), eq(wishlists.productId, productId)));
+    await db
+      .delete(wishlists)
+      .where(and(eq(wishlists.userId, userId), eq(wishlists.productId, productId)));
 
-  updateTag(`wishlist:${userId}`);
-  return { success: true };
+    updateTag(`wishlist:${userId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("removeWishlistItem error:", error);
+    return { success: false, error: "Failed to update wishlist" };
+  }
 }

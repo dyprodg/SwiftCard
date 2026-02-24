@@ -32,19 +32,23 @@ export const ReviewForm = memo(function ReviewForm({ productId }: ReviewFormProp
     }
 
     startTransition(async () => {
-      const result = await submitReview({
-        productId,
-        rating,
-        title,
-        body: body || undefined,
-      });
-      if (result.success) {
-        toast.success(t("submitted"));
-        setRating(0);
-        setTitle("");
-        setBody("");
-      } else {
-        toast.error(result.error ?? t("submitError"));
+      try {
+        const result = await submitReview({
+          productId,
+          rating,
+          title,
+          body: body || undefined,
+        });
+        if (result.success) {
+          toast.success(t("submitted"));
+          setRating(0);
+          setTitle("");
+          setBody("");
+        } else {
+          toast.error(result.error ?? t("submitError"));
+        }
+      } catch {
+        toast.error(t("submitError"));
       }
     });
   }
