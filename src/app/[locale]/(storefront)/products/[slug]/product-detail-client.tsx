@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useEffect } from "react";
+import { useState, useTransition, useEffect, useCallback, useRef } from "react";
 import { ShoppingCart, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -40,11 +40,19 @@ export function ProductDetailClient({
   const [justAdded, setJustAdded] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
   const setOpen = useCartStore((s) => s.setOpen);
-  const addRecentlyViewed = useRecentlyViewedStore((s) => s.addProduct);
 
+  // Track recently viewed — only once per mount
+  const trackedRef = useRef(false);
   useEffect(() => {
-    addRecentlyViewed(productId);
-  }, [productId, addRecentlyViewed]);
+    if (trackedRef.current) return;
+    trackedRef.current = true;
+    useRecentlyViewedStore.getState().addProduct(productId);
+  }, [productId]);
+
+  // Stable callback for variant selection
+  const handleVariantSelect = useCallback((variant: ProductVariant) => {
+    setSelectedVariant(variant);
+  }, []);
 
   const unitPrice = basePrice + (selectedVariant?.priceAdjustment ?? 0);
   const variantName = selectedVariant
@@ -94,7 +102,7 @@ export function ProductDetailClient({
         <VariantSelector
           variants={variants}
           basePrice={basePrice}
-          onSelect={(variant) => setSelectedVariant(variant)}
+          onSelect={handleVariantSelect}
           discount={discount}
           productId={productId}
         />

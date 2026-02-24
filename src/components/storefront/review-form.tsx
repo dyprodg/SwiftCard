@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useCallback, memo } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -13,12 +13,16 @@ type ReviewFormProps = {
   productId: string;
 };
 
-export function ReviewForm({ productId }: ReviewFormProps) {
+export const ReviewForm = memo(function ReviewForm({ productId }: ReviewFormProps) {
   const t = useTranslations("reviews");
   const [rating, setRating] = useState(0);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [isPending, startTransition] = useTransition();
+
+  const handleRate = useCallback((value: number) => {
+    setRating(value);
+  }, []);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -49,7 +53,7 @@ export function ReviewForm({ productId }: ReviewFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className="mb-1 block text-sm font-medium">{t("yourRating")}</label>
-        <StarRating rating={rating} interactive onRate={setRating} />
+        <StarRating rating={rating} interactive onRate={handleRate} />
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium">{t("titleLabel")}</label>
@@ -76,4 +80,4 @@ export function ReviewForm({ productId }: ReviewFormProps) {
       </Button>
     </form>
   );
-}
+});

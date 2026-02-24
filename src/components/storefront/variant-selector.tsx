@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo, memo } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,7 @@ function applyDiscount(
   }
 }
 
-export function VariantSelector({
+export const VariantSelector = memo(function VariantSelector({
   variants,
   basePrice,
   onSelect,
@@ -40,17 +40,31 @@ export function VariantSelector({
   const t = useTranslations("common");
   const [selectedId, setSelectedId] = useState<string | null>(variants[0]?.id ?? null);
 
-  // Extract unique options
-  const sizes = [...new Set(variants.map((v) => v.size).filter(Boolean))];
-  const colors = [...new Set(variants.map((v) => v.color).filter(Boolean))];
+  // Memoize unique options
+  const sizes = useMemo(
+    () => [...new Set(variants.map((v) => v.size).filter(Boolean))],
+    [variants],
+  );
+  const colors = useMemo(
+    () => [...new Set(variants.map((v) => v.color).filter(Boolean))],
+    [variants],
+  );
 
   const [selectedSize, setSelectedSize] = useState<string | null>(sizes[0] ?? null);
   const [selectedColor, setSelectedColor] = useState<string | null>(colors[0] ?? null);
 
+  // Memoize variant lookup map for O(1) access instead of O(n) per call
+  const variantMap = useMemo(() => {
+    const map = new Map<string, ProductVariant>();
+    for (const v of variants) {
+      const key = `${v.size ?? ""}|${v.color ?? ""}`;
+      map.set(key, v);
+    }
+    return map;
+  }, [variants]);
+
   function findVariant(size: string | null, color: string | null) {
-    return variants.find(
-      (v) => (size === null || v.size === size) && (color === null || v.color === color),
-    );
+    return variantMap.get(`${size ?? ""}|${color ?? ""}`) ?? undefined;
   }
 
   function handleSizeChange(size: string) {
@@ -157,4 +171,4 @@ export function VariantSelector({
       )}
     </div>
   );
-}
+});

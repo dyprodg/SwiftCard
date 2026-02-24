@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
@@ -28,24 +28,36 @@ export function RecentlyViewed({ locale, excludeProductId }: RecentlyViewedProps
   const productIds = useRecentlyViewedStore((s) => s.productIds);
   const [products, setProducts] = useState<RecentProduct[]>([]);
 
-  const filteredIds = excludeProductId
-    ? productIds.filter((id) => id !== excludeProductId)
-    : productIds;
+  // Stable key: join IDs into a string so useEffect only fires when the list actually changes
+  const filteredIds = useMemo(() => {
+    const ids = excludeProductId
+      ? productIds.filter((id) => id !== excludeProductId)
+      : productIds;
+    return ids.slice(0, 6);
+  }, [productIds, excludeProductId]);
 
-  const fetchProducts = useCallback(async (ids: string[]) => {
-    if (ids.length === 0) return [];
-    return fetchRecentlyViewedProducts(ids);
-  }, []);
+  const idsKey = filteredIds.join(",");
+  const fetchedRef = useRef("");
 
   useEffect(() => {
+    if (idsKey === fetchedRef.current) return;
+    fetchedRef.current = idsKey;
+
     let cancelled = false;
-    fetchProducts(filteredIds).then((items) => {
-      if (!cancelled) setProducts(items as RecentProduct[]);
+    const promise =
+      filteredIds.length === 0
+        ? Promise.resolve([] as RecentProduct[])
+        : fetchRecentlyViewedProducts(filteredIds).then(
+            (items) => items as RecentProduct[],
+          );
+
+    promise.then((items) => {
+      if (!cancelled) setProducts(items);
     });
     return () => {
       cancelled = true;
     };
-  }, [filteredIds, fetchProducts]);
+  }, [idsKey, filteredIds]);
 
   if (products.length === 0) return null;
 

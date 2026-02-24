@@ -1,5 +1,6 @@
 "use client";
 
+import { memo, useMemo } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -17,18 +18,21 @@ const sizeMap = {
   lg: "h-6 w-6",
 };
 
-export function StarRating({
+export const StarRating = memo(function StarRating({
   rating,
   maxStars = 5,
   size = "md",
   interactive = false,
   onRate,
 }: StarRatingProps) {
+  const stars = useMemo(() => Array.from({ length: maxStars }, (_, i) => i), [maxStars]);
+  const rounded = Math.round(rating);
+
   return (
     <div className="flex items-center gap-0.5">
-      {Array.from({ length: maxStars }, (_, i) => {
+      {stars.map((i) => {
         const starValue = i + 1;
-        const filled = starValue <= Math.round(rating);
+        const filled = starValue <= rounded;
 
         return (
           <button
@@ -56,4 +60,4 @@ export function StarRating({
       })}
     </div>
   );
-}
+});
