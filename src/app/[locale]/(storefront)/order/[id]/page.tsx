@@ -91,6 +91,7 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
           discountAmount: order.discountAmount,
           discountCode: order.discountCode,
           taxInclusive: order.taxInclusive,
+          shippingMethod: order.shippingMethod,
           shippingName: order.shippingName,
           shippingAddress1: order.shippingAddress1,
           shippingAddress2: order.shippingAddress2,

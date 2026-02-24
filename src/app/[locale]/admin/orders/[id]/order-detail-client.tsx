@@ -207,7 +207,12 @@ export function OrderDetailClient({
               </div>
             )}
             <div className="flex justify-between">
-              <span className="text-muted-foreground">{td("shipping")}</span>
+              <span className="text-muted-foreground">
+                {td("shipping")}
+                {order.shippingMethod && (
+                  <span className="ml-1 text-xs">({order.shippingMethod})</span>
+                )}
+              </span>
               <span>
                 {order.shipping === 0
                   ? td("shippingFree")

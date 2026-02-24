@@ -511,7 +511,8 @@
         "item": "Artikel",
         "variant": "Variante",
         "quantity": "Menge",
-        "customerNote": "Kundennotiz"
+        "customerNote": "Kundennotiz",
+        "shippingMethod": "Versandart"
       },
       "paymentStatuses": {
         "PENDING": "Ausstehend",

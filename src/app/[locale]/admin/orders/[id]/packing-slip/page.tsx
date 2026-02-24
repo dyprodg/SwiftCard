@@ -46,6 +46,16 @@ export default async function PackingSlipPage({ params }: Props) {
         </div>
       </div>
 
+      {/* Shipping Method */}
+      {order.shippingMethod && (
+        <div className="mb-4 rounded border border-gray-200 p-3">
+          <span className="text-xs font-semibold tracking-wide uppercase">
+            {t("shippingMethod")}:{" "}
+          </span>
+          <span className="text-sm font-medium">{order.shippingMethod}</span>
+        </div>
+      )}
+
       {/* Ship To */}
       <div className="mb-8">
         <h2 className="mb-2 text-sm font-semibold tracking-wide uppercase">

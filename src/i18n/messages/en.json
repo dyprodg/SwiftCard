@@ -511,7 +511,8 @@
         "item": "Item",
         "variant": "Variant",
         "quantity": "Qty",
-        "customerNote": "Customer Note"
+        "customerNote": "Customer Note",
+        "shippingMethod": "Shipping Method"
       },
       "paymentStatuses": {
         "PENDING": "Pending",

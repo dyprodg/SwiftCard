@@ -131,7 +131,14 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
               <span>{formatPrice(order.tax)}</span>
             </div>
             <div className="flex justify-between">
-              <span>{t("shipping")}</span>
+              <span>
+                {t("shipping")}
+                {order.shippingMethod && (
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    ({order.shippingMethod})
+                  </span>
+                )}
+              </span>
               <span>
                 {order.shipping === 0 ? t("shippingFree") : formatPrice(order.shipping)}
               </span>

@@ -53,6 +53,7 @@ type OrderData = {
   discountAmount: number;
   discountCode: string | null;
   taxInclusive: boolean;
+  shippingMethod: string | null;
   shippingName: string;
   shippingAddress1: string;
   shippingAddress2: string | null;
@@ -315,7 +316,14 @@ export function OrderViewClient({
               <span>{formatPrice(order.tax, order.currency)}</span>
             </div>
             <div className="flex justify-between">
-              <span>{t.shipping}</span>
+              <span>
+                {t.shipping}
+                {order.shippingMethod && (
+                  <span className="text-muted-foreground ml-1 text-xs">
+                    ({order.shippingMethod})
+                  </span>
+                )}
+              </span>
               <span>
                 {order.shipping === 0
                   ? t.shippingFree
