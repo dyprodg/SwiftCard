@@ -44,16 +44,17 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
   // Authorize: token match OR logged-in user email match
   const { userId } = await auth();
   let authorized = false;
+  let userEmail: string | undefined;
 
   if (token && order.guestAccessToken === token) {
     authorized = true;
-  } else {
-    if (userId) {
-      const user = await currentUser();
-      const email = user?.emailAddresses[0]?.emailAddress;
-      if (email && email === order.customerEmail) {
-        authorized = true;
-      }
+  }
+
+  if (userId) {
+    const user = await currentUser();
+    userEmail = user?.emailAddresses[0]?.emailAddress;
+    if (userEmail && userEmail === order.customerEmail) {
+      authorized = true;
     }
   }
 
@@ -62,10 +63,15 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
   // Check return eligibility for logged-in users
   let returnEligible = false;
   let returnedQuantities: Record<string, number> = {};
-  if (userId && order.customerId === userId) {
-    const eligibility = await canRequestReturn(order.id, authUserId);
+  if (userId) {
+    const eligibility = await canRequestReturn(order.id, {
+      customerId: userId,
+      customerEmail: userEmail,
+    });
     returnEligible = eligibility.eligible;
-    returnedQuantities = await getReturnedQuantities(order.id);
+    if (returnEligible) {
+      returnedQuantities = await getReturnedQuantities(order.id);
+    }
   }
 
   return (

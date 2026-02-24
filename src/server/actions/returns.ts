@@ -51,10 +51,18 @@ export async function requestReturn(input: CreateReturnInput) {
   const { userId } = await auth();
   if (!userId) return { error: "Unauthorized" };
 
+  // Get user email for ownership check
+  const { currentUser } = await import("@clerk/nextjs/server");
+  const user = await currentUser();
+  const userEmail = user?.emailAddresses[0]?.emailAddress;
+
   const data = createReturnSchema.parse(input);
 
   // Check eligibility
-  const eligibility = await canRequestReturn(data.orderId, userId);
+  const eligibility = await canRequestReturn(data.orderId, {
+    customerId: userId,
+    customerEmail: userEmail,
+  });
   if (!eligibility.eligible) {
     return { error: eligibility.reason };
   }

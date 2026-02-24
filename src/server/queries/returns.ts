@@ -81,13 +81,14 @@ export async function getReturnStats() {
  */
 export async function canRequestReturn(
   orderId: string,
-  customerId: string,
+  opts: { customerId?: string; customerEmail?: string },
 ): Promise<{ eligible: true } | { eligible: false; reason: string }> {
   const order = await db.query.orders.findFirst({
     where: eq(orders.id, orderId),
     columns: {
       id: true,
       customerId: true,
+      customerEmail: true,
       status: true,
       paymentStatus: true,
       deliveredAt: true,
@@ -99,7 +100,10 @@ export async function canRequestReturn(
     return { eligible: false, reason: "ORDER_NOT_FOUND" };
   }
 
-  if (order.customerId !== customerId) {
+  // Ownership check: match by customerId OR by email
+  const ownerById = opts.customerId && order.customerId === opts.customerId;
+  const ownerByEmail = opts.customerEmail && order.customerEmail === opts.customerEmail;
+  if (!ownerById && !ownerByEmail) {
     return { eligible: false, reason: "NOT_YOUR_ORDER" };
   }
 
