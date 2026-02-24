@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { db } from "@/db";
 import { orders } from "@/db/schema";
 import { sql, desc } from "drizzle-orm";
@@ -137,7 +138,14 @@ export default async function CustomersPage() {
               ) : (
                 customers.map((c) => (
                   <TableRow key={c.email}>
-                    <TableCell className="font-medium">{c.email}</TableCell>
+                    <TableCell>
+                      <Link
+                        href={`/${locale}/admin/customers/${encodeURIComponent(c.email)}`}
+                        className="text-primary font-medium hover:underline"
+                      >
+                        {c.email}
+                      </Link>
+                    </TableCell>
                     <TableCell className="text-muted-foreground">
                       {c.name || "\u2014"}
                     </TableCell>

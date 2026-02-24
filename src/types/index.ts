@@ -26,6 +26,7 @@ import type {
   productReviews,
   stockNotifications,
 } from "@/db/schema/customer-features";
+import type { customerAddresses, abandonedCarts } from "@/db/schema/customer-profiles";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -126,6 +127,11 @@ export type ReviewRatingStats = {
   totalReviews: number;
   distribution: Record<number, number>; // 1-5 -> count
 };
+
+// Customer profile types
+export type CustomerAddress = InferSelectModel<typeof customerAddresses>;
+export type NewCustomerAddress = InferInsertModel<typeof customerAddresses>;
+export type AbandonedCart = InferSelectModel<typeof abandonedCarts>;
 
 // Cart types
 export type CartItem = {

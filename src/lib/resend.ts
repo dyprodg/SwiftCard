@@ -131,6 +131,46 @@ export async function sendBackInStockEmail(
   });
 }
 
+export async function sendAbandonedCartEmail(
+  to: string,
+  data: {
+    items: { productName: string; quantity: number; unitPrice: number }[];
+    subtotal: number;
+    currency: string;
+    recoveryUrl: string;
+  },
+) {
+  const { AbandonedCartEmail } = await import("@/emails/abandoned-cart");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: "You left items in your cart!",
+    react: AbandonedCartEmail(data),
+  });
+}
+
+export async function sendDisputeNotificationEmail(
+  to: string,
+  data: {
+    orderNumber: string;
+    disputeAmount: number;
+    currency: string;
+    reason: string;
+    customerEmail: string;
+    adminUrl: string;
+  },
+) {
+  const { DisputeNotificationEmail } = await import("@/emails/dispute-notification");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `Payment Dispute - ${data.orderNumber}`,
+    react: DisputeNotificationEmail(data),
+  });
+}
+
 export async function sendRefundNotificationEmail(
   to: string,
   data: {

@@ -426,6 +426,9 @@ export function OrderDetailClient({
                   {order.shippingZip} {order.shippingCity}
                 </p>
                 <p>{order.shippingCountry}</p>
+                {order.phone && (
+                  <p className="text-muted-foreground mt-1">{order.phone}</p>
+                )}
               </div>
             )}
           </Card>

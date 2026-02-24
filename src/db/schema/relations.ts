@@ -12,6 +12,7 @@ import { stockReservations } from "./reservations";
 import { fulfillments, fulfillmentItems } from "./fulfillments";
 import { orderEvents } from "./order-events";
 import { wishlists, productReviews, stockNotifications } from "./customer-features";
+import { customerAddresses } from "./customer-profiles";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -203,3 +204,6 @@ export const stockNotificationsRelations = relations(stockNotifications, ({ one 
     references: [productVariants.id],
   }),
 }));
+
+// Customer address relations (no FK — userId is Clerk ID, not a DB column)
+export const customerAddressesRelations = relations(customerAddresses, () => ({}));

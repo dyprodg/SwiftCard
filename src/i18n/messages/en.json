@@ -89,7 +89,8 @@
       "address2": "Apartment, suite, etc. (optional)",
       "city": "City",
       "zip": "ZIP Code",
-      "country": "Country"
+      "country": "Country",
+      "phone": "Phone (optional)"
     },
     "payment": {
       "title": "Payment"
@@ -99,6 +100,9 @@
     },
     "email": "Email",
     "note": "Order note (optional)",
+    "saveAddress": "Save this address for next time",
+    "savedAddresses": "Saved Addresses",
+    "selectAddress": "Select a saved address...",
     "placeOrder": "Place Order",
     "processing": "Processing...",
     "success": {
@@ -132,6 +136,51 @@
     "applied": "Coupon applied",
     "invalidCode": "Invalid or expired coupon code",
     "removed": "Coupon removed"
+  },
+  "account": {
+    "title": "My Account",
+    "nav": {
+      "overview": "Overview",
+      "myOrders": "Orders",
+      "addresses": "Addresses",
+      "data": "Your Data"
+    },
+    "welcome": "Welcome, {name}",
+    "recentOrders": "Recent Orders",
+    "viewAll": "View All",
+    "noOrders": "No orders yet",
+    "defaultAddress": "Default Address",
+    "manageAddresses": "Manage",
+    "noAddresses": "No saved addresses yet",
+    "addAddress": "Add Address",
+    "addresses": "Addresses",
+    "addressBook": {
+      "empty": "No saved addresses yet. Add one to speed up checkout.",
+      "add": "Add Address",
+      "edit": "Edit",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "default": "Default",
+      "setDefault": "Set Default",
+      "deleteConfirmTitle": "Delete Address",
+      "deleteConfirmDescription": "Are you sure you want to delete this address? This action cannot be undone."
+    },
+    "addressForm": {
+      "label": "Label",
+      "labelPlaceholder": "e.g. Home, Work",
+      "name": "Full Name",
+      "company": "Company (optional)",
+      "phone": "Phone (optional)",
+      "address1": "Address",
+      "address2": "Address Line 2 (optional)",
+      "city": "City",
+      "zip": "ZIP Code",
+      "country": "Country",
+      "setAsDefault": "Set as default address",
+      "save": "Save",
+      "saving": "Saving...",
+      "cancel": "Cancel"
+    }
   },
   "orders": {
     "title": "My Orders",
@@ -201,6 +250,7 @@
       "reviews": "Reviews",
       "analytics": "Analytics",
       "settings": "Settings",
+      "abandonedCarts": "Abandoned Carts",
       "viewStorefront": "View Storefront",
       "adminTitle": "SwiftCard Admin"
     },
@@ -355,7 +405,9 @@
         "refundCreated": "Refund processed",
         "shippingAddressEdited": "Shipping address updated",
         "customerNoteEdited": "Customer note updated",
-        "internalNoteAdded": "Internal note added"
+        "internalNoteAdded": "Internal note added",
+        "disputeOpened": "Payment dispute opened — {reason}",
+        "disputeClosed": "Payment dispute closed — {status}"
       },
       "statuses": {
         "PENDING": "Pending",
@@ -538,6 +590,50 @@
       "noCustomers": "No customers yet",
       "account": "Account",
       "guest": "Guest"
+    },
+    "customerDetail": {
+      "back": "Back to Customers",
+      "account": "Account",
+      "guest": "Guest",
+      "lifetimeValue": "Lifetime Value",
+      "totalOrders": "Total Orders",
+      "avgOrderValue": "Avg. Order Value",
+      "totalRefunded": "Total Refunded",
+      "contactInfo": "Contact Information",
+      "emailLabel": "Email",
+      "nameLabel": "Name",
+      "memberSince": "Member since",
+      "firstOrder": "First order",
+      "addresses": "Saved Addresses",
+      "noAddresses": "No saved addresses",
+      "default": "Default",
+      "orderHistory": "Order History",
+      "orderNumber": "Order",
+      "status": "Status",
+      "payment": "Payment",
+      "total": "Total",
+      "date": "Date",
+      "reviews": "Reviews",
+      "wishlist": "Wishlist"
+    },
+    "abandonedCarts": {
+      "title": "Abandoned Carts",
+      "description": "Carts abandoned during checkout. Recovery emails are sent automatically.",
+      "totalAbandoned": "Total Abandoned",
+      "recovered": "Recovered",
+      "emailsSent": "Emails Sent",
+      "lostRevenue": "Lost Revenue",
+      "email": "Email",
+      "items": "Items",
+      "subtotal": "Subtotal",
+      "abandonedAt": "Abandoned At",
+      "status": "Status",
+      "noEmail": "No email",
+      "itemCount": "items",
+      "statusRecovered": "Recovered",
+      "statusEmailSent": "Email Sent",
+      "statusPending": "Pending",
+      "empty": "No abandoned carts"
     },
     "reservations": {
       "title": "Stock Reservations",

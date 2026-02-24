@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
@@ -23,11 +25,29 @@ export function CartPageClient() {
   const t = useTranslations("cart");
   const tc = useTranslations("common");
   const locale = useLocale();
+  const searchParams = useSearchParams();
   const items = useCartStore((s) => s.items);
+  const setItems = useCartStore((s) => s.setItems);
   const totalItems = useCartStore(selectTotalItems);
   const subtotal = useCartStore(selectSubtotal);
   const appliedDiscount = useCartStore((s) => s.appliedDiscount);
   const discountAmount = useCartStore(selectDiscountAmount);
+
+  // Restore cart from abandoned cart recovery link
+  useEffect(() => {
+    const restore = searchParams.get("restore");
+    if (!restore) return;
+    try {
+      const restored = JSON.parse(Buffer.from(restore, "base64url").toString("utf-8"));
+      if (Array.isArray(restored) && restored.length > 0) {
+        setItems(restored);
+      }
+    } catch {
+      // Invalid restore data — ignore
+    }
+    // Clean up URL
+    window.history.replaceState({}, "", `/${locale}/cart`);
+  }, [searchParams, locale, setItems]);
   const updateQuantity = useCartStore((s) => s.updateQuantity);
   const removeItem = useCartStore((s) => s.removeItem);
 

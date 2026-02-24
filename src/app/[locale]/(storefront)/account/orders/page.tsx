@@ -44,8 +44,8 @@ export default async function CustomerOrdersPage() {
   const result = await getOrdersByCustomer(email);
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold">{t("title")}</h1>
+    <div>
+      <h2 className="mb-4 text-lg font-semibold">{t("title")}</h2>
 
       {result.orders.length === 0 ? (
         <Card className="flex flex-col items-center justify-center p-12 text-center">

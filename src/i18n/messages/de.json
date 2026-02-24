@@ -89,7 +89,8 @@
       "address2": "Wohnung, Suite, etc. (optional)",
       "city": "Stadt",
       "zip": "PLZ",
-      "country": "Land"
+      "country": "Land",
+      "phone": "Telefon (optional)"
     },
     "payment": {
       "title": "Zahlung"
@@ -99,6 +100,9 @@
     },
     "email": "E-Mail",
     "note": "Bestellnotiz (optional)",
+    "saveAddress": "Diese Adresse für das nächste Mal speichern",
+    "savedAddresses": "Gespeicherte Adressen",
+    "selectAddress": "Gespeicherte Adresse wählen...",
     "placeOrder": "Bestellung aufgeben",
     "processing": "Wird verarbeitet...",
     "success": {
@@ -132,6 +136,51 @@
     "applied": "Gutschein eingelöst",
     "invalidCode": "Ungültiger oder abgelaufener Gutscheincode",
     "removed": "Gutschein entfernt"
+  },
+  "account": {
+    "title": "Mein Konto",
+    "nav": {
+      "overview": "Übersicht",
+      "myOrders": "Bestellungen",
+      "addresses": "Adressen",
+      "data": "Deine Daten"
+    },
+    "welcome": "Willkommen, {name}",
+    "recentOrders": "Letzte Bestellungen",
+    "viewAll": "Alle anzeigen",
+    "noOrders": "Noch keine Bestellungen",
+    "defaultAddress": "Standardadresse",
+    "manageAddresses": "Verwalten",
+    "noAddresses": "Noch keine gespeicherten Adressen",
+    "addAddress": "Adresse hinzufügen",
+    "addresses": "Adressen",
+    "addressBook": {
+      "empty": "Noch keine gespeicherten Adressen. Füge eine hinzu, um den Checkout zu beschleunigen.",
+      "add": "Adresse hinzufügen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "cancel": "Abbrechen",
+      "default": "Standard",
+      "setDefault": "Als Standard",
+      "deleteConfirmTitle": "Adresse löschen",
+      "deleteConfirmDescription": "Bist du sicher, dass du diese Adresse löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden."
+    },
+    "addressForm": {
+      "label": "Bezeichnung",
+      "labelPlaceholder": "z.B. Zuhause, Büro",
+      "name": "Vollständiger Name",
+      "company": "Firma (optional)",
+      "phone": "Telefon (optional)",
+      "address1": "Adresse",
+      "address2": "Adresszeile 2 (optional)",
+      "city": "Stadt",
+      "zip": "PLZ",
+      "country": "Land",
+      "setAsDefault": "Als Standardadresse festlegen",
+      "save": "Speichern",
+      "saving": "Wird gespeichert...",
+      "cancel": "Abbrechen"
+    }
   },
   "orders": {
     "title": "Meine Bestellungen",
@@ -201,6 +250,7 @@
       "reviews": "Bewertungen",
       "analytics": "Analysen",
       "settings": "Einstellungen",
+      "abandonedCarts": "Verlassene Warenkörbe",
       "viewStorefront": "Zum Shop",
       "adminTitle": "SwiftCard Admin"
     },
@@ -355,7 +405,9 @@
         "refundCreated": "Erstattung verarbeitet",
         "shippingAddressEdited": "Lieferadresse aktualisiert",
         "customerNoteEdited": "Kundennotiz aktualisiert",
-        "internalNoteAdded": "Interne Notiz hinzugefügt"
+        "internalNoteAdded": "Interne Notiz hinzugefügt",
+        "disputeOpened": "Zahlungsstreit eröffnet — {reason}",
+        "disputeClosed": "Zahlungsstreit geschlossen — {status}"
       },
       "statuses": {
         "PENDING": "Ausstehend",
@@ -538,6 +590,50 @@
       "noCustomers": "Noch keine Kunden",
       "account": "Konto",
       "guest": "Gast"
+    },
+    "customerDetail": {
+      "back": "Zurück zu Kunden",
+      "account": "Konto",
+      "guest": "Gast",
+      "lifetimeValue": "Lebenszeitwert",
+      "totalOrders": "Bestellungen",
+      "avgOrderValue": "Ø Bestellwert",
+      "totalRefunded": "Erstattungen",
+      "contactInfo": "Kontaktdaten",
+      "emailLabel": "E-Mail",
+      "nameLabel": "Name",
+      "memberSince": "Mitglied seit",
+      "firstOrder": "Erste Bestellung",
+      "addresses": "Gespeicherte Adressen",
+      "noAddresses": "Keine gespeicherten Adressen",
+      "default": "Standard",
+      "orderHistory": "Bestellverlauf",
+      "orderNumber": "Bestellung",
+      "status": "Status",
+      "payment": "Zahlung",
+      "total": "Gesamt",
+      "date": "Datum",
+      "reviews": "Bewertungen",
+      "wishlist": "Wunschliste"
+    },
+    "abandonedCarts": {
+      "title": "Verlassene Warenkörbe",
+      "description": "Warenkörbe, die während des Checkouts verlassen wurden. Wiederherstellungs-E-Mails werden automatisch versendet.",
+      "totalAbandoned": "Gesamt verlassen",
+      "recovered": "Wiederhergestellt",
+      "emailsSent": "E-Mails gesendet",
+      "lostRevenue": "Verlorener Umsatz",
+      "email": "E-Mail",
+      "items": "Artikel",
+      "subtotal": "Zwischensumme",
+      "abandonedAt": "Verlassen am",
+      "status": "Status",
+      "noEmail": "Keine E-Mail",
+      "itemCount": "Artikel",
+      "statusRecovered": "Wiederhergestellt",
+      "statusEmailSent": "E-Mail gesendet",
+      "statusPending": "Ausstehend",
+      "empty": "Keine verlassenen Warenkörbe"
     },
     "reservations": {
       "title": "Lagerreservierungen",

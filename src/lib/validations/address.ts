@@ -1,38 +1,31 @@
 import { z } from "zod";
 
-export const shippingAddressSchema = z.object({
+export const addressSchema = z.object({
+  label: z.string().trim().min(1, "Label is required").max(50),
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
   phone: z.string().trim().max(30).optional().default(""),
+  company: z.string().trim().max(100).optional().default(""),
   address1: z.string().trim().min(3, "Address is required").max(200),
   address2: z.string().max(200).optional().default(""),
   city: z.string().trim().min(1, "City is required").max(100),
   zip: z.string().trim().min(3, "ZIP code is required").max(20),
   country: z.string().min(2, "Country is required").max(2),
+  isDefault: z.boolean().optional().default(false),
 });
 
-export const checkoutSchema = z.object({
-  shippingAddress: shippingAddressSchema,
-  customerEmail: z.string().email("Invalid email address"),
-  customerNote: z.string().max(500).optional().default(""),
-  couponCode: z.string().trim().max(50).optional(),
-  saveAddress: z.boolean().optional().default(false),
-});
+export type AddressInput = z.infer<typeof addressSchema>;
 
-export type ShippingAddress = z.infer<typeof shippingAddressSchema>;
-export type CheckoutInput = z.infer<typeof checkoutSchema>;
-
-// Form schema for React Hook Form (no defaults, all fields explicit)
-export const checkoutFormSchema = z.object({
+export const addressFormSchema = z.object({
+  label: z.string().trim().min(1, "Label is required").max(50),
   name: z.string().trim().min(2, "Name must be at least 2 characters").max(100),
-  email: z.string().email("Invalid email address"),
   phone: z.string().trim().max(30).optional(),
+  company: z.string().trim().max(100).optional(),
   address1: z.string().trim().min(3, "Address is required").max(200),
   address2: z.string().max(200).optional(),
   city: z.string().trim().min(1, "City is required").max(100),
   zip: z.string().trim().min(3, "ZIP code is required").max(20),
   country: z.string().min(2, "Country is required").max(2),
-  customerNote: z.string().max(500).optional(),
-  saveAddress: z.boolean().optional(),
+  isDefault: z.boolean().optional(),
 });
 
-export type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
+export type AddressFormValues = z.infer<typeof addressFormSchema>;

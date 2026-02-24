@@ -11,6 +11,8 @@ import {
   StickyNote,
   ShoppingCart,
   Activity,
+  AlertTriangle,
+  CheckCircle,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { OrderEvent } from "@/types";
@@ -25,6 +27,8 @@ const EVENT_ICONS: Record<string, typeof Activity> = {
   SHIPPING_ADDRESS_EDITED: MapPin,
   CUSTOMER_NOTE_EDITED: MessageSquare,
   INTERNAL_NOTE_ADDED: StickyNote,
+  DISPUTE_OPENED: AlertTriangle,
+  DISPUTE_CLOSED: CheckCircle,
 };
 
 function ActorDisplay({ createdBy }: { createdBy: string | null }) {
@@ -140,6 +144,10 @@ function EventDescription({
       return <>{t("customerNoteEdited")}</>;
     case "INTERNAL_NOTE_ADDED":
       return <>{t("internalNoteAdded")}</>;
+    case "DISPUTE_OPENED":
+      return <>{t("disputeOpened", { reason: String(data.reason ?? "unknown") })}</>;
+    case "DISPUTE_CLOSED":
+      return <>{t("disputeClosed", { status: String(data.status ?? "unknown") })}</>;
     default:
       return <>{type}</>;
   }

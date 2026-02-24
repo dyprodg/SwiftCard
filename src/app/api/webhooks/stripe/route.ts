@@ -10,6 +10,8 @@ import { sendPaymentFailedEmail } from "@/lib/resend";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
 import { convertReservations, expireReservations } from "@/lib/reservations";
 import { logOrderEvent, logOrderEventTx } from "@/lib/utils/order-events";
+import { sendDisputeNotificationEmail } from "@/lib/resend";
+import { markCartRecovered } from "@/server/actions/abandoned-carts";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -76,9 +78,14 @@ export async function POST(req: NextRequest) {
           // Convert reservations to permanent (stock stays decremented)
           await convertReservations(orderId);
 
-          // Clear the cart
+          // Clear the cart + mark abandoned cart as recovered
           if (cartId) {
             await deleteCart(cartId).catch(() => {});
+            // cartId format: "guest:SESSION_ID" — extract session
+            const sessionIdFromCart = cartId.startsWith("guest:")
+              ? cartId.slice(6)
+              : cartId;
+            await markCartRecovered(sessionIdFromCart).catch(() => {});
           }
 
           // Send order confirmation email
@@ -224,6 +231,127 @@ export async function POST(req: NextRequest) {
             await tx.update(orders).set(updateData).where(eq(orders.id, order.id));
           });
         }
+
+        break;
+      }
+
+      case "payment_intent.canceled": {
+        const paymentIntent = event.data.object as Stripe.PaymentIntent;
+        const orderId = paymentIntent.metadata.orderId;
+
+        if (orderId) {
+          const [updated] = await db
+            .update(orders)
+            .set({
+              status: "CANCELLED",
+              paymentStatus: "FAILED",
+              cancelledAt: new Date(),
+            })
+            .where(
+              and(
+                eq(orders.id, orderId),
+                eq(orders.stripePaymentIntentId, paymentIntent.id),
+              ),
+            )
+            .returning();
+
+          if (updated) {
+            await logOrderEvent({
+              orderId,
+              type: "STATUS_CHANGED",
+              data: { from: updated.status, to: "CANCELLED", reason: "payment_canceled" },
+              createdBy: "stripe-webhook",
+            });
+
+            // Expire reservations (restores stock)
+            await expireReservations(orderId);
+          }
+        }
+
+        break;
+      }
+
+      case "charge.dispute.created": {
+        const dispute = event.data.object as Stripe.Dispute;
+        const chargeId =
+          typeof dispute.charge === "string" ? dispute.charge : dispute.charge?.id;
+
+        if (!chargeId) break;
+
+        // Find order via PaymentIntent
+        const piId =
+          typeof dispute.payment_intent === "string"
+            ? dispute.payment_intent
+            : dispute.payment_intent?.id;
+
+        if (!piId) break;
+
+        const [order] = await db
+          .select()
+          .from(orders)
+          .where(eq(orders.stripePaymentIntentId, piId));
+
+        if (!order) {
+          console.warn(`Webhook charge.dispute.created: no order for PI ${piId}`);
+          break;
+        }
+
+        // Log dispute event
+        await logOrderEvent({
+          orderId: order.id,
+          type: "DISPUTE_OPENED",
+          data: {
+            disputeId: dispute.id,
+            amount: dispute.amount,
+            reason: dispute.reason,
+            status: dispute.status,
+          },
+          createdBy: "stripe-webhook",
+        });
+
+        // Send admin notification email
+        const contactEmail = process.env.ADMIN_EMAIL || process.env.RESEND_TEST_EMAIL;
+        if (contactEmail) {
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+          sendDisputeNotificationEmail(contactEmail, {
+            orderNumber: order.orderNumber,
+            disputeAmount: dispute.amount,
+            currency: order.currency,
+            reason: dispute.reason,
+            customerEmail: order.customerEmail,
+            adminUrl: `${appUrl}/en/admin/orders/${order.id}`,
+          }).catch((err) => console.error("Failed to send dispute email:", err));
+        }
+
+        break;
+      }
+
+      case "charge.dispute.closed": {
+        const dispute = event.data.object as Stripe.Dispute;
+        const piId =
+          typeof dispute.payment_intent === "string"
+            ? dispute.payment_intent
+            : dispute.payment_intent?.id;
+
+        if (!piId) break;
+
+        const [order] = await db
+          .select()
+          .from(orders)
+          .where(eq(orders.stripePaymentIntentId, piId));
+
+        if (!order) break;
+
+        await logOrderEvent({
+          orderId: order.id,
+          type: "DISPUTE_CLOSED",
+          data: {
+            disputeId: dispute.id,
+            status: dispute.status, // "won", "lost", "warning_closed"
+            reason: dispute.reason,
+          },
+          createdBy: "stripe-webhook",
+        });
 
         break;
       }

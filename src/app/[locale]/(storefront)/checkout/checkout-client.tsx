@@ -40,10 +40,23 @@ import { getItemDiscount } from "@/lib/utils/item-discount";
 import { checkoutFormSchema, type CheckoutFormValues } from "@/lib/validations/checkout";
 import { SHIPPING_COUNTRIES } from "@/lib/constants/countries";
 import { CouponInput } from "@/components/storefront/coupon-input";
+import { AddressSelector } from "@/components/storefront/address-selector";
+import { Checkbox } from "@/components/ui/checkbox";
+import type { CustomerAddress } from "@/types";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-export function CheckoutClient() {
+type CheckoutClientProps = {
+  savedAddresses?: CustomerAddress[];
+  userEmail?: string | null;
+  isLoggedIn?: boolean;
+};
+
+export function CheckoutClient({
+  savedAddresses = [],
+  userEmail = null,
+  isLoggedIn = false,
+}: CheckoutClientProps) {
   const t = useTranslations("checkout");
   const tCart = useTranslations("cart");
   const tc = useTranslations("common");
@@ -61,17 +74,22 @@ export function CheckoutClient() {
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Find default saved address for auto-fill
+  const defaultAddr = savedAddresses.find((a) => a.isDefault) ?? savedAddresses[0];
+
   const form = useForm<CheckoutFormValues>({
     resolver: zodResolver(checkoutFormSchema),
     defaultValues: {
-      name: "",
-      email: "",
-      address1: "",
-      address2: "",
-      city: "",
-      zip: "",
-      country: "CH",
+      name: defaultAddr?.name ?? "",
+      email: userEmail ?? "",
+      phone: defaultAddr?.phone ?? "",
+      address1: defaultAddr?.address1 ?? "",
+      address2: defaultAddr?.address2 ?? "",
+      city: defaultAddr?.city ?? "",
+      zip: defaultAddr?.zip ?? "",
+      country: defaultAddr?.country ?? "CH",
       customerNote: "",
+      saveAddress: false,
     },
   });
 
@@ -97,6 +115,7 @@ export function CheckoutClient() {
         body: JSON.stringify({
           shippingAddress: {
             name: values.name,
+            phone: values.phone || "",
             address1: values.address1,
             address2: values.address2 || "",
             city: values.city,
@@ -105,6 +124,7 @@ export function CheckoutClient() {
           },
           customerEmail: values.email,
           customerNote: values.customerNote || "",
+          saveAddress: values.saveAddress ?? false,
           ...(couponCode && { couponCode }),
         }),
       });
@@ -159,6 +179,22 @@ export function CheckoutClient() {
                 <CardTitle>{t("shipping.title")}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
+                {/* Saved address selector for logged-in users */}
+                {savedAddresses.length > 0 && (
+                  <AddressSelector
+                    addresses={savedAddresses}
+                    onSelect={(addr) => {
+                      form.setValue("name", addr.name);
+                      form.setValue("phone", addr.phone ?? "");
+                      form.setValue("address1", addr.address1);
+                      form.setValue("address2", addr.address2 ?? "");
+                      form.setValue("city", addr.city);
+                      form.setValue("zip", addr.zip);
+                      form.setValue("country", addr.country);
+                    }}
+                  />
+                )}
+
                 <FormField
                   control={form.control}
                   name="name"
@@ -181,6 +217,20 @@ export function CheckoutClient() {
                       <FormLabel>{t("email")}</FormLabel>
                       <FormControl>
                         <Input type="email" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("shipping.phone")}</FormLabel>
+                      <FormControl>
+                        <Input type="tel" placeholder="+41 79 123 45 67" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -269,6 +319,25 @@ export function CheckoutClient() {
                     </FormItem>
                   )}
                 />
+
+                {/* Save address checkbox for logged-in users */}
+                {isLoggedIn && (
+                  <FormField
+                    control={form.control}
+                    name="saveAddress"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center gap-2 space-y-0">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="font-normal">{t("saveAddress")}</FormLabel>
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <FormField
                   control={form.control}

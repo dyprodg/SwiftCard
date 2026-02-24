@@ -17,6 +17,12 @@ import {
 import { createReservationsInTx } from "@/lib/reservations";
 import { getReservationSettings } from "@/lib/edge-config";
 import { logOrderEvent } from "@/lib/utils/order-events";
+import {
+  snapshotAbandonedCart,
+  markCartRecovered,
+} from "@/server/actions/abandoned-carts";
+import { saveAddressFromCheckout } from "@/server/actions/addresses";
+import { auth } from "@clerk/nextjs/server";
 
 export async function POST(req: NextRequest) {
   try {
@@ -54,7 +60,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { shippingAddress, customerEmail, customerNote, couponCode } = validation.data;
+    const { shippingAddress, customerEmail, customerNote, couponCode, saveAddress } =
+      validation.data;
 
     // Get cart via cookie (works for both guests and logged-in users)
     // API routes are excluded from Clerk middleware, so we use the cart_session cookie
@@ -279,6 +286,7 @@ export async function POST(req: NextRequest) {
           currency,
           customerId: null, // Guest checkout — linked by email
           customerEmail,
+          phone: shippingAddress.phone || null,
           shippingName: shippingAddress.name,
           shippingAddress1: shippingAddress.address1,
           shippingAddress2: shippingAddress.address2 || null,
@@ -347,6 +355,28 @@ export async function POST(req: NextRequest) {
       .update(orders)
       .set({ stripePaymentIntentId: paymentIntent.id })
       .where(eq(orders.id, result.order.id));
+
+    // Snapshot abandoned cart (in case payment is never completed)
+    snapshotAbandonedCart({
+      sessionId: sessionId!,
+      userId: null, // Will be set client-side if available
+      email: customerEmail,
+      items: cartItems,
+      subtotal: result.order.subtotal,
+    }).catch(() => {});
+
+    // Save address for logged-in users if they opted in
+    if (saveAddress) {
+      saveAddressFromCheckout({
+        name: shippingAddress.name,
+        phone: shippingAddress.phone,
+        address1: shippingAddress.address1,
+        address2: shippingAddress.address2,
+        city: shippingAddress.city,
+        zip: shippingAddress.zip,
+        country: shippingAddress.country,
+      }).catch(() => {});
+    }
 
     // Send order-created email (fire-and-forget)
     const orderViewUrl = buildOrderViewUrl(

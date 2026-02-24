@@ -11,6 +11,8 @@ export const orderEventTypeEnum = pgEnum("order_event_type", [
   "SHIPPING_ADDRESS_EDITED",
   "CUSTOMER_NOTE_EDITED",
   "INTERNAL_NOTE_ADDED",
+  "DISPUTE_OPENED",
+  "DISPUTE_CLOSED",
 ]);
 
 export const orderEvents = pgTable(

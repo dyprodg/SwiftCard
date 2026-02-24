@@ -59,6 +59,7 @@ export default async function PackingSlipPage({ params }: Props) {
             {order.shippingZip} {order.shippingCity}
           </p>
           <p>{order.shippingCountry}</p>
+          {order.phone && <p className="mt-1 text-gray-600">{order.phone}</p>}
         </div>
       </div>
 

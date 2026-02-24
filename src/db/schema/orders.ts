@@ -62,6 +62,7 @@ export const orders = pgTable(
     currency: text("currency").default("CHF").notNull(),
     customerId: text("customer_id"),
     customerEmail: text("customer_email").notNull(),
+    phone: text("phone"),
     shippingName: text("shipping_name").notNull(),
     shippingAddress1: text("shipping_address1").notNull(),
     shippingAddress2: text("shipping_address2"),
