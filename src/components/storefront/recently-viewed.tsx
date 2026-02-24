@@ -6,7 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useRecentlyViewedStore } from "@/stores/recently-viewed-store";
-import { getProductsByIds } from "@/server/queries/recently-viewed";
+import { fetchRecentlyViewedProducts } from "@/server/actions/search";
 import { formatPrice } from "@/lib/utils/format-price";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -34,7 +34,7 @@ export function RecentlyViewed({ locale, excludeProductId }: RecentlyViewedProps
 
   const fetchProducts = useCallback(async (ids: string[]) => {
     if (ids.length === 0) return [];
-    return getProductsByIds(ids.slice(0, 6));
+    return fetchRecentlyViewedProducts(ids);
   }, []);
 
   useEffect(() => {
