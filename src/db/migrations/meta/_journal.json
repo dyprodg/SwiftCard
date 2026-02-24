@@ -50,6 +50,13 @@
       "when": 1771937949831,
       "tag": "0006_brown_tattoo",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1771943802664,
+      "tag": "0007_smart_talkback",
+      "breakpoints": true
     }
   ]
 }

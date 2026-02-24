@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Store, User, ClipboardList } from "lucide-react";
+import { Store, User, ClipboardList, Heart } from "lucide-react";
 import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import { CartSheet } from "./cart-sheet";
 import { LocaleSwitcher } from "./locale-switcher";
+import { SearchBar } from "./search-bar";
 import { getShopSettings } from "@/lib/edge-config";
 
 export async function Header() {
@@ -34,6 +35,9 @@ export async function Header() {
 
         {/* Actions */}
         <div className="flex items-center gap-2">
+          {/* Search */}
+          <SearchBar />
+
           {/* Locale Switcher */}
           <LocaleSwitcher />
 
@@ -42,6 +46,12 @@ export async function Header() {
 
           {/* Auth */}
           <SignedIn>
+            <Button variant="ghost" size="icon" asChild>
+              <Link href={`/${locale}/wishlist`}>
+                <Heart className="h-5 w-5" />
+                <span className="sr-only">Wishlist</span>
+              </Link>
+            </Button>
             <Button variant="ghost" size="icon" asChild>
               <Link href={`/${locale}/account/orders`}>
                 <ClipboardList className="h-5 w-5" />

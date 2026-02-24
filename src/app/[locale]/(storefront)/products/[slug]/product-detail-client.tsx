@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { ShoppingCart, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { VariantSelector } from "@/components/storefront/variant-selector";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/stores/cart-store";
+import { useRecentlyViewedStore } from "@/stores/recently-viewed-store";
 import { addToCart } from "@/server/actions/cart";
 import type { ProductVariant } from "@/types";
 
@@ -39,6 +40,11 @@ export function ProductDetailClient({
   const [justAdded, setJustAdded] = useState(false);
   const addItem = useCartStore((s) => s.addItem);
   const setOpen = useCartStore((s) => s.setOpen);
+  const addRecentlyViewed = useRecentlyViewedStore((s) => s.addProduct);
+
+  useEffect(() => {
+    addRecentlyViewed(productId);
+  }, [productId, addRecentlyViewed]);
 
   const unitPrice = basePrice + (selectedVariant?.priceAdjustment ?? 0);
   const variantName = selectedVariant
@@ -90,6 +96,7 @@ export function ProductDetailClient({
           basePrice={basePrice}
           onSelect={(variant) => setSelectedVariant(variant)}
           discount={discount}
+          productId={productId}
         />
       )}
 

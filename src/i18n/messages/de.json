@@ -198,6 +198,7 @@
       "customers": "Kunden",
       "discounts": "Rabatte",
       "reservations": "Reservierungen",
+      "reviews": "Bewertungen",
       "analytics": "Analysen",
       "settings": "Einstellungen",
       "viewStorefront": "Zum Shop",
@@ -675,6 +676,26 @@
         "OTHER": "Sonstiges"
       }
     },
+    "reviews": {
+      "title": "Bewertungen",
+      "description": "Kundenbewertungen moderieren",
+      "totalCount": "{count} Bewertungen insgesamt",
+      "product": "Produkt",
+      "customer": "Kunde",
+      "rating": "Bewertung",
+      "reviewTitle": "Bewertung",
+      "status": "Status",
+      "date": "Datum",
+      "actions": "Aktionen",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "deleteReview": "Löschen",
+      "verified": "Verifiziert",
+      "moderated": "Bewertung moderiert",
+      "deleted": "Bewertung gelöscht",
+      "error": "Etwas ist schiefgelaufen",
+      "noReviews": "Noch keine Bewertungen"
+    },
     "dataTable": {
       "noResults": "Keine Ergebnisse.",
       "showing": "Zeige",
@@ -683,6 +704,53 @@
       "next": "Weiter",
       "page": "Seite"
     }
+  },
+  "wishlist": {
+    "title": "Wunschliste",
+    "empty": "Deine Wunschliste ist leer",
+    "browseProducts": "Produkte durchsuchen",
+    "noImage": "Kein Bild",
+    "added": "Zur Wunschliste hinzugefügt",
+    "removed": "Von der Wunschliste entfernt",
+    "error": "Etwas ist schiefgelaufen",
+    "addToWishlist": "Zur Wunschliste hinzufügen",
+    "removeFromWishlist": "Von der Wunschliste entfernen"
+  },
+  "reviews": {
+    "title": "Kundenbewertungen",
+    "writeReview": "Bewertung schreiben",
+    "yourRating": "Deine Bewertung",
+    "titleLabel": "Titel",
+    "titlePlaceholder": "Fasse deine Erfahrung zusammen",
+    "bodyLabel": "Bewertung (optional)",
+    "bodyPlaceholder": "Teile mehr Details über deine Erfahrung...",
+    "submitReview": "Bewertung abgeben",
+    "submitting": "Wird gesendet...",
+    "submitted": "Bewertung eingereicht! Sie erscheint nach der Moderation.",
+    "submitError": "Fehler beim Senden der Bewertung",
+    "selectRating": "Bitte wähle eine Bewertung",
+    "alreadyReviewed": "Du hast dieses Produkt bereits bewertet.",
+    "signInToReview": "Melde dich an, um eine Bewertung abzugeben.",
+    "verifiedPurchase": "Verifizierter Kauf",
+    "noReviews": "Noch keine Bewertungen. Sei der Erste, der dieses Produkt bewertet!"
+  },
+  "stockNotification": {
+    "notifyMe": "Benachrichtige mich",
+    "emailPlaceholder": "deine@email.com",
+    "notify": "Benachrichtigen",
+    "subscribing": "Wird abonniert...",
+    "subscribed": "Wir benachrichtigen dich, wenn es wieder verfügbar ist!",
+    "enterEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
+    "error": "Fehler beim Abonnieren"
+  },
+  "search": {
+    "placeholder": "Produkte suchen...",
+    "searching": "Suche...",
+    "noResults": "Keine Produkte gefunden"
+  },
+  "recentlyViewed": {
+    "title": "Kürzlich angesehen",
+    "noImage": "Kein Bild"
   },
   "footer": {
     "legal": "Rechtliches",

@@ -13,6 +13,7 @@ import {
   Tag,
   Clock,
   BarChart3,
+  MessageSquare,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +23,7 @@ const navItems = [
   { key: "orders" as const, href: "/admin/orders", icon: ShoppingCart },
   { key: "discounts" as const, href: "/admin/discounts", icon: Tag },
   { key: "customers" as const, href: "/admin/customers", icon: Users },
+  { key: "reviews" as const, href: "/admin/reviews", icon: MessageSquare },
   { key: "reservations" as const, href: "/admin/reservations", icon: Clock },
   { key: "analytics" as const, href: "/admin/analytics", icon: BarChart3 },
   { key: "settings" as const, href: "/admin/settings/general", icon: Settings },

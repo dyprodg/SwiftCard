@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils/format-price";
+import { NotifyMeButton } from "@/components/storefront/notify-me-button";
 import type { ProductVariant } from "@/types";
 
 type VariantSelectorProps = {
@@ -12,6 +13,7 @@ type VariantSelectorProps = {
   basePrice: number;
   onSelect: (variant: ProductVariant) => void;
   discount?: { type: "PERCENTAGE" | "FIXED" | "FREE_SHIPPING"; value: number } | null;
+  productId?: string;
 };
 
 function applyDiscount(
@@ -33,6 +35,7 @@ export function VariantSelector({
   basePrice,
   onSelect,
   discount,
+  productId,
 }: VariantSelectorProps) {
   const t = useTranslations("common");
   const [selectedId, setSelectedId] = useState<string | null>(variants[0]?.id ?? null);
@@ -129,21 +132,26 @@ export function VariantSelector({
 
       {/* Price display */}
       {selected && (
-        <div className="flex items-baseline gap-2">
-          <span className="text-2xl font-bold">{formatPrice(discountedPrice)}</span>
-          {hasDiscount && discountedPrice < totalPrice && (
-            <span className="text-muted-foreground text-lg line-through">
-              {formatPrice(totalPrice)}
-            </span>
-          )}
-          {selected.stock === 0 ? (
-            <span className="text-destructive text-sm">{t("outOfStock")}</span>
-          ) : selected.stock <= 5 ? (
-            <span className="text-sm text-orange-600">
-              {t("onlyXLeft", { count: selected.stock })}
-            </span>
-          ) : (
-            <span className="text-sm text-green-600">{t("inStock")}</span>
+        <div className="space-y-2">
+          <div className="flex items-baseline gap-2">
+            <span className="text-2xl font-bold">{formatPrice(discountedPrice)}</span>
+            {hasDiscount && discountedPrice < totalPrice && (
+              <span className="text-muted-foreground text-lg line-through">
+                {formatPrice(totalPrice)}
+              </span>
+            )}
+            {selected.stock === 0 ? (
+              <span className="text-destructive text-sm">{t("outOfStock")}</span>
+            ) : selected.stock <= 5 ? (
+              <span className="text-sm text-orange-600">
+                {t("onlyXLeft", { count: selected.stock })}
+              </span>
+            ) : (
+              <span className="text-sm text-green-600">{t("inStock")}</span>
+            )}
+          </div>
+          {selected.stock === 0 && productId && (
+            <NotifyMeButton variantId={selected.id} productId={productId} />
           )}
         </div>
       )}

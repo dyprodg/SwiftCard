@@ -198,6 +198,7 @@
       "customers": "Customers",
       "discounts": "Discounts",
       "reservations": "Reservations",
+      "reviews": "Reviews",
       "analytics": "Analytics",
       "settings": "Settings",
       "viewStorefront": "View Storefront",
@@ -675,6 +676,26 @@
         "OTHER": "Other"
       }
     },
+    "reviews": {
+      "title": "Reviews",
+      "description": "Moderate customer product reviews",
+      "totalCount": "{count} reviews total",
+      "product": "Product",
+      "customer": "Customer",
+      "rating": "Rating",
+      "reviewTitle": "Review",
+      "status": "Status",
+      "date": "Date",
+      "actions": "Actions",
+      "approve": "Approve",
+      "reject": "Reject",
+      "deleteReview": "Delete",
+      "verified": "Verified",
+      "moderated": "Review moderated",
+      "deleted": "Review deleted",
+      "error": "Something went wrong",
+      "noReviews": "No reviews yet"
+    },
     "dataTable": {
       "noResults": "No results.",
       "showing": "Showing",
@@ -683,6 +704,53 @@
       "next": "Next",
       "page": "Page"
     }
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "empty": "Your wishlist is empty",
+    "browseProducts": "Browse Products",
+    "noImage": "No image",
+    "added": "Added to wishlist",
+    "removed": "Removed from wishlist",
+    "error": "Something went wrong",
+    "addToWishlist": "Add to wishlist",
+    "removeFromWishlist": "Remove from wishlist"
+  },
+  "reviews": {
+    "title": "Customer Reviews",
+    "writeReview": "Write a Review",
+    "yourRating": "Your Rating",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Summarize your experience",
+    "bodyLabel": "Review (optional)",
+    "bodyPlaceholder": "Share more details about your experience...",
+    "submitReview": "Submit Review",
+    "submitting": "Submitting...",
+    "submitted": "Review submitted! It will appear after moderation.",
+    "submitError": "Failed to submit review",
+    "selectRating": "Please select a rating",
+    "alreadyReviewed": "You have already reviewed this product.",
+    "signInToReview": "Sign in to leave a review.",
+    "verifiedPurchase": "Verified Purchase",
+    "noReviews": "No reviews yet. Be the first to review this product!"
+  },
+  "stockNotification": {
+    "notifyMe": "Notify Me When Available",
+    "emailPlaceholder": "your@email.com",
+    "notify": "Notify",
+    "subscribing": "Subscribing...",
+    "subscribed": "We'll notify you when it's back in stock!",
+    "enterEmail": "Please enter a valid email",
+    "error": "Failed to subscribe"
+  },
+  "search": {
+    "placeholder": "Search products...",
+    "searching": "Searching...",
+    "noResults": "No products found"
+  },
+  "recentlyViewed": {
+    "title": "Recently Viewed",
+    "noImage": "No image"
   },
   "footer": {
     "legal": "Legal",

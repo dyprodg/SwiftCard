@@ -10,6 +10,7 @@ import { getActiveDiscountsForDisplay } from "@/server/queries/discounts";
 import { organizationJsonLd } from "@/lib/seo/json-ld";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { ProductGridSkeleton } from "@/components/storefront/product-grid-skeleton";
+import { RecentlyViewed } from "@/components/storefront/recently-viewed";
 import { Button } from "@/components/ui/button";
 import { getShopSettings } from "@/lib/edge-config";
 
@@ -82,6 +83,11 @@ export default async function HomePage() {
       >
         <FeaturedProducts locale={locale} />
       </Suspense>
+
+      {/* Recently Viewed */}
+      <section className="container mx-auto px-4 pb-16">
+        <RecentlyViewed locale={locale} />
+      </section>
     </div>
   );
 }

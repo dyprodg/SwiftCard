@@ -113,6 +113,24 @@ export async function sendShippingNotificationEmail(
   });
 }
 
+export async function sendBackInStockEmail(
+  to: string,
+  data: {
+    productName: string;
+    productUrl: string;
+    variantName?: string;
+  },
+) {
+  const { BackInStockEmail } = await import("@/emails/back-in-stock");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `${data.productName} is back in stock!`,
+    react: BackInStockEmail(data),
+  });
+}
+
 export async function sendRefundNotificationEmail(
   to: string,
   data: {

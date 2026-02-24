@@ -6,4 +6,5 @@ export * from "./discounts";
 export * from "./reservations";
 export * from "./fulfillments";
 export * from "./order-events";
+export * from "./customer-features";
 export * from "./relations";

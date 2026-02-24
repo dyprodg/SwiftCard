@@ -11,6 +11,7 @@ import { discounts, discountProducts, discountCategories } from "./discounts";
 import { stockReservations } from "./reservations";
 import { fulfillments, fulfillmentItems } from "./fulfillments";
 import { orderEvents } from "./order-events";
+import { wishlists, productReviews, stockNotifications } from "./customer-features";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -21,6 +22,9 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   variants: many(productVariants),
   orderItems: many(orderItems),
   translations: many(productTranslations),
+  wishlists: many(wishlists),
+  reviews: many(productReviews),
+  stockNotifications: many(stockNotifications),
 }));
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
@@ -37,6 +41,7 @@ export const productVariantsRelations = relations(productVariants, ({ one, many 
   }),
   orderItems: many(orderItems),
   reservations: many(stockReservations),
+  stockNotifications: many(stockNotifications),
 }));
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({
@@ -168,5 +173,33 @@ export const orderEventsRelations = relations(orderEvents, ({ one }) => ({
   order: one(orders, {
     fields: [orderEvents.orderId],
     references: [orders.id],
+  }),
+}));
+
+// Wishlist relations
+export const wishlistsRelations = relations(wishlists, ({ one }) => ({
+  product: one(products, {
+    fields: [wishlists.productId],
+    references: [products.id],
+  }),
+}));
+
+// Product review relations
+export const productReviewsRelations = relations(productReviews, ({ one }) => ({
+  product: one(products, {
+    fields: [productReviews.productId],
+    references: [products.id],
+  }),
+}));
+
+// Stock notification relations
+export const stockNotificationsRelations = relations(stockNotifications, ({ one }) => ({
+  product: one(products, {
+    fields: [stockNotifications.productId],
+    references: [products.id],
+  }),
+  variant: one(productVariants, {
+    fields: [stockNotifications.variantId],
+    references: [productVariants.id],
   }),
 }));

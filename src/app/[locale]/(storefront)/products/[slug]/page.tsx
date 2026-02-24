@@ -1,17 +1,23 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { getLocale, getTranslations } from "next-intl/server";
+import { auth } from "@clerk/nextjs/server";
 import { ChevronRight } from "lucide-react";
 
 import { getProductBySlug } from "@/server/queries/products";
 import { getActiveDiscountsForDisplay } from "@/server/queries/discounts";
+import { getWishlistProductIds } from "@/server/queries/wishlist";
 import { localizeProduct } from "@/lib/utils/localize-product";
 import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { formatPrice } from "@/lib/utils/format-price";
 import { Badge } from "@/components/ui/badge";
 import { DiscountBadge } from "@/components/storefront/discount-badge";
+import { WishlistButton } from "@/components/storefront/wishlist-button";
+import { ReviewList } from "@/components/storefront/review-list";
+import { RecentlyViewed } from "@/components/storefront/recently-viewed";
 import { ProductDetailClient } from "./product-detail-client";
 import type { DiscountWithRelations } from "@/types";
 
@@ -108,9 +114,11 @@ export default async function ProductDetailPage({ params }: Props) {
   const locale = await getLocale();
   const t = await getTranslations("products");
   const tc = await getTranslations("common");
-  const [product, activeDiscounts] = await Promise.all([
+  const { userId } = await auth();
+  const [product, activeDiscounts, wishlistedIds] = await Promise.all([
     getProductBySlug(slug),
     getActiveDiscountsForDisplay(),
+    userId ? getWishlistProductIds(userId) : [],
   ]);
 
   if (!product || product.status !== "ACTIVE") {
@@ -120,6 +128,7 @@ export default async function ProductDetailPage({ params }: Props) {
   const localized = localizeProduct(product, locale);
   const primaryImage = localized.images[0];
   const discount = findBestDiscountForProduct(product, activeDiscounts);
+  const isWishlisted = wishlistedIds.includes(product.id);
 
   const breadcrumbItems = [
     { name: tc("home"), url: `${APP_URL}/${locale}` },
@@ -217,9 +226,16 @@ export default async function ProductDetailPage({ params }: Props) {
         {/* Product Info */}
         <div className="space-y-6">
           <div>
-            <div className="mb-2 flex flex-wrap gap-1">
-              {product.featured && <Badge>{tc("featured")}</Badge>}
-              {discount && <DiscountBadge type={discount.type} value={discount.value} />}
+            <div className="mb-2 flex flex-wrap items-center gap-2">
+              <div className="flex flex-wrap gap-1">
+                {product.featured && <Badge>{tc("featured")}</Badge>}
+                {discount && (
+                  <DiscountBadge type={discount.type} value={discount.value} />
+                )}
+              </div>
+              {userId && (
+                <WishlistButton productId={product.id} isWishlisted={isWishlisted} />
+              )}
             </div>
             <h1 className="text-3xl font-bold tracking-tight">{localized.name}</h1>
             {product.category && (
@@ -265,6 +281,18 @@ export default async function ProductDetailPage({ params }: Props) {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Reviews */}
+      <div className="mt-12">
+        <Suspense fallback={null}>
+          <ReviewList productId={product.id} />
+        </Suspense>
+      </div>
+
+      {/* Recently Viewed */}
+      <div className="mt-12">
+        <RecentlyViewed locale={locale} excludeProductId={product.id} />
       </div>
     </div>
   );

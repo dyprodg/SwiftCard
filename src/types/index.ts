@@ -21,6 +21,11 @@ import type {
 import type { stockReservations } from "@/db/schema/reservations";
 import type { fulfillments, fulfillmentItems } from "@/db/schema/fulfillments";
 import type { orderEvents } from "@/db/schema/order-events";
+import type {
+  wishlists,
+  productReviews,
+  stockNotifications,
+} from "@/db/schema/customer-features";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -110,6 +115,17 @@ export type AppliedDiscount = {
 
 // Reservation types
 export type StockReservation = InferSelectModel<typeof stockReservations>;
+
+// Customer feature types
+export type Wishlist = InferSelectModel<typeof wishlists>;
+export type ProductReview = InferSelectModel<typeof productReviews>;
+export type StockNotification = InferSelectModel<typeof stockNotifications>;
+
+export type ReviewRatingStats = {
+  averageRating: number;
+  totalReviews: number;
+  distribution: Record<number, number>; // 1-5 -> count
+};
 
 // Cart types
 export type CartItem = {
