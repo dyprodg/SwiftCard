@@ -198,6 +198,7 @@
       "customers": "Kunden",
       "discounts": "Rabatte",
       "reservations": "Reservierungen",
+      "analytics": "Analysen",
       "settings": "Einstellungen",
       "viewStorefront": "Zum Shop",
       "adminTitle": "SwiftCard Admin"
@@ -612,6 +613,66 @@
         "linkTextEn": "Linktext (EN)",
         "linkTextDe": "Linktext (DE)",
         "bgColor": "Hintergrund CSS-Klasse"
+      }
+    },
+    "analytics": {
+      "title": "Analysen",
+      "description": "Detaillierte Einblicke in die Shop-Performance",
+      "noData": "Keine Daten für diesen Zeitraum verfügbar.",
+      "tabs": {
+        "overview": "Übersicht",
+        "products": "Produkte",
+        "refunds": "Rückerstattungen",
+        "discounts": "Rabatte",
+        "customers": "Kunden"
+      },
+      "presets": {
+        "7d": "7T",
+        "30d": "30T",
+        "90d": "90T",
+        "1y": "1J",
+        "all": "Alle"
+      },
+      "kpis": {
+        "revenue": "Umsatz",
+        "orders": "Bestellungen",
+        "avgOrderValue": "Ø Bestellwert",
+        "refundRate": "Rückerstattungsquote",
+        "totalRefunded": "Gesamt erstattet",
+        "refundCount": "Anzahl Rückerstattungen",
+        "newCustomers": "Neue Kunden",
+        "returningCustomers": "Wiederkehrende Kunden"
+      },
+      "charts": {
+        "revenue": "Umsatz im Zeitverlauf",
+        "orders": "Bestellungen im Zeitverlauf",
+        "categoryRevenue": "Umsatz nach Kategorie",
+        "refundReasons": "Rückerstattungsgründe",
+        "refundAmount": "Rückerstattungen im Zeitverlauf"
+      },
+      "tables": {
+        "topProducts": "Top 10 Produkte",
+        "productName": "Produkt",
+        "unitsSold": "Verkaufte Einheiten",
+        "revenue": "Umsatz",
+        "topCustomers": "Top 10 Kunden",
+        "customerEmail": "E-Mail",
+        "orderCount": "Bestellungen",
+        "totalSpent": "Gesamtausgaben",
+        "discountPerformance": "Rabatt-Performance",
+        "discountCode": "Code",
+        "discountName": "Name",
+        "discountType": "Typ",
+        "timesUsed": "Verwendet",
+        "totalGiven": "Gesamtrabatt",
+        "revenueGenerated": "Generierter Umsatz"
+      },
+      "refundReasons": {
+        "DAMAGED": "Beschädigt",
+        "MISSING_ITEM": "Fehlender Artikel",
+        "CUSTOMER_REQUEST": "Kundenwunsch",
+        "DUPLICATE": "Duplikat",
+        "OTHER": "Sonstiges"
       }
     },
     "dataTable": {

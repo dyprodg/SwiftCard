@@ -198,6 +198,7 @@
       "customers": "Customers",
       "discounts": "Discounts",
       "reservations": "Reservations",
+      "analytics": "Analytics",
       "settings": "Settings",
       "viewStorefront": "View Storefront",
       "adminTitle": "SwiftCard Admin"
@@ -612,6 +613,66 @@
         "linkTextEn": "Link Text (EN)",
         "linkTextDe": "Link Text (DE)",
         "bgColor": "Background CSS Class"
+      }
+    },
+    "analytics": {
+      "title": "Analytics",
+      "description": "Detailed insights into your store performance",
+      "noData": "No data available for this period.",
+      "tabs": {
+        "overview": "Overview",
+        "products": "Products",
+        "refunds": "Refunds",
+        "discounts": "Discounts",
+        "customers": "Customers"
+      },
+      "presets": {
+        "7d": "7D",
+        "30d": "30D",
+        "90d": "90D",
+        "1y": "1Y",
+        "all": "All"
+      },
+      "kpis": {
+        "revenue": "Revenue",
+        "orders": "Orders",
+        "avgOrderValue": "Avg. Order Value",
+        "refundRate": "Refund Rate",
+        "totalRefunded": "Total Refunded",
+        "refundCount": "Refund Count",
+        "newCustomers": "New Customers",
+        "returningCustomers": "Returning Customers"
+      },
+      "charts": {
+        "revenue": "Revenue Over Time",
+        "orders": "Orders Over Time",
+        "categoryRevenue": "Revenue by Category",
+        "refundReasons": "Refund Reasons",
+        "refundAmount": "Refund Amount Over Time"
+      },
+      "tables": {
+        "topProducts": "Top 10 Products",
+        "productName": "Product",
+        "unitsSold": "Units Sold",
+        "revenue": "Revenue",
+        "topCustomers": "Top 10 Customers",
+        "customerEmail": "Email",
+        "orderCount": "Orders",
+        "totalSpent": "Total Spent",
+        "discountPerformance": "Discount Performance",
+        "discountCode": "Code",
+        "discountName": "Name",
+        "discountType": "Type",
+        "timesUsed": "Times Used",
+        "totalGiven": "Total Discount",
+        "revenueGenerated": "Revenue Generated"
+      },
+      "refundReasons": {
+        "DAMAGED": "Damaged",
+        "MISSING_ITEM": "Missing Item",
+        "CUSTOMER_REQUEST": "Customer Request",
+        "DUPLICATE": "Duplicate",
+        "OTHER": "Other"
       }
     },
     "dataTable": {
