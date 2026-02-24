@@ -197,3 +197,31 @@ export async function sendRefundNotificationEmail(
     react: RefundNotificationEmail(data),
   });
 }
+
+export async function sendPaymentLinkEmail(
+  to: string,
+  data: {
+    orderNumber: string;
+    items: {
+      productName: string;
+      variantName: string | null;
+      quantity: number;
+      total: number;
+    }[];
+    total: number;
+    currency: string;
+    paymentUrl: string;
+    expiresAt: Date;
+    customMessage?: string;
+    orderViewUrl?: string;
+  },
+) {
+  const { PaymentLinkEmail } = await import("@/emails/payment-link");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `Payment Link - ${data.orderNumber}`,
+    react: PaymentLinkEmail(data),
+  });
+}

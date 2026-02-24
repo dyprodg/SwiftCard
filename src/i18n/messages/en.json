@@ -257,7 +257,8 @@
       "tax": "Tax",
       "abandonedCarts": "Abandoned Carts",
       "viewStorefront": "View Storefront",
-      "adminTitle": "SwiftCard Admin"
+      "adminTitle": "SwiftCard Admin",
+      "draftOrders": "Draft Orders"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -413,9 +414,14 @@
         "customerNoteEdited": "Customer note updated",
         "internalNoteAdded": "Internal note added",
         "disputeOpened": "Payment dispute opened — {reason}",
-        "disputeClosed": "Payment dispute closed — {status}"
+        "disputeClosed": "Payment dispute closed — {status}",
+        "draftCreated": "Draft order created",
+        "draftUpdated": "Draft order updated",
+        "paymentLinkSent": "Payment link sent to {email}",
+        "paymentLinkExpired": "Payment link expired"
       },
       "statuses": {
+        "DRAFT": "Draft",
         "PENDING": "Pending",
         "CONFIRMED": "Confirmed",
         "PROCESSING": "Processing",
@@ -516,6 +522,71 @@
           "totalRefunded": "Total refunded",
           "remaining": "Remaining refundable"
         }
+      }
+    },
+    "draftOrders": {
+      "title": "Draft Orders",
+      "description": "Create and manage orders for phone, email, or B2B sales",
+      "create": "Create Draft Order",
+      "createTitle": "Create Draft Order",
+      "createDescription": "Build an order manually and send a payment link to the customer",
+      "editTitle": "Edit Draft Order",
+      "editDescription": "Modify the draft order before sending the payment link",
+      "empty": "No draft orders. Create one for phone or email orders.",
+      "columns": {
+        "order": "Order",
+        "customer": "Customer",
+        "items": "Items",
+        "total": "Total",
+        "date": "Created",
+        "actions": "Actions"
+      },
+      "deleteDialog": {
+        "title": "Delete Draft Order?",
+        "description": "This will permanently delete this draft order. This action cannot be undone.",
+        "cancel": "Cancel",
+        "confirm": "Delete",
+        "deleting": "Deleting..."
+      },
+      "sendLink": {
+        "title": "Send Payment Link",
+        "description": "The customer will receive an email with a payment link valid for 24 hours. Stock will be reserved until the link expires.",
+        "messageLabel": "Custom Message (optional)",
+        "messagePlaceholder": "Add a personal message to the payment email...",
+        "messageHint": "This message will be included in the payment link email.",
+        "cancel": "Cancel",
+        "send": "Send Payment Link",
+        "sending": "Sending...",
+        "success": "Payment link sent successfully!"
+      },
+      "form": {
+        "products": "Products",
+        "searchProducts": "Search products by name...",
+        "stock": "Stock",
+        "lineItems": "Order Items",
+        "noItems": "No items added yet. Search for products above.",
+        "each": "each",
+        "subtotal": "Subtotal",
+        "customerInfo": "Customer Information",
+        "email": "Email",
+        "name": "Name",
+        "phone": "Phone",
+        "shippingAddress": "Shipping Address",
+        "address1": "Address Line 1",
+        "address2": "Address Line 2",
+        "zip": "ZIP Code",
+        "city": "City",
+        "country": "Country",
+        "discount": "Discount",
+        "couponPlaceholder": "Enter coupon code...",
+        "couponHint": "Automatic discounts are applied automatically. Enter a code for manual coupons.",
+        "internalNote": "Internal Note",
+        "internalNotePlaceholder": "Notes visible only to admin...",
+        "saveDraft": "Save as Draft",
+        "updateDraft": "Update Draft",
+        "saving": "Saving...",
+        "createAndSendLink": "Create & Send Payment Link",
+        "saveAndSendLink": "Save & Send Payment Link"
       }
     },
     "discounts": {

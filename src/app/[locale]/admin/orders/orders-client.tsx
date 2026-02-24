@@ -206,6 +206,7 @@ export function OrdersClient({
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t("allStatuses")}</SelectItem>
+            <SelectItem value="DRAFT">{t("statuses.DRAFT")}</SelectItem>
             <SelectItem value="PENDING">{t("statuses.PENDING")}</SelectItem>
             <SelectItem value="CONFIRMED">{t("statuses.CONFIRMED")}</SelectItem>
             <SelectItem value="PROCESSING">{t("statuses.PROCESSING")}</SelectItem>

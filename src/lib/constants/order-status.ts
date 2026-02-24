@@ -3,6 +3,7 @@
  * Key = current status, Value = array of allowed next statuses.
  */
 export const ORDER_STATUS_TRANSITIONS: Record<string, string[]> = {
+  DRAFT: ["PENDING", "CANCELLED"],
   PENDING: ["CONFIRMED", "CANCELLED"],
   CONFIRMED: ["PROCESSING", "CANCELLED", "REFUNDED"],
   PROCESSING: ["SHIPPED", "CANCELLED", "REFUNDED"],

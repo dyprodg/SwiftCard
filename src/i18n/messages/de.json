@@ -257,7 +257,8 @@
       "tax": "Steuern",
       "abandonedCarts": "Verlassene Warenkörbe",
       "viewStorefront": "Zum Shop",
-      "adminTitle": "SwiftCard Admin"
+      "adminTitle": "SwiftCard Admin",
+      "draftOrders": "Entwurfsbestellungen"
     },
     "dashboard": {
       "title": "Dashboard",
@@ -413,9 +414,14 @@
         "customerNoteEdited": "Kundennotiz aktualisiert",
         "internalNoteAdded": "Interne Notiz hinzugefügt",
         "disputeOpened": "Zahlungsstreit eröffnet — {reason}",
-        "disputeClosed": "Zahlungsstreit geschlossen — {status}"
+        "disputeClosed": "Zahlungsstreit geschlossen — {status}",
+        "draftCreated": "Entwurfsbestellung erstellt",
+        "draftUpdated": "Entwurfsbestellung aktualisiert",
+        "paymentLinkSent": "Zahlungslink gesendet an {email}",
+        "paymentLinkExpired": "Zahlungslink abgelaufen"
       },
       "statuses": {
+        "DRAFT": "Entwurf",
         "PENDING": "Ausstehend",
         "CONFIRMED": "Bestätigt",
         "PROCESSING": "In Bearbeitung",
@@ -516,6 +522,71 @@
           "totalRefunded": "Gesamt erstattet",
           "remaining": "Verbleibend erstattbar"
         }
+      }
+    },
+    "draftOrders": {
+      "title": "Entwurfsbestellungen",
+      "description": "Bestellungen für Telefon-, E-Mail- oder B2B-Verkäufe erstellen und verwalten",
+      "create": "Entwurf erstellen",
+      "createTitle": "Entwurfsbestellung erstellen",
+      "createDescription": "Bestellung manuell erstellen und Zahlungslink an den Kunden senden",
+      "editTitle": "Entwurfsbestellung bearbeiten",
+      "editDescription": "Entwurfsbestellung vor dem Senden des Zahlungslinks ändern",
+      "empty": "Keine Entwurfsbestellungen. Erstellen Sie eine für Telefon- oder E-Mail-Bestellungen.",
+      "columns": {
+        "order": "Bestellung",
+        "customer": "Kunde",
+        "items": "Artikel",
+        "total": "Gesamt",
+        "date": "Erstellt",
+        "actions": "Aktionen"
+      },
+      "deleteDialog": {
+        "title": "Entwurfsbestellung löschen?",
+        "description": "Die Entwurfsbestellung wird dauerhaft gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.",
+        "cancel": "Abbrechen",
+        "confirm": "Löschen",
+        "deleting": "Wird gelöscht..."
+      },
+      "sendLink": {
+        "title": "Zahlungslink senden",
+        "description": "Der Kunde erhält eine E-Mail mit einem Zahlungslink, der 24 Stunden gültig ist. Der Lagerbestand wird bis zum Ablauf des Links reserviert.",
+        "messageLabel": "Persönliche Nachricht (optional)",
+        "messagePlaceholder": "Fügen Sie eine persönliche Nachricht zur Zahlungs-E-Mail hinzu...",
+        "messageHint": "Diese Nachricht wird in die Zahlungslink-E-Mail aufgenommen.",
+        "cancel": "Abbrechen",
+        "send": "Zahlungslink senden",
+        "sending": "Wird gesendet...",
+        "success": "Zahlungslink erfolgreich gesendet!"
+      },
+      "form": {
+        "products": "Produkte",
+        "searchProducts": "Produkte nach Name suchen...",
+        "stock": "Lager",
+        "lineItems": "Bestellpositionen",
+        "noItems": "Noch keine Artikel hinzugefügt. Suchen Sie oben nach Produkten.",
+        "each": "pro Stück",
+        "subtotal": "Zwischensumme",
+        "customerInfo": "Kundeninformationen",
+        "email": "E-Mail",
+        "name": "Name",
+        "phone": "Telefon",
+        "shippingAddress": "Lieferadresse",
+        "address1": "Adresszeile 1",
+        "address2": "Adresszeile 2",
+        "zip": "PLZ",
+        "city": "Ort",
+        "country": "Land",
+        "discount": "Rabatt",
+        "couponPlaceholder": "Gutscheincode eingeben...",
+        "couponHint": "Automatische Rabatte werden automatisch angewendet. Geben Sie einen Code für manuelle Gutscheine ein.",
+        "internalNote": "Interne Notiz",
+        "internalNotePlaceholder": "Notizen nur für Admins sichtbar...",
+        "saveDraft": "Als Entwurf speichern",
+        "updateDraft": "Entwurf aktualisieren",
+        "saving": "Wird gespeichert...",
+        "createAndSendLink": "Erstellen & Zahlungslink senden",
+        "saveAndSendLink": "Speichern & Zahlungslink senden"
       }
     },
     "discounts": {

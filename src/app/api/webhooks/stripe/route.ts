@@ -356,6 +356,105 @@ export async function POST(req: NextRequest) {
         break;
       }
 
+      case "checkout.session.completed": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const orderId = session.metadata?.orderId;
+        const isDraftOrder = session.metadata?.isDraftOrder === "true";
+
+        if (orderId && isDraftOrder) {
+          // Draft order payment completed via Checkout Session
+          const paymentIntentId =
+            typeof session.payment_intent === "string"
+              ? session.payment_intent
+              : session.payment_intent?.id;
+
+          const [updated] = await db
+            .update(orders)
+            .set({
+              status: "CONFIRMED",
+              paymentStatus: "PAID",
+              paidAt: new Date(),
+              stripePaymentIntentId: paymentIntentId || null,
+            })
+            .where(
+              and(eq(orders.id, orderId), eq(orders.stripeCheckoutSessionId, session.id)),
+            )
+            .returning();
+
+          if (!updated) {
+            console.warn(
+              `Webhook: checkout.session.completed for order ${orderId} — already processed`,
+            );
+            break;
+          }
+
+          await logOrderEvent({
+            orderId,
+            type: "PAYMENT_STATUS_CHANGED",
+            data: { from: "PENDING", to: "PAID" },
+            createdBy: "stripe-webhook",
+          });
+          await logOrderEvent({
+            orderId,
+            type: "STATUS_CHANGED",
+            data: { from: "PENDING", to: "CONFIRMED" },
+            createdBy: "stripe-webhook",
+          });
+
+          // Convert reservations to permanent
+          await convertReservations(orderId);
+
+          // Send order confirmation email
+          await handlePaymentSuccess(orderId).catch((err) =>
+            console.error("Failed to send order confirmation for draft:", err),
+          );
+        }
+
+        break;
+      }
+
+      case "checkout.session.expired": {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const orderId = session.metadata?.orderId;
+        const isDraftOrder = session.metadata?.isDraftOrder === "true";
+
+        if (orderId && isDraftOrder) {
+          // Payment link expired — revert to DRAFT so admin can resend
+          const [updated] = await db
+            .update(orders)
+            .set({
+              status: "DRAFT",
+              paymentLinkUrl: null,
+              paymentLinkExpiresAt: null,
+              stripeCheckoutSessionId: null,
+            })
+            .where(
+              and(eq(orders.id, orderId), eq(orders.stripeCheckoutSessionId, session.id)),
+            )
+            .returning();
+
+          if (updated) {
+            await logOrderEvent({
+              orderId,
+              type: "PAYMENT_LINK_EXPIRED",
+              data: { sessionId: session.id },
+              createdBy: "stripe-webhook",
+            });
+            await logOrderEvent({
+              orderId,
+              type: "STATUS_CHANGED",
+              data: { from: "PENDING", to: "DRAFT" },
+              createdBy: "stripe-webhook",
+            });
+
+            // Expire reservations (restore stock)
+            await expireReservations(orderId);
+          }
+        }
+
+        break;
+      }
+
       default:
         // Unhandled event type
         break;

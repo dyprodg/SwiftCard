@@ -13,6 +13,9 @@ import {
   Activity,
   AlertTriangle,
   CheckCircle,
+  FileEdit,
+  Send,
+  Clock,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import type { OrderEvent } from "@/types";
@@ -29,6 +32,10 @@ const EVENT_ICONS: Record<string, typeof Activity> = {
   INTERNAL_NOTE_ADDED: StickyNote,
   DISPUTE_OPENED: AlertTriangle,
   DISPUTE_CLOSED: CheckCircle,
+  DRAFT_CREATED: FileEdit,
+  DRAFT_UPDATED: FileEdit,
+  PAYMENT_LINK_SENT: Send,
+  PAYMENT_LINK_EXPIRED: Clock,
 };
 
 function ActorDisplay({ createdBy }: { createdBy: string | null }) {
@@ -148,6 +155,14 @@ function EventDescription({
       return <>{t("disputeOpened", { reason: String(data.reason ?? "unknown") })}</>;
     case "DISPUTE_CLOSED":
       return <>{t("disputeClosed", { status: String(data.status ?? "unknown") })}</>;
+    case "DRAFT_CREATED":
+      return <>{t("draftCreated")}</>;
+    case "DRAFT_UPDATED":
+      return <>{t("draftUpdated")}</>;
+    case "PAYMENT_LINK_SENT":
+      return <>{t("paymentLinkSent", { email: String(data.email ?? "") })}</>;
+    case "PAYMENT_LINK_EXPIRED":
+      return <>{t("paymentLinkExpired")}</>;
     default:
       return <>{type}</>;
   }

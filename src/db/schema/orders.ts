@@ -11,6 +11,7 @@ import {
 import { createId } from "@paralleldrive/cuid2";
 
 export const orderStatusEnum = pgEnum("order_status", [
+  "DRAFT",
   "PENDING",
   "CONFIRMED",
   "PROCESSING",
@@ -95,11 +96,18 @@ export const orders = pgTable(
     guestAccessToken: text("guest_access_token")
       .$defaultFn(() => createId())
       .notNull(),
+    isDraft: boolean("is_draft").default(false).notNull(),
+    createdByAdmin: text("created_by_admin"),
+    stripeCheckoutSessionId: text("stripe_checkout_session_id"),
+    paymentLinkUrl: text("payment_link_url"),
+    paymentLinkExpiresAt: timestamp("payment_link_expires_at"),
+    paymentLinkSentAt: timestamp("payment_link_sent_at"),
   },
   (table) => [
     uniqueIndex("orders_order_number_idx").on(table.orderNumber),
     uniqueIndex("orders_stripe_pi_idx").on(table.stripePaymentIntentId),
     uniqueIndex("orders_guest_token_idx").on(table.guestAccessToken),
+    uniqueIndex("orders_stripe_session_idx").on(table.stripeCheckoutSessionId),
     index("orders_customer_id_idx").on(table.customerId),
     index("orders_status_idx").on(table.status),
     index("orders_created_at_idx").on(table.createdAt),

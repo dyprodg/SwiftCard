@@ -7,6 +7,8 @@ import {
 
 describe("isValidStatusTransition", () => {
   it.each([
+    ["DRAFT", "PENDING"],
+    ["DRAFT", "CANCELLED"],
     ["PENDING", "CONFIRMED"],
     ["PENDING", "CANCELLED"],
     ["CONFIRMED", "PROCESSING"],
@@ -24,6 +26,8 @@ describe("isValidStatusTransition", () => {
   });
 
   it.each([
+    ["DRAFT", "CONFIRMED"],
+    ["DRAFT", "SHIPPED"],
     ["PENDING", "SHIPPED"],
     ["PENDING", "DELIVERED"],
     ["CONFIRMED", "DELIVERED"],

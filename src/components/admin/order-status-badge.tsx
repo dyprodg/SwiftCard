@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 const statusClasses: Record<string, string> = {
+  DRAFT: "bg-slate-100 text-slate-800 border-slate-200",
   PENDING: "bg-yellow-100 text-yellow-800 border-yellow-200",
   CONFIRMED: "bg-blue-100 text-blue-800 border-blue-200",
   PROCESSING: "bg-purple-100 text-purple-800 border-purple-200",
@@ -29,6 +30,7 @@ export function OrderStatusBadge({ status }: { status: string }) {
     <Badge variant="outline" className={cn("border", className)}>
       {t(
         status as
+          | "DRAFT"
           | "PENDING"
           | "CONFIRMED"
           | "PROCESSING"
