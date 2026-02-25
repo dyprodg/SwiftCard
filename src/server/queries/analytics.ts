@@ -482,7 +482,7 @@ export async function getCustomerBreakdown(range: DateRange): Promise<CustomerBr
     .where(
       and(
         eq(orders.paymentStatus, "PAID"),
-        sql`${orders.paidAt} < ${new Date(range.dateFrom)}`,
+        sql`${orders.paidAt} < ${range.dateFrom}::timestamp`,
         sql`${orders.customerEmail} IN (${sql.join(
           periodCustomers.map((c) => sql`${c.customerEmail}`),
           sql`, `,

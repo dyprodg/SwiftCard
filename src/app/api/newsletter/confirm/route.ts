@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { confirmSubscription } from "@/server/actions/newsletter";
 
 export async function GET(req: NextRequest) {
@@ -12,6 +13,7 @@ export async function GET(req: NextRequest) {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
   if (result.success) {
+    revalidateTag("newsletter-subscribers", "minutes");
     return NextResponse.redirect(`${appUrl}/${locale}?subscribed=true`);
   }
 

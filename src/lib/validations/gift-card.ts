@@ -7,7 +7,7 @@ export const createGiftCardSchema = z.object({
   recipientName: z.string().max(200).optional(),
   senderName: z.string().max(200).optional(),
   personalMessage: z.string().max(1000).optional(),
-  expiresAt: z.string().datetime().optional(), // ISO date string
+  expiresAt: z.string().optional(), // date or ISO datetime string
   note: z.string().max(500).optional(),
 });
 
@@ -15,7 +15,7 @@ export const createGiftCardSchema = z.object({
 export const updateGiftCardSchema = z.object({
   id: z.string().min(1),
   status: z.enum(["ACTIVE", "DISABLED"]).optional(),
-  expiresAt: z.string().datetime().nullable().optional(),
+  expiresAt: z.string().nullable().optional(),
 });
 
 // Admin: adjust gift card balance

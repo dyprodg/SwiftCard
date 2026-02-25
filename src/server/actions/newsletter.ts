@@ -3,7 +3,7 @@
 import { db } from "@/db";
 import { newsletterSubscribers, emailCampaigns, campaignSends } from "@/db/schema";
 import { eq, and, lte, sql } from "drizzle-orm";
-import { updateTag } from "next/cache";
+import { updateTag, revalidateTag } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 import { createId } from "@paralleldrive/cuid2";
 import {
@@ -98,7 +98,7 @@ export async function confirmSubscription(token: string) {
     })
     .where(eq(newsletterSubscribers.id, subscriber.id));
 
-  updateTag("newsletter-subscribers");
+  // Note: cache invalidation done by caller (revalidateTag in Route Handlers, updateTag in server actions)
   return { success: true };
 }
 
@@ -118,7 +118,7 @@ export async function unsubscribeByToken(token: string) {
     })
     .where(eq(newsletterSubscribers.id, subscriber.id));
 
-  updateTag("newsletter-subscribers");
+  // Note: cache invalidation done by caller
   return { success: true };
 }
 
@@ -364,8 +364,8 @@ export async function processCampaignSend(campaignId: string) {
     })
     .where(eq(emailCampaigns.id, campaignId));
 
-  updateTag("email-campaigns");
-  updateTag("email-campaign");
+  revalidateTag("email-campaigns", "minutes");
+  revalidateTag("email-campaign", "minutes");
 }
 
 // ==================== CRON: PROCESS SCHEDULED CAMPAIGNS ====================

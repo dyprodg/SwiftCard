@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { unsubscribeByToken } from "@/server/actions/newsletter";
 
 export async function GET(req: NextRequest) {
@@ -8,6 +9,7 @@ export async function GET(req: NextRequest) {
   }
 
   await unsubscribeByToken(token);
+  revalidateTag("newsletter-subscribers", "minutes");
 
   // Return a simple HTML page confirming unsubscribe
   const html = `<!DOCTYPE html>

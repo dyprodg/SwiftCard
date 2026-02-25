@@ -5,7 +5,7 @@ import { orders, orderItems, orderRefunds } from "@/db/schema/orders";
 import { subscriptions, subscriptionPlans } from "@/db/schema/subscriptions";
 import { products, productVariants } from "@/db/schema/products";
 import { eq, and } from "drizzle-orm";
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { constructEvent } from "@/lib/stripe/webhooks";
 import { deleteCart } from "@/lib/kv";
 import { handlePaymentSuccess } from "@/server/actions/orders";
@@ -497,7 +497,7 @@ export async function POST(req: NextRequest) {
                   console.error("Failed to send subscription confirmed email:", err),
                 );
 
-                updateTag("subscriptions");
+                revalidateTag("subscriptions", "minutes");
               }
             }
           }
@@ -702,7 +702,7 @@ export async function POST(req: NextRequest) {
               console.error("Failed to send subscription renewed email:", err),
             );
 
-            updateTag("subscriptions");
+            revalidateTag("subscriptions", "minutes");
           }
         }
         break;
@@ -743,7 +743,7 @@ export async function POST(req: NextRequest) {
               console.error("Failed to send subscription payment failed email:", err),
             );
 
-            updateTag("subscriptions");
+            revalidateTag("subscriptions", "minutes");
           }
         }
 
@@ -785,7 +785,7 @@ export async function POST(req: NextRequest) {
               .update(subscriptions)
               .set(updates)
               .where(eq(subscriptions.id, sub.id));
-            updateTag("subscriptions");
+            revalidateTag("subscriptions", "minutes");
           }
         }
         break;
@@ -819,7 +819,7 @@ export async function POST(req: NextRequest) {
             console.error("Failed to send subscription cancelled email:", err),
           );
 
-          updateTag("subscriptions");
+          revalidateTag("subscriptions", "minutes");
         }
         break;
       }
