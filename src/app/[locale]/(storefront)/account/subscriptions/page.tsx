@@ -1,8 +1,9 @@
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
 import { getSubscriptionsByCustomer } from "@/server/queries/subscriptions";
+import { getFeatureFlags } from "@/lib/edge-config";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/utils/format-price";
@@ -18,6 +19,8 @@ const STATUS_VARIANT = {
 } as const;
 
 export default async function CustomerSubscriptionsPage() {
+  const features = await getFeatureFlags();
+  if (!features.subscriptions) notFound();
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
 

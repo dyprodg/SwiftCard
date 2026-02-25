@@ -1,8 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getLocale, getTranslations } from "next-intl/server";
-import Link from "next/link";
-import { User, Package, MapPin, Shield } from "lucide-react";
+import { getFeatureFlags } from "@/lib/edge-config";
 import { AccountNav } from "./account-nav";
 
 type Props = {
@@ -17,13 +16,16 @@ export default async function AccountLayout({ children }: Props) {
     redirect(`/${locale}/sign-in`);
   }
 
-  const t = await getTranslations("account");
+  const [t, features] = await Promise.all([
+    getTranslations("account"),
+    getFeatureFlags(),
+  ]);
 
   return (
     <div className="container mx-auto max-w-5xl px-4 py-8">
       <h1 className="mb-6 text-2xl font-bold">{t("title")}</h1>
       <div className="flex flex-col gap-8 md:flex-row">
-        <AccountNav locale={locale} />
+        <AccountNav locale={locale} showSubscriptions={features.subscriptions} />
         <div className="flex-1">{children}</div>
       </div>
     </div>

@@ -1,9 +1,11 @@
+import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Gift } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getFeatureFlags } from "@/lib/edge-config";
 import { GiftCardPurchaseForm } from "./gift-card-purchase-form";
 
 type Props = {
@@ -11,6 +13,9 @@ type Props = {
 };
 
 export default async function GiftCardsPage({ params }: Props) {
+  const features = await getFeatureFlags();
+  if (!features.giftCards) notFound();
+
   const { locale } = await params;
   const t = await getTranslations("giftCards");
 

@@ -7,12 +7,12 @@ import { Button } from "@/components/ui/button";
 import { CartSheet } from "./cart-sheet";
 import { LocaleSwitcher } from "./locale-switcher";
 import { SearchBar } from "./search-bar";
-import { getShopSettings } from "@/lib/edge-config";
+import { getShopSettings, getFeatureFlags } from "@/lib/edge-config";
 
 export async function Header() {
   const locale = await getLocale();
   const t = await getTranslations("common");
-  const settings = await getShopSettings();
+  const [settings, features] = await Promise.all([getShopSettings(), getFeatureFlags()]);
 
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
@@ -31,18 +31,22 @@ export async function Header() {
           >
             {t("products")}
           </Link>
-          <Link
-            href={`/${locale}/bundles`}
-            className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
-          >
-            {t("bundles")}
-          </Link>
-          <Link
-            href={`/${locale}/gift-cards`}
-            className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
-          >
-            {t("giftCards")}
-          </Link>
+          {features.bundles && (
+            <Link
+              href={`/${locale}/bundles`}
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+            >
+              {t("bundles")}
+            </Link>
+          )}
+          {features.giftCards && (
+            <Link
+              href={`/${locale}/gift-cards`}
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+            >
+              {t("giftCards")}
+            </Link>
+          )}
         </nav>
 
         {/* Actions */}

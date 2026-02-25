@@ -1,12 +1,17 @@
+import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { getActiveBundles } from "@/server/queries/bundles";
 import { BundleCard } from "@/components/storefront/bundle-card";
+import { getFeatureFlags } from "@/lib/edge-config";
 
 type Props = {
   params: Promise<{ locale: string }>;
 };
 
 export default async function BundlesPage({ params }: Props) {
+  const features = await getFeatureFlags();
+  if (!features.bundles) notFound();
+
   const { locale } = await params;
   const t = await getTranslations("bundles");
   const bundles = await getActiveBundles();

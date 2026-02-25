@@ -12,6 +12,7 @@ import { getActiveDiscountsForDisplay } from "@/server/queries/discounts";
 import { getWishlistProductIds } from "@/server/queries/wishlist";
 import { getSubscriptionPlansForProduct } from "@/server/queries/subscriptions";
 import { localizeProduct } from "@/lib/utils/localize-product";
+import { getFeatureFlags } from "@/lib/edge-config";
 import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { formatPrice } from "@/lib/utils/format-price";
 import { Badge } from "@/components/ui/badge";
@@ -127,10 +128,12 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
 
-  // Fetch subscription plans if product is subscribable
-  const subPlans = product.subscribable
-    ? await getSubscriptionPlansForProduct(product.id)
-    : [];
+  // Fetch subscription plans if product is subscribable and feature enabled
+  const features = await getFeatureFlags();
+  const subPlans =
+    features.subscriptions && product.subscribable
+      ? await getSubscriptionPlansForProduct(product.id)
+      : [];
 
   const localized = localizeProduct(product, locale);
   const primaryImage = localized.images[0];

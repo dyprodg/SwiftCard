@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 const tabKeys = [
   "general",
+  "features",
   "shipping",
   "payment",
   "legal",
@@ -16,6 +17,7 @@ const tabKeys = [
 ] as const;
 const tabHrefs: Record<string, string> = {
   general: "/admin/settings/general",
+  features: "/admin/settings/features",
   shipping: "/admin/settings/shipping",
   payment: "/admin/settings/payment",
   legal: "/admin/settings/legal",

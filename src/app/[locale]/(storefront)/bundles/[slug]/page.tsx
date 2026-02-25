@@ -5,6 +5,7 @@ import Image from "next/image";
 import { getBundleBySlug } from "@/server/queries/bundles";
 import { formatPrice } from "@/lib/utils/format-price";
 import { calculateBundleSavings } from "@/lib/utils/bundle-calculator";
+import { getFeatureFlags } from "@/lib/edge-config";
 import { Badge } from "@/components/ui/badge";
 import { AddBundleToCartButton } from "./add-bundle-button";
 
@@ -13,6 +14,8 @@ type Props = {
 };
 
 export default async function BundleDetailPage({ params }: Props) {
+  const features = await getFeatureFlags();
+  if (!features.bundles) notFound();
   const { locale, slug } = await params;
   const t = await getTranslations("bundles");
   const bundle = await getBundleBySlug(slug);

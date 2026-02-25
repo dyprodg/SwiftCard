@@ -1,7 +1,11 @@
+import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
+import { getFeatureFlags } from "@/lib/edge-config";
 import { BalanceChecker } from "./balance-checker";
 
 export default async function CheckBalancePage() {
+  const features = await getFeatureFlags();
+  if (!features.giftCards) notFound();
   const t = await getTranslations("giftCards");
 
   return (

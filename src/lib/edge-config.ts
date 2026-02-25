@@ -174,3 +174,31 @@ export async function getFeatureFlag(flag: string): Promise<boolean> {
     return false;
   }
 }
+
+// Feature flags for optional storefront modules
+export type FeatureFlags = {
+  bundles: boolean;
+  giftCards: boolean;
+  subscriptions: boolean;
+};
+
+const FEATURE_FLAGS_DEFAULTS: FeatureFlags = {
+  bundles: false,
+  giftCards: false,
+  subscriptions: false,
+};
+
+export async function getFeatureFlags(): Promise<FeatureFlags> {
+  "use cache";
+  cacheTag("feature-flags");
+  cacheLife("hours");
+
+  try {
+    const client = getClient();
+    if (!client) return FEATURE_FLAGS_DEFAULTS;
+    const flags = await client.get<FeatureFlags>("featureFlags");
+    return flags ?? FEATURE_FLAGS_DEFAULTS;
+  } catch {
+    return FEATURE_FLAGS_DEFAULTS;
+  }
+}

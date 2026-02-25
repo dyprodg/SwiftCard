@@ -1006,6 +1006,16 @@
         "linkTextEn": "Linktext (EN)",
         "linkTextDe": "Linktext (DE)",
         "bgColor": "Hintergrund CSS-Klasse"
+      },
+      "features": "Funktionen",
+      "featuresForm": {
+        "title": "Shop-Funktionen",
+        "bundlesLabel": "Produktpakete",
+        "bundlesDescription": "Pakete-Seite und Navigationslink im Shop anzeigen",
+        "giftCardsLabel": "Geschenkkarten",
+        "giftCardsDescription": "Geschenkkarten-Seite anzeigen und Kauf/Einlösung ermöglichen",
+        "subscriptionsLabel": "Abonnements",
+        "subscriptionsDescription": "Abo-Optionen auf Produktseiten anzeigen und Abonnements ermöglichen"
       }
     },
     "analytics": {

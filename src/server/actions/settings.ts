@@ -157,6 +157,28 @@ export async function updateMaintenanceMode(enabled: boolean) {
   revalidatePath("/", "layout");
 }
 
+export async function updateFeatureFlags(input: {
+  bundles: boolean;
+  giftCards: boolean;
+  subscriptions: boolean;
+}) {
+  await requireAdmin();
+
+  await updateEdgeConfig([
+    {
+      key: "featureFlags",
+      value: {
+        bundles: input.bundles,
+        giftCards: input.giftCards,
+        subscriptions: input.subscriptions,
+      },
+    },
+  ]);
+
+  updateTag("feature-flags");
+  revalidatePath("/", "layout");
+}
+
 export async function updateEventBanner(input: {
   enabled: boolean;
   textEn: string;

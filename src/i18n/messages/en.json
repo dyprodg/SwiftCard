@@ -1006,6 +1006,16 @@
         "linkTextEn": "Link Text (EN)",
         "linkTextDe": "Link Text (DE)",
         "bgColor": "Background CSS Class"
+      },
+      "features": "Features",
+      "featuresForm": {
+        "title": "Storefront Features",
+        "bundlesLabel": "Product Bundles",
+        "bundlesDescription": "Show the bundles page and navigation link in the storefront",
+        "giftCardsLabel": "Gift Cards",
+        "giftCardsDescription": "Show the gift cards page and allow customers to purchase/redeem gift cards",
+        "subscriptionsLabel": "Subscriptions",
+        "subscriptionsDescription": "Show subscription options on products and allow customers to subscribe"
       }
     },
     "analytics": {
