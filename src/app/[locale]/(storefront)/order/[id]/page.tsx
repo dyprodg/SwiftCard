@@ -29,6 +29,8 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
   const { token } = await searchParams;
   const locale = await getLocale();
   const t = await getTranslations("orderView");
+  const tOrders = await getTranslations("orders");
+  const tReturns = await getTranslations("returns");
 
   const order = await db.query.orders.findFirst({
     where: eq(orders.id, id),
@@ -149,6 +151,38 @@ export default async function OrderViewPage({ params, searchParams }: Props) {
           refunded: t("refunded"),
           requestReturn: t("requestReturn"),
           returnStatus: t("returnStatus"),
+          statuses: {
+            PENDING: tOrders("statuses.PENDING"),
+            CONFIRMED: tOrders("statuses.CONFIRMED"),
+            PROCESSING: tOrders("statuses.PROCESSING"),
+            SHIPPED: tOrders("statuses.SHIPPED"),
+            DELIVERED: tOrders("statuses.DELIVERED"),
+            CANCELLED: tOrders("statuses.CANCELLED"),
+            REFUNDED: tOrders("statuses.REFUNDED"),
+          },
+          paymentStatuses: {
+            PENDING: tOrders("paymentStatuses.PENDING"),
+            PAID: tOrders("paymentStatuses.PAID"),
+            FAILED: tOrders("paymentStatuses.FAILED"),
+            REFUNDED: tOrders("paymentStatuses.REFUNDED"),
+            PARTIALLY_REFUNDED: tOrders("paymentStatuses.PARTIALLY_REFUNDED"),
+          },
+          returnStatuses: {
+            REQUESTED: tReturns("statuses.REQUESTED"),
+            APPROVED: tReturns("statuses.APPROVED"),
+            RECEIVED: tReturns("statuses.RECEIVED"),
+            REFUNDED: tReturns("statuses.REFUNDED"),
+            REJECTED: tReturns("statuses.REJECTED"),
+          },
+          returnReasons: {
+            DEFECTIVE: tReturns("reasons.DEFECTIVE"),
+            WRONG_ITEM: tReturns("reasons.WRONG_ITEM"),
+            NOT_AS_DESCRIBED: tReturns("reasons.NOT_AS_DESCRIBED"),
+            CHANGED_MIND: tReturns("reasons.CHANGED_MIND"),
+            TOO_LARGE: tReturns("reasons.TOO_LARGE"),
+            TOO_SMALL: tReturns("reasons.TOO_SMALL"),
+            OTHER: tReturns("reasons.OTHER"),
+          },
         }}
         returnEligible={returnEligible}
         returnedQuantities={returnedQuantities}

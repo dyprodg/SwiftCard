@@ -91,7 +91,11 @@ export default async function CustomerOrdersPage() {
                   <div className="space-y-1">
                     <p>
                       <span className="text-muted-foreground">{t("paymentLabel")} </span>
-                      <span className="font-medium">{order.paymentStatus}</span>
+                      <span className="font-medium">
+                        {t(
+                          `paymentStatuses.${order.paymentStatus as "PENDING" | "PAID" | "FAILED" | "REFUNDED" | "PARTIALLY_REFUNDED"}`,
+                        )}
+                      </span>
                     </p>
                     {order.shippedAt && (
                       <p>

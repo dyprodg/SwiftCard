@@ -267,6 +267,13 @@
       "TOO_LARGE": "Zu gross",
       "TOO_SMALL": "Zu klein",
       "OTHER": "Sonstiges"
+    },
+    "statuses": {
+      "REQUESTED": "Angefragt",
+      "APPROVED": "Genehmigt",
+      "RECEIVED": "Erhalten",
+      "REFUNDED": "Erstattet",
+      "REJECTED": "Abgelehnt"
     }
   },
   "maintenance": {

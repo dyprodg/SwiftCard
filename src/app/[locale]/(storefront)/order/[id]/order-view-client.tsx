@@ -99,6 +99,10 @@ type Translations = {
   refunded: string;
   requestReturn: string;
   returnStatus: string;
+  statuses: Record<string, string>;
+  paymentStatuses: Record<string, string>;
+  returnStatuses: Record<string, string>;
+  returnReasons: Record<string, string>;
 };
 
 const statusColors: Record<string, string> = {
@@ -266,13 +270,13 @@ export function OrderViewClient({
             </span>
             <div className="flex gap-2">
               <Badge variant="outline" className={statusColors[order.status] ?? ""}>
-                {order.status}
+                {t.statuses[order.status] ?? order.status}
               </Badge>
               <Badge
                 variant="outline"
                 className={paymentStatusColors[order.paymentStatus] ?? ""}
               >
-                {order.paymentStatus}
+                {t.paymentStatuses[order.paymentStatus] ?? order.paymentStatus}
               </Badge>
             </div>
           </CardTitle>
@@ -416,7 +420,9 @@ export function OrderViewClient({
                   className="flex items-center justify-between rounded-md border p-3"
                 >
                   <div>
-                    <p className="text-sm font-medium">{r.reason}</p>
+                    <p className="text-sm font-medium">
+                      {t.returnReasons[r.reason] ?? r.reason}
+                    </p>
                     <p className="text-muted-foreground text-xs">
                       {new Date(r.createdAt).toLocaleDateString(
                         locale === "de" ? "de-CH" : "en-CH",
@@ -424,7 +430,7 @@ export function OrderViewClient({
                     </p>
                   </div>
                   <Badge variant="outline" className={returnStatusColors[r.status] ?? ""}>
-                    {r.status}
+                    {t.returnStatuses[r.status] ?? r.status}
                   </Badge>
                 </div>
               ))}
