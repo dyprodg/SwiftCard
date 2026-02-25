@@ -16,7 +16,11 @@ import {
   sendSubscriptionRenewedEmail,
   sendSubscriptionPaymentFailedEmail,
   sendSubscriptionCancelledEmail,
+  sendGiftCardEmail,
 } from "@/lib/resend";
+import { giftCards, giftCardTransactions } from "@/db/schema/gift-cards";
+import { generateGiftCardCode, formatGiftCardCode } from "@/lib/utils/gift-card-code";
+import { formatPrice } from "@/lib/utils/format-price";
 import { buildOrderViewUrl } from "@/lib/utils/order-url";
 import { convertReservations, expireReservations } from "@/lib/reservations";
 import { logOrderEvent, logOrderEventTx } from "@/lib/utils/order-events";
@@ -376,6 +380,59 @@ export async function POST(req: NextRequest) {
         const orderId = session.metadata?.orderId;
         const isDraftOrder = session.metadata?.isDraftOrder === "true";
         const isSubscription = session.metadata?.isSubscription === "true";
+        const isGiftCardPurchase = session.metadata?.type === "gift_card_purchase";
+
+        if (isGiftCardPurchase) {
+          // ── Gift card purchase completed ──
+          const amount = parseInt(session.metadata?.amount || "0", 10);
+          const recipientEmail = session.metadata?.recipientEmail || "";
+          const recipientName = session.metadata?.recipientName || "";
+          const senderName = session.metadata?.senderName || "";
+          const personalMessage = session.metadata?.personalMessage || "";
+          const purchaserEmail = session.metadata?.purchaserEmail || "";
+          const purchaserUserId = session.metadata?.purchaserUserId || "";
+
+          if (amount > 0 && recipientEmail) {
+            const code = generateGiftCardCode();
+
+            const [card] = await db
+              .insert(giftCards)
+              .values({
+                code,
+                initialBalance: amount,
+                currentBalance: amount,
+                status: "ACTIVE",
+                recipientEmail,
+                recipientName: recipientName || null,
+                senderName: senderName || null,
+                personalMessage: personalMessage || null,
+                purchasedByEmail: purchaserEmail || null,
+                purchasedByUserId: purchaserUserId || null,
+              })
+              .returning();
+
+            await db.insert(giftCardTransactions).values({
+              giftCardId: card.id,
+              type: "PURCHASE",
+              amount,
+              balanceAfter: amount,
+              note: "Customer purchase via Stripe",
+              createdBy: purchaserUserId || "stripe",
+            });
+
+            // Send gift card email to recipient
+            sendGiftCardEmail(recipientEmail, {
+              recipientName: recipientName || recipientEmail,
+              senderName: senderName || "Someone special",
+              code: formatGiftCardCode(code),
+              amount: formatPrice(amount),
+              personalMessage: personalMessage || undefined,
+            }).catch((err) => console.error("Failed to send gift card email:", err));
+
+            revalidateTag("gift-cards", "minutes");
+          }
+          break;
+        }
 
         if (isSubscription && session.mode === "subscription") {
           // ── Subscription checkout completed ──

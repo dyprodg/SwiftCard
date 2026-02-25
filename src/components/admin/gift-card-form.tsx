@@ -56,6 +56,7 @@ export function GiftCardForm() {
           personalMessage: data.personalMessage || undefined,
           expiresAt: data.expiresAt || undefined,
           note: data.note || undefined,
+          sendEmail: data.sendEmail,
         });
         toast.success(t("created"));
         router.push(`/${locale}/admin/gift-cards/${card.id}`);

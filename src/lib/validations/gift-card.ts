@@ -9,6 +9,7 @@ export const createGiftCardSchema = z.object({
   personalMessage: z.string().max(1000).optional(),
   expiresAt: z.string().optional(), // date or ISO datetime string
   note: z.string().max(500).optional(),
+  sendEmail: z.boolean().optional(),
 });
 
 // Admin: update gift card status/expiry

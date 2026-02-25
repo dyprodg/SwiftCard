@@ -14,7 +14,13 @@ import {
   type UpdateGiftCardInput,
   type AdjustBalanceInput,
 } from "@/lib/validations/gift-card";
-import { generateGiftCardCode, normalizeGiftCardCode } from "@/lib/utils/gift-card-code";
+import {
+  generateGiftCardCode,
+  normalizeGiftCardCode,
+  formatGiftCardCode,
+} from "@/lib/utils/gift-card-code";
+import { sendGiftCardEmail } from "@/lib/resend";
+import { formatPrice } from "@/lib/utils/format-price";
 
 async function requireAdmin() {
   const { userId, sessionClaims } = await auth();
@@ -57,6 +63,20 @@ export async function createGiftCard(input: CreateGiftCardInput) {
       note: data.note || "Admin-issued gift card",
       createdBy: adminId,
     });
+
+    // Send gift card email to recipient
+    if (data.sendEmail && data.recipientEmail) {
+      sendGiftCardEmail(data.recipientEmail, {
+        recipientName: data.recipientName || data.recipientEmail,
+        senderName: data.senderName || "SwiftCard",
+        code: formatGiftCardCode(code),
+        amount: formatPrice(data.initialBalance),
+        personalMessage: data.personalMessage || undefined,
+        expiresAt: data.expiresAt
+          ? new Date(data.expiresAt).toLocaleDateString("de-CH")
+          : undefined,
+      }).catch((err) => console.error("Failed to send gift card email:", err));
+    }
 
     updateTag("gift-cards");
     return card;

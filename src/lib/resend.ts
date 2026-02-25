@@ -362,3 +362,24 @@ export async function sendPaymentLinkEmail(
     react: PaymentLinkEmail(data),
   });
 }
+
+export async function sendGiftCardEmail(
+  to: string,
+  data: {
+    recipientName: string;
+    senderName: string;
+    code: string;
+    amount: string;
+    personalMessage?: string;
+    expiresAt?: string;
+  },
+) {
+  const { GiftCardReceivedEmail } = await import("@/emails/gift-card-received");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `You received a ${data.amount} gift card from ${data.senderName}!`,
+    react: GiftCardReceivedEmail(data),
+  });
+}
