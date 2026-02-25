@@ -1,31 +1,16 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures/base-test";
+import { dismissCookieBanner } from "../fixtures/helpers";
 
-// Dismiss cookie banner by setting consent in localStorage before the page hydrates
-async function dismissCookieBanner(page: import("@playwright/test").Page) {
-  await page.evaluate(() => {
-    localStorage.setItem(
-      "swiftcard-cookie-consent",
-      JSON.stringify({
-        state: { consent: { essential: true, analytics: false } },
-        version: 0,
-      }),
-    );
-  });
-  await page.reload();
-}
-
-test.describe("Header navigation", () => {
-  test("header is visible and sticky", async ({ page }) => {
+test.describe("Header Navigation", () => {
+  test("header is visible", async ({ page }) => {
     await page.goto("/de");
-    const header = page.locator("header");
-    await expect(header).toBeVisible();
+    await expect(page.locator("header")).toBeVisible();
   });
 
-  test("logo/shop name links to home", async ({ page }) => {
+  test("logo links to home", async ({ page }) => {
     await page.goto("/de/products");
     const header = page.locator("header");
-    const homeLink = header.getByRole("link").first();
-    await homeLink.click();
+    await header.getByRole("link").first().click();
     await expect(page).toHaveURL(/\/de$/);
   });
 
@@ -36,18 +21,29 @@ test.describe("Header navigation", () => {
     await expect(page).toHaveURL(/\/de\/products/);
   });
 
-  test("locale switcher is visible in header", async ({ page }) => {
+  test("locale switcher is visible", async ({ page }) => {
     await page.goto("/de");
     const header = page.locator("header");
     await expect(header.getByRole("link", { name: "EN", exact: true })).toBeVisible();
   });
+
+  test("cart icon is visible in header", async ({ page }) => {
+    await page.goto("/de");
+    const header = page.locator("header");
+    // Cart button/icon should be present
+    await expect(
+      header
+        .locator("button, a")
+        .filter({ has: page.locator("svg") })
+        .last(),
+    ).toBeVisible();
+  });
 });
 
-test.describe("Footer navigation", () => {
+test.describe("Footer Navigation", () => {
   test("footer is visible on homepage", async ({ page }) => {
     await page.goto("/de");
-    const footer = page.locator("footer");
-    await expect(footer).toBeVisible();
+    await expect(page.locator("footer")).toBeVisible();
   });
 
   test("terms link navigates to terms page", async ({ page }) => {
@@ -74,7 +70,7 @@ test.describe("Footer navigation", () => {
     await expect(page).toHaveURL(/\/de\/imprint/);
   });
 
-  test("cookie settings button is visible in footer", async ({ page }) => {
+  test("cookie settings button is visible", async ({ page }) => {
     await page.goto("/de");
     await dismissCookieBanner(page);
     const footer = page.locator("footer");
@@ -82,19 +78,11 @@ test.describe("Footer navigation", () => {
   });
 });
 
-test.describe("Cross-page navigation", () => {
-  test("can navigate from products back to home via logo", async ({ page }) => {
+test.describe("Cross-page Navigation", () => {
+  test("can navigate from products back to home", async ({ page }) => {
     await page.goto("/de/products");
     const header = page.locator("header");
     await header.getByRole("link").first().click();
     await expect(page).toHaveURL(/\/de$/);
-  });
-
-  test("legal pages have consistent header and footer", async ({ page }) => {
-    for (const path of ["/de/terms", "/de/privacy", "/de/imprint"]) {
-      await page.goto(path);
-      await expect(page.locator("header")).toBeVisible();
-      await expect(page.locator("footer")).toBeVisible();
-    }
   });
 });

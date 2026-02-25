@@ -1,38 +1,38 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures/base-test";
 
-test.describe("SEO meta tags", () => {
-  test("homepage has a title", async ({ page }) => {
+test.describe("SEO Meta Tags", () => {
+  test("homepage has title", async ({ page }) => {
     await page.goto("/de");
     const title = await page.title();
     expect(title.length).toBeGreaterThan(0);
   });
 
-  test("products page has a title", async ({ page }) => {
+  test("products page has title", async ({ page }) => {
     await page.goto("/de/products");
     const title = await page.title();
     expect(title.length).toBeGreaterThan(0);
   });
 
-  test("terms page has correct title", async ({ page }) => {
+  test("terms page has correct DE title", async ({ page }) => {
     await page.goto("/de/terms");
     const title = await page.title();
     expect(title).toContain("Geschäftsbedingungen");
   });
 
-  test("privacy page has correct title", async ({ page }) => {
+  test("privacy page has correct DE title", async ({ page }) => {
     await page.goto("/de/privacy");
     const title = await page.title();
     expect(title).toContain("Datenschutz");
   });
 
-  test("EN terms page has English title", async ({ page }) => {
+  test("terms page has correct EN title", async ({ page }) => {
     await page.goto("/en/terms");
     const title = await page.title();
     expect(title).toContain("Terms");
   });
 });
 
-test.describe("Robots meta", () => {
+test.describe("Robots Meta", () => {
   test("cart page has noindex", async ({ page }) => {
     await page.goto("/de/cart");
     const robots = page.locator('meta[name="robots"]');
@@ -53,17 +53,15 @@ test.describe("Robots meta", () => {
       const content = await robotsMeta.getAttribute("content");
       expect(content).not.toContain("noindex");
     }
-    // If no robots meta exists, that's fine (defaults to index)
   });
 });
 
-test.describe("JSON-LD structured data", () => {
+test.describe("JSON-LD Structured Data", () => {
   test("homepage has Organization JSON-LD", async ({ page }) => {
     await page.goto("/de");
     const jsonLd = page.locator('script[type="application/ld+json"]');
     const count = await jsonLd.count();
     expect(count).toBeGreaterThan(0);
-
     const text = await jsonLd.first().textContent();
     const data = JSON.parse(text!);
     expect(data["@type"]).toBe("Organization");
