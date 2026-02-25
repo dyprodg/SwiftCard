@@ -255,6 +255,86 @@ export async function sendReturnReceivedEmail(
   });
 }
 
+export async function sendSubscriptionConfirmedEmail(
+  to: string,
+  data: {
+    planName: string;
+    interval: string;
+    price: number;
+    currency: string;
+    nextBillingDate: string;
+    manageUrl: string;
+  },
+) {
+  const { SubscriptionConfirmedEmail } = await import("@/emails/subscription-confirmed");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `Subscription Confirmed — ${data.planName}`,
+    react: SubscriptionConfirmedEmail(data),
+  });
+}
+
+export async function sendSubscriptionRenewedEmail(
+  to: string,
+  data: {
+    planName: string;
+    orderNumber: string;
+    price: number;
+    currency: string;
+    nextBillingDate: string;
+    manageUrl: string;
+  },
+) {
+  const { SubscriptionRenewedEmail } = await import("@/emails/subscription-renewed");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `Subscription Renewed — ${data.planName}`,
+    react: SubscriptionRenewedEmail(data),
+  });
+}
+
+export async function sendSubscriptionPaymentFailedEmail(
+  to: string,
+  data: {
+    planName: string;
+    price: number;
+    currency: string;
+    manageUrl: string;
+  },
+) {
+  const { SubscriptionPaymentFailedEmail } =
+    await import("@/emails/subscription-payment-failed");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `Payment Failed — ${data.planName}`,
+    react: SubscriptionPaymentFailedEmail(data),
+  });
+}
+
+export async function sendSubscriptionCancelledEmail(
+  to: string,
+  data: {
+    planName: string;
+    endDate: string;
+    shopUrl: string;
+  },
+) {
+  const { SubscriptionCancelledEmail } = await import("@/emails/subscription-cancelled");
+
+  return resend.emails.send({
+    from: FROM_EMAIL,
+    to: resolveRecipient(to),
+    subject: `Subscription Cancelled — ${data.planName}`,
+    react: SubscriptionCancelledEmail(data),
+  });
+}
+
 export async function sendPaymentLinkEmail(
   to: string,
   data: {

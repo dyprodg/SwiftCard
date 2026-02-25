@@ -29,6 +29,14 @@ import type {
 import type { customerAddresses, abandonedCarts } from "@/db/schema/customer-profiles";
 import type { shippingZones, shippingRates, taxZones } from "@/db/schema/shipping";
 import type { returns, returnItems } from "@/db/schema/returns";
+import type { bundles, bundleItems, bundleTranslations } from "@/db/schema/bundles";
+import type { giftCards, giftCardTransactions } from "@/db/schema/gift-cards";
+import type {
+  newsletterSubscribers,
+  emailCampaigns,
+  campaignSends,
+} from "@/db/schema/email-marketing";
+import type { subscriptionPlans, subscriptions } from "@/db/schema/subscriptions";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -153,6 +161,49 @@ export type ShippingZoneWithRates = ShippingZone & {
   rates: ShippingRate[];
 };
 
+// Bundle types
+export type Bundle = InferSelectModel<typeof bundles>;
+export type BundleItem = InferSelectModel<typeof bundleItems>;
+export type BundleTranslation = InferSelectModel<typeof bundleTranslations>;
+
+export type BundleWithItems = Bundle & {
+  items: (BundleItem & {
+    product: Product & { images: ProductImage[]; variants: ProductVariant[] };
+    variant: ProductVariant | null;
+  })[];
+  translations: BundleTranslation[];
+};
+
+// Gift card types
+export type GiftCard = InferSelectModel<typeof giftCards>;
+export type GiftCardTransaction = InferSelectModel<typeof giftCardTransactions>;
+
+export type GiftCardWithTransactions = GiftCard & {
+  transactions: GiftCardTransaction[];
+};
+
+// Email marketing types
+export type NewsletterSubscriber = InferSelectModel<typeof newsletterSubscribers>;
+export type EmailCampaign = InferSelectModel<typeof emailCampaigns>;
+export type CampaignSend = InferSelectModel<typeof campaignSends>;
+
+export type CampaignWithSends = EmailCampaign & {
+  sends: CampaignSend[];
+};
+
+// Subscription types
+export type SubscriptionPlan = InferSelectModel<typeof subscriptionPlans>;
+export type Subscription = InferSelectModel<typeof subscriptions>;
+
+export type SubscriptionPlanWithProduct = SubscriptionPlan & {
+  product: Product & { images: ProductImage[] };
+  variant: ProductVariant | null;
+};
+
+export type SubscriptionWithPlan = Subscription & {
+  plan: SubscriptionPlanWithProduct;
+};
+
 // Cart types
 export type CartItem = {
   productId: string;
@@ -163,10 +214,12 @@ export type CartItem = {
   unitPrice: number; // cents
   imageUrl: string | null;
   categoryId: string | null;
+  bundleId?: string | null; // links cart items that belong to a bundle
 };
 
 // Checkout types
 export type CheckoutResponse = {
-  clientSecret: string;
+  clientSecret: string | null; // null when fully covered by gift card
   orderId: string;
+  paid?: boolean; // true when gift card covers the full amount
 };

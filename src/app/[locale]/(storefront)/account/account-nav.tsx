@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { User, Package, MapPin, Shield } from "lucide-react";
+import { User, Package, MapPin, Shield, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { key: "overview" as const, href: "/account", icon: User },
   { key: "myOrders" as const, href: "/account/orders", icon: Package },
+  { key: "subscriptions" as const, href: "/account/subscriptions", icon: RefreshCw },
   { key: "addresses" as const, href: "/account/addresses", icon: MapPin },
   { key: "data" as const, href: "/account/data", icon: Shield },
 ];

@@ -31,6 +31,18 @@ export async function Header() {
           >
             {t("products")}
           </Link>
+          <Link
+            href={`/${locale}/bundles`}
+            className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+          >
+            {t("bundles")}
+          </Link>
+          <Link
+            href={`/${locale}/gift-cards`}
+            className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+          >
+            {t("giftCards")}
+          </Link>
         </nav>
 
         {/* Actions */}

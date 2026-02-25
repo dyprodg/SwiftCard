@@ -15,6 +15,7 @@ export const checkoutSchema = z.object({
   customerEmail: z.string().email("Invalid email address"),
   customerNote: z.string().max(500).optional().default(""),
   couponCode: z.string().trim().max(50).optional(),
+  giftCardCode: z.string().trim().max(20).optional(),
   saveAddress: z.boolean().optional().default(false),
   shippingRateId: z.string().optional(),
 });

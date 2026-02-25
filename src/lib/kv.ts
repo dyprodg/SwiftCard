@@ -18,6 +18,7 @@ export type CartItem = {
   unitPrice: number; // cents
   imageUrl: string | null;
   categoryId: string | null;
+  bundleId?: string | null; // links cart items that belong to a bundle
 };
 
 // ==================== KEYS ====================

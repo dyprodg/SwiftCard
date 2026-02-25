@@ -32,6 +32,9 @@ import {
 } from "@/server/actions/abandoned-carts";
 import { saveAddressFromCheckout } from "@/server/actions/addresses";
 import { auth } from "@clerk/nextjs/server";
+import { giftCards } from "@/db/schema";
+import { normalizeGiftCardCode } from "@/lib/utils/gift-card-code";
+import { redeemGiftCardInTx } from "@/server/actions/gift-cards";
 
 export async function POST(req: NextRequest) {
   try {
@@ -74,6 +77,7 @@ export async function POST(req: NextRequest) {
       customerEmail,
       customerNote,
       couponCode,
+      giftCardCode,
       saveAddress,
       shippingRateId,
     } = validation.data;
@@ -315,6 +319,35 @@ export async function POST(req: NextRequest) {
         taxInclusive,
       );
 
+      // ===== GIFT CARD VALIDATION =====
+      let gcId: string | null = null;
+      let gcAmount = 0;
+      let gcCode: string | null = null;
+      let gcCard: { id: string; currentBalance: number; code: string } | null = null;
+
+      if (giftCardCode) {
+        const normalizedCode = normalizeGiftCardCode(giftCardCode);
+        const [card] = await tx
+          .select()
+          .from(giftCards)
+          .where(eq(giftCards.code, normalizedCode));
+
+        if (!card) throw new Error("Gift card not found");
+        if (card.status !== "ACTIVE") throw new Error("Gift card is not active");
+        if (card.expiresAt && card.expiresAt < new Date())
+          throw new Error("Gift card has expired");
+        if (card.currentBalance <= 0)
+          throw new Error("Gift card has no remaining balance");
+
+        gcCard = card;
+        gcId = card.id;
+        gcCode = card.code;
+        gcAmount = Math.min(card.currentBalance, total);
+      }
+
+      const stripeChargeAmount = total - gcAmount;
+      const fullyCoveredByGiftCard = stripeChargeAmount <= 0;
+
       // Generate order number (simple sequential)
       const [countResult] = await tx
         .select({ count: sql<number>`count(*)::int` })
@@ -326,8 +359,8 @@ export async function POST(req: NextRequest) {
         .insert(orders)
         .values({
           orderNumber,
-          status: "PENDING",
-          paymentStatus: "PENDING",
+          status: fullyCoveredByGiftCard ? "CONFIRMED" : "PENDING",
+          paymentStatus: fullyCoveredByGiftCard ? "PAID" : "PENDING",
           fulfillmentStatus: "UNFULFILLED",
           subtotal,
           tax,
@@ -349,8 +382,17 @@ export async function POST(req: NextRequest) {
           discountAmount,
           discountCode,
           taxInclusive,
+          giftCardId: gcId,
+          giftCardAmount: gcAmount,
+          giftCardCode: gcCode,
+          ...(fullyCoveredByGiftCard && { paidAt: new Date() }),
         })
         .returning();
+
+      // Deduct gift card balance atomically
+      if (gcCard && gcAmount > 0) {
+        await redeemGiftCardInTx(tx, gcCard.id, gcAmount, order.id);
+      }
 
       // Insert order items
       await tx.insert(orderItems).values(
@@ -380,12 +422,84 @@ export async function POST(req: NextRequest) {
         reservationSettings.timeoutMinutes,
       );
 
-      return { order, validatedItems, total, currency, discountCode, discountAmount };
+      return {
+        order,
+        validatedItems,
+        total,
+        stripeChargeAmount,
+        fullyCoveredByGiftCard,
+        currency,
+        discountCode,
+        discountAmount,
+        gcAmount,
+      };
     });
 
-    // Create Stripe PaymentIntent
+    // Fire-and-forget helpers
+    const orderViewUrl = buildOrderViewUrl(
+      result.order.id,
+      result.order.guestAccessToken,
+      "en",
+    );
+
+    logOrderEvent({
+      orderId: result.order.id,
+      type: "ORDER_CREATED",
+      data: { orderNumber: result.order.orderNumber },
+      createdBy: "system",
+    }).catch(() => {});
+
+    if (result.gcAmount > 0) {
+      logOrderEvent({
+        orderId: result.order.id,
+        type: "GIFT_CARD_APPLIED",
+        data: { amount: result.gcAmount },
+        createdBy: "system",
+      }).catch(() => {});
+    }
+
+    sendOrderCreatedEmail(result.order.customerEmail, {
+      orderNumber: result.order.orderNumber,
+      items: result.validatedItems.map((item) => ({
+        productName: item.productName,
+        variantName: item.variantName,
+        quantity: item.quantity,
+        total: item.unitPrice * item.quantity,
+      })),
+      total: result.total,
+      currency: result.currency,
+      orderViewUrl,
+    }).catch((err) => console.error("Failed to send order-created email:", err));
+
+    // Save address for logged-in users if they opted in
+    if (saveAddress) {
+      saveAddressFromCheckout({
+        name: shippingAddress.name,
+        phone: shippingAddress.phone,
+        address1: shippingAddress.address1,
+        address2: shippingAddress.address2,
+        city: shippingAddress.city,
+        zip: shippingAddress.zip,
+        country: shippingAddress.country,
+      }).catch(() => {});
+    }
+
+    // If gift card fully covers the order, skip Stripe
+    if (result.fullyCoveredByGiftCard) {
+      // Clear the cart (fire-and-forget)
+      const { setCart } = await import("@/lib/kv");
+      setCart(cartId, []).catch(() => {});
+
+      return NextResponse.json({
+        clientSecret: null,
+        orderId: result.order.id,
+        paid: true,
+      });
+    }
+
+    // Create Stripe PaymentIntent for the remaining amount
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: result.total,
+      amount: result.stripeChargeAmount,
       currency: result.currency.toLowerCase(),
       metadata: {
         orderId: result.order.id,
@@ -395,6 +509,9 @@ export async function POST(req: NextRequest) {
         ...(result.discountCode && { discountCode: result.discountCode }),
         ...(result.discountAmount > 0 && {
           discountAmount: result.discountAmount.toString(),
+        }),
+        ...(result.gcAmount > 0 && {
+          giftCardAmount: result.gcAmount.toString(),
         }),
       },
       automatic_payment_methods: {
@@ -411,51 +528,11 @@ export async function POST(req: NextRequest) {
     // Snapshot abandoned cart (in case payment is never completed)
     snapshotAbandonedCart({
       sessionId: sessionId!,
-      userId: null, // Will be set client-side if available
+      userId: null,
       email: customerEmail,
       items: cartItems,
       subtotal: result.order.subtotal,
     }).catch(() => {});
-
-    // Save address for logged-in users if they opted in
-    if (saveAddress) {
-      saveAddressFromCheckout({
-        name: shippingAddress.name,
-        phone: shippingAddress.phone,
-        address1: shippingAddress.address1,
-        address2: shippingAddress.address2,
-        city: shippingAddress.city,
-        zip: shippingAddress.zip,
-        country: shippingAddress.country,
-      }).catch(() => {});
-    }
-
-    // Send order-created email (fire-and-forget)
-    const orderViewUrl = buildOrderViewUrl(
-      result.order.id,
-      result.order.guestAccessToken,
-      "en",
-    );
-    // Log ORDER_CREATED event (fire-and-forget)
-    logOrderEvent({
-      orderId: result.order.id,
-      type: "ORDER_CREATED",
-      data: { orderNumber: result.order.orderNumber },
-      createdBy: "system",
-    }).catch(() => {});
-
-    sendOrderCreatedEmail(result.order.customerEmail, {
-      orderNumber: result.order.orderNumber,
-      items: result.validatedItems.map((item) => ({
-        productName: item.productName,
-        variantName: item.variantName,
-        quantity: item.quantity,
-        total: item.unitPrice * item.quantity,
-      })),
-      total: result.total,
-      currency: result.currency,
-      orderViewUrl,
-    }).catch((err) => console.error("Failed to send order-created email:", err));
 
     return NextResponse.json({
       clientSecret: paymentIntent.client_secret,

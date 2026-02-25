@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { LocaleSwitcher } from "./locale-switcher";
 import { CookieSettingsButton } from "./cookie-settings-button";
+import { NewsletterFooterForm } from "./newsletter-footer-form";
 import { getShopSettings } from "@/lib/edge-config";
 
 export async function Footer() {
@@ -14,7 +15,7 @@ export async function Footer() {
   return (
     <footer className="bg-muted/40 border-t">
       <div className="container mx-auto px-4 py-8">
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 font-bold">
@@ -56,6 +57,13 @@ export async function Footer() {
               </Link>
               <CookieSettingsButton label={t("cookieSettings")} />
             </nav>
+          </div>
+
+          {/* Newsletter */}
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold">{t("newsletter")}</h3>
+            <p className="text-muted-foreground text-sm">{t("newsletterDescription")}</p>
+            <NewsletterFooterForm />
           </div>
 
           {/* Copyright + Locale */}

@@ -10,6 +10,7 @@ import { ChevronRight } from "lucide-react";
 import { getProductBySlug } from "@/server/queries/products";
 import { getActiveDiscountsForDisplay } from "@/server/queries/discounts";
 import { getWishlistProductIds } from "@/server/queries/wishlist";
+import { getSubscriptionPlansForProduct } from "@/server/queries/subscriptions";
 import { localizeProduct } from "@/lib/utils/localize-product";
 import { productJsonLd, breadcrumbJsonLd } from "@/lib/seo/json-ld";
 import { formatPrice } from "@/lib/utils/format-price";
@@ -19,6 +20,7 @@ import { WishlistButton } from "@/components/storefront/wishlist-button";
 import { ReviewList } from "@/components/storefront/review-list";
 import { RecentlyViewed } from "@/components/storefront/recently-viewed";
 import { ProductDetailClient } from "./product-detail-client";
+import { SubscriptionOptions } from "@/components/storefront/subscription-options";
 import type { DiscountWithRelations } from "@/types";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://localhost:3000";
@@ -124,6 +126,11 @@ export default async function ProductDetailPage({ params }: Props) {
   if (!product || product.status !== "ACTIVE") {
     notFound();
   }
+
+  // Fetch subscription plans if product is subscribable
+  const subPlans = product.subscribable
+    ? await getSubscriptionPlansForProduct(product.id)
+    : [];
 
   const localized = localizeProduct(product, locale);
   const primaryImage = localized.images[0];
@@ -270,6 +277,11 @@ export default async function ProductDetailPage({ params }: Props) {
             categoryId={product.categoryId}
             discount={discount ? { type: discount.type, value: discount.value } : null}
           />
+
+          {/* Subscription Options */}
+          {subPlans.length > 0 && (
+            <SubscriptionOptions plans={subPlans} basePrice={product.basePrice} />
+          )}
 
           {/* Description */}
           {localized.description && (

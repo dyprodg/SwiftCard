@@ -10,4 +10,8 @@ export * from "./customer-features";
 export * from "./customer-profiles";
 export * from "./shipping";
 export * from "./returns";
+export * from "./bundles";
+export * from "./gift-cards";
+export * from "./email-marketing";
+export * from "./subscriptions";
 export * from "./relations";

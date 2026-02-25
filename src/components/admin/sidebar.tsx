@@ -19,17 +19,25 @@ import {
   Percent,
   FileEdit,
   RotateCcw,
+  PackagePlus,
+  Gift,
+  Mail,
+  RefreshCw,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
   { key: "dashboard" as const, href: "/admin/dashboard", icon: LayoutDashboard },
   { key: "products" as const, href: "/admin/products", icon: Package },
+  { key: "bundles" as const, href: "/admin/bundles", icon: PackagePlus },
   { key: "orders" as const, href: "/admin/orders", icon: ShoppingCart },
   { key: "draftOrders" as const, href: "/admin/draft-orders", icon: FileEdit },
   { key: "returns" as const, href: "/admin/returns", icon: RotateCcw },
+  { key: "giftCards" as const, href: "/admin/gift-cards", icon: Gift },
+  { key: "subscriptions" as const, href: "/admin/subscriptions", icon: RefreshCw },
   { key: "discounts" as const, href: "/admin/discounts", icon: Tag },
   { key: "customers" as const, href: "/admin/customers", icon: Users },
+  { key: "emailMarketing" as const, href: "/admin/email-marketing", icon: Mail },
   { key: "reviews" as const, href: "/admin/reviews", icon: MessageSquare },
   { key: "abandonedCarts" as const, href: "/admin/abandoned-carts", icon: ShoppingBag },
   { key: "shipping" as const, href: "/admin/shipping", icon: Truck },

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Plus } from "lucide-react";
+import { Plus, Download, Upload } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { getProducts } from "@/server/queries/products";
@@ -50,12 +50,29 @@ export default async function ProductsPage({ searchParams, params }: Props) {
           <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-muted-foreground">{t("totalCount", { count: total })}</p>
         </div>
-        <Button asChild>
-          <Link href={`/${locale}/admin/products/new`}>
-            <Plus className="mr-2 h-4 w-4" />
-            {t("addProduct")}
-          </Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" asChild>
+            <a
+              href={`/api/admin/products/export${sp.status ? `?status=${sp.status}` : ""}`}
+              download
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {t("exportCsv")}
+            </a>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/${locale}/admin/products/import`}>
+              <Upload className="mr-2 h-4 w-4" />
+              {t("importCsv")}
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href={`/${locale}/admin/products/new`}>
+              <Plus className="mr-2 h-4 w-4" />
+              {t("addProduct")}
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

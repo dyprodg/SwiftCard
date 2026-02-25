@@ -22,6 +22,13 @@ export const orderEventTypeEnum = pgEnum("order_event_type", [
   "RETURN_RECEIVED",
   "RETURN_REFUNDED",
   "RETURN_REJECTED",
+  "GIFT_CARD_APPLIED",
+  "GIFT_CARD_ISSUED",
+  "GIFT_CARD_REFUNDED",
+  "SUBSCRIPTION_CREATED",
+  "SUBSCRIPTION_RENEWED",
+  "SUBSCRIPTION_CANCELLED",
+  "SUBSCRIPTION_PAUSED",
 ]);
 
 export const orderEvents = pgTable(

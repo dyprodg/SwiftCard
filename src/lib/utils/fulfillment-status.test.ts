@@ -13,6 +13,7 @@ function makeOrderItem(
     variantName: null,
     unitPrice: 1000,
     total: overrides.quantity * 1000,
+    bundleId: null,
     ...overrides,
   };
 }

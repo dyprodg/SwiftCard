@@ -103,6 +103,10 @@ export const orders = pgTable(
     paymentLinkExpiresAt: timestamp("payment_link_expires_at"),
     paymentLinkSentAt: timestamp("payment_link_sent_at"),
     taxInclusive: boolean("tax_inclusive").default(true).notNull(),
+    giftCardId: text("gift_card_id"),
+    giftCardAmount: integer("gift_card_amount").default(0).notNull(),
+    giftCardCode: text("gift_card_code"),
+    subscriptionId: text("subscription_id"),
   },
   (table) => [
     uniqueIndex("orders_order_number_idx").on(table.orderNumber),
@@ -129,6 +133,7 @@ export const orderItems = pgTable(
     quantity: integer("quantity").notNull(),
     unitPrice: integer("unit_price").notNull(),
     total: integer("total").notNull(),
+    bundleId: text("bundle_id"), // nullable — links to bundle purchase
   },
   (table) => [
     index("order_items_order_id_idx").on(table.orderId),

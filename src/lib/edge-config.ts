@@ -118,6 +118,41 @@ export async function getReturnSettings(): Promise<ReturnSettings> {
   }
 }
 
+export type NewsletterSettings = {
+  enabled: boolean;
+  doubleOptIn: boolean;
+  showPopup: boolean;
+  popupDelaySeconds: number;
+  showFooterForm: boolean;
+  winbackEnabled: boolean;
+  winbackDays: number;
+};
+
+const NEWSLETTER_DEFAULTS: NewsletterSettings = {
+  enabled: true,
+  doubleOptIn: true,
+  showPopup: false,
+  popupDelaySeconds: 10,
+  showFooterForm: true,
+  winbackEnabled: false,
+  winbackDays: 90,
+};
+
+export async function getNewsletterSettings(): Promise<NewsletterSettings> {
+  "use cache";
+  cacheTag("newsletter-settings");
+  cacheLife("hours");
+
+  try {
+    const client = getClient();
+    if (!client) return NEWSLETTER_DEFAULTS;
+    const settings = await client.get<NewsletterSettings>("newsletterSettings");
+    return settings ?? NEWSLETTER_DEFAULTS;
+  } catch {
+    return NEWSLETTER_DEFAULTS;
+  }
+}
+
 export async function isMaintenanceMode(): Promise<boolean> {
   try {
     const client = getClient();

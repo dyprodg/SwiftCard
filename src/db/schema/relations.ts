@@ -15,6 +15,10 @@ import { wishlists, productReviews, stockNotifications } from "./customer-featur
 import { customerAddresses } from "./customer-profiles";
 import { shippingZones, shippingRates, taxZones } from "./shipping";
 import { returns, returnItems } from "./returns";
+import { bundles, bundleItems, bundleTranslations } from "./bundles";
+import { giftCards, giftCardTransactions } from "./gift-cards";
+import { newsletterSubscribers, emailCampaigns, campaignSends } from "./email-marketing";
+import { subscriptionPlans, subscriptions } from "./subscriptions";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -28,6 +32,7 @@ export const productsRelations = relations(products, ({ one, many }) => ({
   wishlists: many(wishlists),
   reviews: many(productReviews),
   stockNotifications: many(stockNotifications),
+  subscriptionPlans: many(subscriptionPlans),
 }));
 
 export const productImagesRelations = relations(productImages, ({ one }) => ({
@@ -71,6 +76,10 @@ export const ordersRelations = relations(orders, ({ one, many }) => ({
   reservations: many(stockReservations),
   events: many(orderEvents),
   returns: many(returns),
+  subscription: one(subscriptions, {
+    fields: [orders.subscriptionId],
+    references: [subscriptions.id],
+  }),
   discount: one(discounts, {
     fields: [orders.discountId],
     references: [discounts.id],
@@ -247,5 +256,94 @@ export const returnItemsRelations = relations(returnItems, ({ one }) => ({
   orderItem: one(orderItems, {
     fields: [returnItems.orderItemId],
     references: [orderItems.id],
+  }),
+}));
+
+// Bundle relations
+export const bundlesRelations = relations(bundles, ({ many }) => ({
+  items: many(bundleItems),
+  translations: many(bundleTranslations),
+}));
+
+export const bundleItemsRelations = relations(bundleItems, ({ one }) => ({
+  bundle: one(bundles, {
+    fields: [bundleItems.bundleId],
+    references: [bundles.id],
+  }),
+  product: one(products, {
+    fields: [bundleItems.productId],
+    references: [products.id],
+  }),
+  variant: one(productVariants, {
+    fields: [bundleItems.variantId],
+    references: [productVariants.id],
+  }),
+}));
+
+export const bundleTranslationsRelations = relations(bundleTranslations, ({ one }) => ({
+  bundle: one(bundles, {
+    fields: [bundleTranslations.bundleId],
+    references: [bundles.id],
+  }),
+}));
+
+// Gift card relations
+export const giftCardsRelations = relations(giftCards, ({ many }) => ({
+  transactions: many(giftCardTransactions),
+}));
+
+export const giftCardTransactionsRelations = relations(
+  giftCardTransactions,
+  ({ one }) => ({
+    giftCard: one(giftCards, {
+      fields: [giftCardTransactions.giftCardId],
+      references: [giftCards.id],
+    }),
+  }),
+);
+
+// Email marketing relations
+export const emailCampaignsRelations = relations(emailCampaigns, ({ many }) => ({
+  sends: many(campaignSends),
+}));
+
+export const campaignSendsRelations = relations(campaignSends, ({ one }) => ({
+  campaign: one(emailCampaigns, {
+    fields: [campaignSends.campaignId],
+    references: [emailCampaigns.id],
+  }),
+  subscriber: one(newsletterSubscribers, {
+    fields: [campaignSends.subscriberId],
+    references: [newsletterSubscribers.id],
+  }),
+}));
+
+export const newsletterSubscribersRelations = relations(
+  newsletterSubscribers,
+  ({ many }) => ({
+    sends: many(campaignSends),
+  }),
+);
+
+// Subscription relations
+export const subscriptionPlansRelations = relations(
+  subscriptionPlans,
+  ({ one, many }) => ({
+    product: one(products, {
+      fields: [subscriptionPlans.productId],
+      references: [products.id],
+    }),
+    variant: one(productVariants, {
+      fields: [subscriptionPlans.variantId],
+      references: [productVariants.id],
+    }),
+    subscriptions: many(subscriptions),
+  }),
+);
+
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  plan: one(subscriptionPlans, {
+    fields: [subscriptions.planId],
+    references: [subscriptionPlans.id],
   }),
 }));

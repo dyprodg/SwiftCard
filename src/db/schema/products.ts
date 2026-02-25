@@ -37,6 +37,7 @@ export const products = pgTable(
       .notNull(),
     publishedAt: timestamp("published_at"),
     categoryId: text("category_id"),
+    subscribable: boolean("subscribable").default(false).notNull(),
   },
   (table) => [
     uniqueIndex("products_slug_idx").on(table.slug),
