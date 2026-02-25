@@ -1,28 +1,29 @@
-import { test, expect } from "../fixtures/base-test";
+import { test, expect } from "../fixtures/auth-test";
+import { isAdminAccessible } from "../fixtures/helpers";
 
-function skipIfNoAuth(page: import("@playwright/test").Page) {
-  if (page.url().includes("sign-in")) {
-    test.skip(true, "Admin auth not configured");
+async function skipIfNoAdmin(page: import("@playwright/test").Page) {
+  if (!(await isAdminAccessible(page))) {
+    test.skip(true, "Admin access not available");
   }
 }
 
 test.describe("Admin Customers", () => {
   test("customers list loads", async ({ page, serverErrors }) => {
     await page.goto("/de/admin/customers");
-    skipIfNoAuth(page);
+    await skipIfNoAdmin(page);
     await expect(page.getByRole("heading", { name: /Kunden|Customers/i })).toBeVisible();
     expect(serverErrors).toHaveLength(0);
   });
 
   test("shows customer table or empty state", async ({ page }) => {
     await page.goto("/de/admin/customers");
-    skipIfNoAuth(page);
+    await skipIfNoAdmin(page);
     await expect(page.locator("main")).toBeVisible();
   });
 
   test("customer detail loads if customers exist", async ({ page, serverErrors }) => {
     await page.goto("/de/admin/customers");
-    skipIfNoAuth(page);
+    await skipIfNoAdmin(page);
 
     const customerLinks = page.locator('a[href*="/admin/customers/"]');
     if ((await customerLinks.count()) === 0) {

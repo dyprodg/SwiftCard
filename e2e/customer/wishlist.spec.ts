@@ -1,9 +1,10 @@
-import { test, expect } from "../fixtures/base-test";
+import { test, expect } from "../fixtures/auth-test";
+import { isOnSignInPage } from "../fixtures/helpers";
 
 test.describe("Wishlist", () => {
   test("wishlist page loads", async ({ page, serverErrors }) => {
     await page.goto("/de/wishlist");
-    if (page.url().includes("sign-in")) {
+    if (await isOnSignInPage(page)) {
       test.skip(true, "Auth not configured");
       return;
     }
@@ -15,7 +16,7 @@ test.describe("Wishlist", () => {
 
   test("shows wishlist items or empty state", async ({ page }) => {
     await page.goto("/de/wishlist");
-    if (page.url().includes("sign-in")) {
+    if (await isOnSignInPage(page)) {
       test.skip(true, "Auth not configured");
       return;
     }
@@ -25,14 +26,11 @@ test.describe("Wishlist", () => {
 
   test("wishlist icon visible in header when authenticated", async ({ page }) => {
     await page.goto("/de");
-    if (page.url().includes("sign-in")) {
+    if (await isOnSignInPage(page)) {
       test.skip(true, "Auth not configured");
       return;
     }
-    // Heart icon should be visible in header for authenticated users
     const header = page.locator("header");
-    await expect(
-      header.locator('a[href*="/wishlist"], button').filter({ has: page.locator("svg") }),
-    ).toBeVisible();
+    await expect(header.locator('a[href*="/wishlist"]')).toBeVisible();
   });
 });

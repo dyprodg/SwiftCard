@@ -1,19 +1,22 @@
-import { test, expect } from "../fixtures/base-test";
+import { test, expect } from "../fixtures/auth-test";
+import { isOnSignInPage } from "../fixtures/helpers";
 
 test.describe("Address Book", () => {
   test("addresses page loads", async ({ page, serverErrors }) => {
     await page.goto("/de/account/addresses");
-    if (page.url().includes("sign-in")) {
+    if (await isOnSignInPage(page)) {
       test.skip(true, "Auth not configured");
       return;
     }
-    await expect(page.getByRole("heading", { name: /Adress/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Adressen|Addresses/i }),
+    ).toBeVisible();
     expect(serverErrors).toHaveLength(0);
   });
 
   test("has add address button", async ({ page }) => {
     await page.goto("/de/account/addresses");
-    if (page.url().includes("sign-in")) {
+    if (await isOnSignInPage(page)) {
       test.skip(true, "Auth not configured");
       return;
     }
@@ -26,20 +29,16 @@ test.describe("Address Book", () => {
 
   test("add address form has required fields", async ({ page }) => {
     await page.goto("/de/account/addresses");
-    if (page.url().includes("sign-in")) {
+    if (await isOnSignInPage(page)) {
       test.skip(true, "Auth not configured");
       return;
     }
 
-    // Click add address
     const addBtn = page
       .getByRole("button", { name: /hinzufügen|add/i })
       .or(page.getByRole("link", { name: /hinzufügen|add/i }));
     await addBtn.click();
 
-    // Form should appear with name, address, city, zip, country fields
-    await expect(
-      page.locator('input[name="name"]').or(page.getByLabel(/Name/i)),
-    ).toBeVisible({ timeout: 3000 });
+    await expect(page.getByLabel(/Name/i).first()).toBeVisible({ timeout: 3000 });
   });
 });

@@ -29,6 +29,29 @@ export async function isFeatureEnabled(page: Page, feature: "bundles" | "gift-ca
   return (await link.count()) > 0;
 }
 
+/**
+ * Check if the page was redirected to sign-in by Clerk (client-side redirect).
+ * Returns true if on sign-in page after a brief wait.
+ */
+export async function isOnSignInPage(page: Page): Promise<boolean> {
+  await page.waitForTimeout(2000);
+  return page.url().includes("sign-in");
+}
+
+/**
+ * Check if an admin page loaded successfully (not 404 or sign-in redirect).
+ * Admin pages return 404 when the user lacks the admin role.
+ */
+export async function isAdminAccessible(page: Page): Promise<boolean> {
+  const pageNotFound = await page
+    .getByText("Page Not Found")
+    .isVisible()
+    .catch(() => false);
+  if (pageNotFound) return false;
+  if (page.url().includes("sign-in")) return false;
+  return true;
+}
+
 /** Navigate to a page with cookie banner already dismissed */
 export async function gotoWithCookies(page: Page, url: string) {
   await page.goto(url);

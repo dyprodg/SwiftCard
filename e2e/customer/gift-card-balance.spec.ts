@@ -1,4 +1,5 @@
-import { test, expect } from "../fixtures/base-test";
+import { test, expect } from "../fixtures/auth-test";
+import { isOnSignInPage } from "../fixtures/helpers";
 
 test.describe("Gift Card Balance Check (Authenticated)", () => {
   test("balance check page accessible when authenticated", async ({ page }) => {
@@ -7,30 +8,25 @@ test.describe("Gift Card Balance Check (Authenticated)", () => {
       test.skip(true, "Gift cards feature is disabled");
       return;
     }
-    if (page.url().includes("sign-in")) {
+    if (await isOnSignInPage(page)) {
       test.skip(true, "Auth not configured");
       return;
     }
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 
-  test("can submit balance check form", async ({ page }) => {
+  test("balance check form has input and button", async ({ page }) => {
     const response = await page.goto("/de/gift-cards/check-balance");
     if (response?.status() === 404) {
       test.skip(true, "Gift cards feature is disabled");
       return;
     }
 
+    // Verify form elements exist
     const codeInput = page.locator("input").first();
-    await codeInput.fill("TEST-CODE-1234");
+    await expect(codeInput).toBeVisible();
 
     const checkBtn = page.getByRole("button", { name: /prüfen|check/i });
-    if (await checkBtn.isVisible()) {
-      await checkBtn.click();
-      // Should show result (either balance or error)
-      await page.waitForTimeout(2000);
-      const main = page.locator("main");
-      await expect(main).toBeVisible();
-    }
+    await expect(checkBtn).toBeVisible();
   });
 });
