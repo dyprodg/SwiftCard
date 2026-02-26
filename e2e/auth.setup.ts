@@ -16,6 +16,11 @@ type ClerkWindow = Window & {
       };
     };
     setActive: (opts: { session: string }) => Promise<void>;
+    user?: {
+      publicMetadata: Record<string, unknown>;
+      primaryEmailAddress?: { emailAddress: string };
+    };
+    session?: { id: string };
   };
 };
 
@@ -26,62 +31,45 @@ type ClerkWindow = Window & {
 async function createSignInToken(email: string): Promise<string | null> {
   const secretKey = process.env.CLERK_SECRET_KEY;
   if (!secretKey) {
-    console.warn("⚠ CLERK_SECRET_KEY not set — cannot create sign-in token");
+    console.warn("CLERK_SECRET_KEY not set");
     return null;
   }
 
-  // Find user by email
   const usersRes = await fetch(
     `${CLERK_API}/users?email_address[]=${encodeURIComponent(email)}`,
     { headers: { Authorization: `Bearer ${secretKey}` } },
   );
-  const users = await usersRes.json();
-  if (!users?.length) {
-    console.warn(`⚠ No Clerk user found for ${email}`);
+  const users = (await usersRes.json()) as Array<{
+    id: string;
+    email_addresses: Array<{ email_address: string }>;
+  }>;
+
+  // Find the exact user matching the email (API may return multiple)
+  const user = users?.find((u) =>
+    u.email_addresses.some((e) => e.email_address.toLowerCase() === email.toLowerCase()),
+  );
+  if (!user) {
+    console.warn(`No Clerk user found for ${email}`);
     return null;
   }
 
-  // Create sign-in token
   const tokenRes = await fetch(`${CLERK_API}/sign_in_tokens`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${secretKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ user_id: users[0].id }),
+    body: JSON.stringify({ user_id: user.id }),
   });
   const tokenData = await tokenRes.json();
-  if (!tokenData?.token) {
-    console.warn("⚠ Failed to create sign-in token:", tokenData);
-    return null;
-  }
-
-  return tokenData.token;
+  return tokenData?.token || null;
 }
 
-setup("authenticate as customer", async ({ page }) => {
-  setup.setTimeout(60_000);
-
-  const email = process.env.E2E_CLERK_USER_EMAIL;
-  if (!email) {
-    console.warn("⚠ E2E_CLERK_USER_EMAIL not set — skipping customer auth");
-    await page.context().storageState({ path: CUSTOMER_AUTH_FILE });
-    return;
-  }
-
-  const token = await createSignInToken(email);
-  if (!token) {
-    console.warn("⚠ Could not create sign-in token — skipping customer auth");
-    await page.context().storageState({ path: CUSTOMER_AUTH_FILE });
-    return;
-  }
-
+async function signInViaToken(page: import("@playwright/test").Page, token: string) {
   await setupClerkTestingToken({ page });
   await page.goto("/de");
 
-  // Use Clerk's client-side API to sign in with the token
   await page.evaluate(async (ticket: string) => {
-    // Wait for Clerk to initialize
     const win = window as ClerkWindow;
     let attempts = 0;
     while (!win.Clerk?.client && attempts < 50) {
@@ -98,73 +86,41 @@ setup("authenticate as customer", async ({ page }) => {
     await clerk.setActive({ session: signIn.createdSessionId });
   }, token);
 
-  // Verify auth by navigating to account page
-  await page.goto("/de/account");
-  await page.waitForTimeout(2000);
-  if (page.url().includes("sign-in")) {
-    console.warn("⚠ Customer sign-in via token failed — tests will skip");
-  } else {
-    console.log("✓ Customer authenticated successfully");
-  }
+  await page.waitForTimeout(1000);
+}
 
-  await page.context().storageState({ path: CUSTOMER_AUTH_FILE });
-});
-
-setup("authenticate as admin", async ({ page }) => {
+// Single account used for both customer and admin tests
+setup("authenticate", async ({ page }) => {
   setup.setTimeout(60_000);
 
   const email = process.env.E2E_CLERK_ADMIN_EMAIL;
   if (!email) {
-    console.warn("⚠ E2E_CLERK_ADMIN_EMAIL not set — skipping admin auth");
+    console.warn("E2E_CLERK_ADMIN_EMAIL not set — skipping auth");
+    await page.context().storageState({ path: CUSTOMER_AUTH_FILE });
     await page.context().storageState({ path: ADMIN_AUTH_FILE });
     return;
   }
 
   const token = await createSignInToken(email);
   if (!token) {
-    console.warn("⚠ Could not create sign-in token — skipping admin auth");
+    console.warn("Could not create sign-in token — skipping auth");
+    await page.context().storageState({ path: CUSTOMER_AUTH_FILE });
     await page.context().storageState({ path: ADMIN_AUTH_FILE });
     return;
   }
 
-  await setupClerkTestingToken({ page });
-  await page.goto("/de");
+  await signInViaToken(page, token);
 
-  // Use Clerk's client-side API to sign in with the token
-  await page.evaluate(async (ticket: string) => {
-    const win = window as ClerkWindow;
-    let attempts = 0;
-    while (!win.Clerk?.client && attempts < 50) {
-      await new Promise((r) => setTimeout(r, 200));
-      attempts++;
-    }
-    const clerk = win.Clerk;
-    if (!clerk?.client) throw new Error("Clerk client not available");
-
-    const signIn = await clerk.client.signIn.create({
-      strategy: "ticket",
-      ticket,
-    });
-    await clerk.setActive({ session: signIn.createdSessionId });
-  }, token);
-
-  // Wait for session cookies to propagate, then reload
-  await page.waitForTimeout(1000);
-  await page.reload();
-  await page.waitForTimeout(1000);
-
-  // Verify admin access (admin requires publicMetadata.role === "admin")
-  await page.goto("/de/admin/dashboard");
-  const h1 = page.locator("h1");
-  const isAdminAccessible = await h1.isVisible({ timeout: 10_000 }).catch(() => false);
-  if (isAdminAccessible) {
-    console.log("✓ Admin authenticated successfully");
+  // Verify sign-in worked
+  await page.goto("/de/account");
+  await page.waitForTimeout(2000);
+  if (page.url().includes("sign-in")) {
+    console.warn("Sign-in failed — tests will skip auth-required checks");
   } else {
-    console.warn(
-      '⚠ Admin dashboard not accessible — ensure the admin user has { "role": "admin" } in Clerk publicMetadata. ' +
-        "Admin tests will be skipped.",
-    );
+    console.log("Authenticated successfully");
   }
 
+  // Save the same session for both customer and admin projects
+  await page.context().storageState({ path: CUSTOMER_AUTH_FILE });
   await page.context().storageState({ path: ADMIN_AUTH_FILE });
 });

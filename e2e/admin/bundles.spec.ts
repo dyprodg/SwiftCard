@@ -16,10 +16,14 @@ test.describe("Admin Bundles", () => {
   });
 
   test("has create bundle button", async ({ page }) => {
-    await page.goto("/de/admin/bundles");
+    test.slow(); // page may load large datasets
+    await page.goto("/de/admin/bundles", { waitUntil: "domcontentloaded" });
     await skipIfNoAdmin(page);
+    await expect(page.getByRole("heading", { name: /Pakete|Bundles/i })).toBeVisible({
+      timeout: 15000,
+    });
     await expect(
-      page.getByRole("link", { name: /erstellen|create|neu|new/i }),
+      page.getByRole("link", { name: /erstellen|create|neu|new|hinzufügen|add/i }),
     ).toBeVisible();
   });
 

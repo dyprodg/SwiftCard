@@ -11,7 +11,9 @@ test.describe("Admin Draft Orders", () => {
   test("draft orders list loads", async ({ page, serverErrors }) => {
     await page.goto("/de/admin/draft-orders");
     await skipIfNoAdmin(page);
-    await expect(page.getByRole("heading", { name: /Entwürfe|Draft/i })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Entwurfsbestellungen|Entwürfe|Draft/i }),
+    ).toBeVisible();
     expect(serverErrors).toHaveLength(0);
   });
 

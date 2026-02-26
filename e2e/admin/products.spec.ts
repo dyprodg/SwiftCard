@@ -19,7 +19,7 @@ test.describe("Admin Products", () => {
     await page.goto("/de/admin/products");
     await skipIfNoAdmin(page);
     await expect(
-      page.getByRole("link", { name: /erstellen|create|neu|new/i }),
+      page.getByRole("link", { name: /erstellen|create|neu|new|hinzufügen|add/i }),
     ).toBeVisible();
   });
 

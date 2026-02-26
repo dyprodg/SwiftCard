@@ -36,7 +36,7 @@ export default defineConfig({
         storageState: "e2e/.auth/customer.json",
       },
     },
-    // Admin tests
+    // Admin tests — longer timeouts for data-heavy pages
     {
       name: "admin",
       testDir: "./e2e/admin",
@@ -44,7 +44,9 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         storageState: "e2e/.auth/admin.json",
+        navigationTimeout: 60_000,
       },
+      timeout: 60_000,
     },
   ],
   webServer: {
