@@ -37,6 +37,7 @@ import type {
   campaignSends,
 } from "@/db/schema/email-marketing";
 import type { subscriptionPlans, subscriptions } from "@/db/schema/subscriptions";
+import type { pages, pageTranslations } from "@/db/schema/pages";
 
 // Product types
 export type Product = InferSelectModel<typeof products>;
@@ -202,6 +203,15 @@ export type SubscriptionPlanWithProduct = SubscriptionPlan & {
 
 export type SubscriptionWithPlan = Subscription & {
   plan: SubscriptionPlanWithProduct;
+};
+
+// Page / CMS types
+export type Page = InferSelectModel<typeof pages>;
+export type NewPage = InferInsertModel<typeof pages>;
+export type PageTranslation = InferSelectModel<typeof pageTranslations>;
+
+export type PageWithTranslations = Page & {
+  translations: PageTranslation[];
 };
 
 // Cart types

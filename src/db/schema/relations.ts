@@ -19,6 +19,7 @@ import { bundles, bundleItems, bundleTranslations } from "./bundles";
 import { giftCards, giftCardTransactions } from "./gift-cards";
 import { newsletterSubscribers, emailCampaigns, campaignSends } from "./email-marketing";
 import { subscriptionPlans, subscriptions } from "./subscriptions";
+import { pages, pageTranslations } from "./pages";
 
 export const productsRelations = relations(products, ({ one, many }) => ({
   category: one(categories, {
@@ -345,5 +346,17 @@ export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
   plan: one(subscriptionPlans, {
     fields: [subscriptions.planId],
     references: [subscriptionPlans.id],
+  }),
+}));
+
+// Page relations
+export const pagesRelations = relations(pages, ({ many }) => ({
+  translations: many(pageTranslations),
+}));
+
+export const pageTranslationsRelations = relations(pageTranslations, ({ one }) => ({
+  page: one(pages, {
+    fields: [pageTranslations.pageId],
+    references: [pages.id],
   }),
 }));

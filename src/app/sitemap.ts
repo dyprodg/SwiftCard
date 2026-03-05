@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { products } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { cacheTag, cacheLife } from "next/cache";
+import { getPublishedPagesForSitemap } from "@/server/queries/pages";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://localhost:3000";
 const locales = ["de", "en"] as const;
@@ -10,12 +11,16 @@ const locales = ["de", "en"] as const;
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   "use cache";
   cacheTag("products");
+  cacheTag("pages");
   cacheLife("hours");
-  // Fetch all active products
-  const activeProducts = await db
-    .select({ slug: products.slug, updatedAt: products.updatedAt })
-    .from(products)
-    .where(eq(products.status, "ACTIVE"));
+  // Fetch all active products and published pages
+  const [activeProducts, publishedPages] = await Promise.all([
+    db
+      .select({ slug: products.slug, updatedAt: products.updatedAt })
+      .from(products)
+      .where(eq(products.status, "ACTIVE")),
+    getPublishedPagesForSitemap(),
+  ]);
 
   const entries: MetadataRoute.Sitemap = [];
 
@@ -55,6 +60,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         alternates: {
           languages: Object.fromEntries(
             locales.map((l) => [l, `${APP_URL}/${l}/products/${product.slug}`]),
+          ),
+        },
+      });
+    }
+  }
+
+  // Blog posts and custom pages
+  for (const page of publishedPages) {
+    const path = page.type === "BLOG" ? `/blog/${page.slug}` : `/pages/${page.slug}`;
+    for (const locale of locales) {
+      entries.push({
+        url: `${APP_URL}/${locale}${path}`,
+        lastModified: page.updatedAt ?? new Date(),
+        changeFrequency: "weekly",
+        priority: page.type === "BLOG" ? 0.7 : 0.6,
+        alternates: {
+          languages: Object.fromEntries(
+            locales.map((l) => [l, `${APP_URL}/${l}${path}`]),
           ),
         },
       });

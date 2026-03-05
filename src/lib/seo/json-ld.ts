@@ -50,6 +50,31 @@ export function productJsonLd(
   };
 }
 
+export function generateArticleJsonLd(
+  page: {
+    title: string;
+    excerpt?: string | null;
+    coverImageUrl?: string | null;
+    publishedAt?: Date | null;
+    updatedAt?: Date | null;
+    slug: string;
+  },
+  locale: string,
+  appUrl: string,
+) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: page.title,
+    description: page.excerpt ?? undefined,
+    image: page.coverImageUrl ? [page.coverImageUrl] : undefined,
+    datePublished: page.publishedAt?.toISOString() ?? undefined,
+    dateModified: page.updatedAt?.toISOString() ?? undefined,
+    url: `${appUrl}/${locale}/blog/${page.slug}`,
+    inLanguage: locale,
+  };
+}
+
 export function breadcrumbJsonLd(items: { name: string; url: string }[]) {
   return {
     "@context": "https://schema.org",

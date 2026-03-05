@@ -157,26 +157,19 @@
 - Clerk Backend API sign-in tokens for auth bypass
 - Total: 432 unit + 176 E2E = **608 tests**
 
+### Phase 22: Blog & Custom Pages (CMS-lite) (`0018_acoustic_miek.sql`)
+
+- `pages` + `page_translations` tables (type: PAGE|BLOG, status: DRAFT|PUBLISHED|ARCHIVED, tags text[], GIN index)
+- Tiptap v3 rich text editor (StarterKit, Link, Image, Placeholder, CharacterCount, CodeBlockLowlight)
+- Admin CRUD: `/admin/pages` (list with type tabs), `/admin/pages/new`, `/admin/pages/[id]/edit`
+- `PageForm` (react-hook-form + zodResolver), inline DE/EN translation tabs
+- `localizePage()` utility: falls back to primary-language fields when no translation exists
+- Storefront: `/blog` (listing + tag cloud), `/blog/[slug]` (post + Article JSON-LD), `/pages/[slug]` (custom page)
+- Sitemap updated with blog + custom page entries
+- i18n: `admin.pages.*`, `blog.*`, `pages.*` namespaces in EN + DE
+- 39 unit tests (471 total), 20 E2E tests (`e2e/admin/pages.spec.ts` + `e2e/public/blog.spec.ts`), migration: `0018_acoustic_miek.sql`
+
 ---
-
-## Future Phases (not started)
-
-### Phase 22: Blog & Custom Pages (CMS-lite)
-
-**Goal:** Content marketing and custom landing pages.
-
-**Schema:**
-
-- `pages` table: id, slug, title, content (rich text/MDX), type (page/blog), status, publishedAt, authorId, metaTitle, metaDescription
-- `page_translations` table: id, pageId, locale, title, content
-
-**Features:**
-
-- Rich text editor for admin (Tiptap or similar)
-- Blog with listing page, individual post pages, categories/tags
-- Custom pages (about, FAQ, etc.) with unique slugs
-- SEO metadata per page, sitemap inclusion
-- i18n translations for all content
 
 ### Phase 23: Portability Layer
 
@@ -223,7 +216,7 @@ Phases 22–23 can be done in any order. Phase 23 should ideally be last.
 | Forms      | React Hook Form + Zod                                                     |
 | UI         | shadcn/ui                                                                 |
 | Charts     | recharts                                                                  |
-| Testing    | Vitest (432 unit) + Playwright (176 E2E)                                  |
+| Testing    | Vitest (471 unit) + Playwright (176 E2E)                                  |
 | Monitoring | Sentry                                                                    |
 
 ## DB Migrations
@@ -243,3 +236,4 @@ Phases 22–23 can be done in any order. Phase 23 should ideally be last.
 | `0011_outstanding_ben_grimm.sql` | Phase 19 (draft orders)                            |
 | `0012_harsh_namora.sql`          | Phase 20 (returns)                                 |
 | `0013_silent_legion.sql`         | Tax-inclusive pricing                              |
+| `0018_acoustic_miek.sql`         | Phase 22 (pages, page_translations)                |

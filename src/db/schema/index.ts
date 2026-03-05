@@ -14,4 +14,5 @@ export * from "./bundles";
 export * from "./gift-cards";
 export * from "./email-marketing";
 export * from "./subscriptions";
+export * from "./pages";
 export * from "./relations";

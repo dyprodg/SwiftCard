@@ -23,6 +23,7 @@ import {
   Gift,
   Mail,
   RefreshCw,
+  FileText,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +39,7 @@ const navItems = [
   { key: "discounts" as const, href: "/admin/discounts", icon: Tag },
   { key: "customers" as const, href: "/admin/customers", icon: Users },
   { key: "emailMarketing" as const, href: "/admin/email-marketing", icon: Mail },
+  { key: "pages" as const, href: "/admin/pages", icon: FileText },
   { key: "reviews" as const, href: "/admin/reviews", icon: MessageSquare },
   { key: "abandonedCarts" as const, href: "/admin/abandoned-carts", icon: ShoppingBag },
   { key: "shipping" as const, href: "/admin/shipping", icon: Truck },
